@@ -1,6 +1,6 @@
 {
   "packageId": "Cmf.Audit",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "This package deploys an Audit solution for Critical Manufacturing Customization",
   "packageType": "Root",
   "isInstallable": true,
@@ -18,11 +18,15 @@
     },
     {
       "id": "Cmf.Audit.Grafana",
-      "version": "1.0.0"
+      "version": "2.0.0"
+    },
+    {
+      "id": "Cmf.Audit.Data",
+      "version": "2.0.0"
     },
     {
       "id": "Cmf.Audit.ExportedObjects",
-      "version": "1.0.0"
+      "version": "2.0.0"
     }
   ],
   "testPackages": []
