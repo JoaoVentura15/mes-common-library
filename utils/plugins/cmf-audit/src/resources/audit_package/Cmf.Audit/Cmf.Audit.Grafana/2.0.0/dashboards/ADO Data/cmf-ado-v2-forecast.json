@@ -1,0 +1,1893 @@
+{
+  "uid": "cmf-ado-v2-forecast",
+  "title": "ADO v2 - Epic forecast",
+  "tags": [
+    "ado",
+    "forecast"
+  ],
+  "schemaVersion": 41,
+  "editable": true,
+  "timezone": "browser",
+  "graphTooltip": 0,
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "hidden": true
+  },
+  "description": "Monte Carlo forecast of an Epic, a Feature or a Milestone and of each team against a target date (data set ADOTelemetry.ADOEpicForecastTyped).",
+  "templating": {
+    "list": [
+      {
+        "type": "query",
+        "name": "Organization",
+        "label": "Organization",
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "multi": true,
+        "includeAll": true,
+        "allValue": "'__all'",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOScopeDimensionsTyped?$apply=groupby((Organization))&$select=Organization&$orderby=Organization",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "hide": 0,
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        }
+      },
+      {
+        "type": "query",
+        "name": "Project",
+        "label": "Project",
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "multi": true,
+        "includeAll": true,
+        "allValue": "'__all'",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOScopeDimensionsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})))/groupby((Project))&$select=Project&$orderby=Project",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "hide": 0,
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        }
+      },
+      {
+        "type": "custom",
+        "name": "Scope",
+        "label": "Scope",
+        "query": "Milestone : milestone,Epic : epic,Feature : feature",
+        "current": {
+          "text": "Milestone",
+          "value": "milestone"
+        },
+        "options": [
+          {
+            "text": "Milestone",
+            "value": "milestone",
+            "selected": true
+          },
+          {
+            "text": "Epic",
+            "value": "epic",
+            "selected": false
+          },
+          {
+            "text": "Feature",
+            "value": "feature",
+            "selected": false
+          }
+        ],
+        "hide": 0
+      },
+      {
+        "type": "query",
+        "name": "Milestone",
+        "label": "Milestones",
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "multi": true,
+        "includeAll": false,
+        "allValue": "'__all'",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOScopeDimensionsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Milestone ne '')/groupby((Milestone))&$select=Milestone&$orderby=Milestone",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "hide": 0,
+        "current": {
+          "text": "",
+          "value": ""
+        }
+      },
+      {
+        "type": "query",
+        "name": "Feature",
+        "label": "Features (Scope = Feature; stories without one are grouped by their epic)",
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "multi": true,
+        "includeAll": false,
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOScopeDimensionsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and OpenItems gt 0)/groupby((GroupLabel))&$select=GroupLabel&$orderby=GroupLabel",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "hide": 0,
+        "current": {
+          "text": "",
+          "value": ""
+        }
+      },
+      {
+        "type": "textbox",
+        "name": "EpicId",
+        "label": "Epic work item id (Scope = Epic)",
+        "query": "0",
+        "current": {
+          "text": "0",
+          "value": "0"
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "0",
+            "value": "0"
+          }
+        ],
+        "hide": 0
+      },
+      {
+        "type": "textbox",
+        "name": "TargetDate",
+        "label": "Target date (YYYY-MM-DD)",
+        "query": "2026-11-25",
+        "current": {
+          "text": "2026-11-25",
+          "value": "2026-11-25"
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "2026-11-25",
+            "value": "2026-11-25"
+          }
+        ],
+        "hide": 2
+      },
+      {
+        "type": "custom",
+        "name": "Unit",
+        "label": "Unit",
+        "query": "Items : items,Story points : points",
+        "current": {
+          "selected": true,
+          "text": "Story points",
+          "value": "points"
+        },
+        "options": [
+          {
+            "text": "Items",
+            "value": "items",
+            "selected": false
+          },
+          {
+            "text": "Story points",
+            "value": "points",
+            "selected": true
+          }
+        ],
+        "hide": 0
+      },
+      {
+        "type": "custom",
+        "name": "HistoryWeeks",
+        "label": "History weeks",
+        "query": "8 : 8,12 : 12,16 : 16,20 : 20",
+        "current": {
+          "selected": true,
+          "text": "20",
+          "value": "20"
+        },
+        "options": [
+          {
+            "text": "8",
+            "value": "8",
+            "selected": false
+          },
+          {
+            "text": "12",
+            "value": "12",
+            "selected": false
+          },
+          {
+            "text": "16",
+            "value": "16",
+            "selected": false
+          },
+          {
+            "text": "20",
+            "value": "20",
+            "selected": true
+          }
+        ],
+        "hide": 0
+      },
+      {
+        "type": "custom",
+        "name": "SkipLatestWeeks",
+        "label": "Skip latest weeks",
+        "query": "0 : 0,1 : 1,2 : 2",
+        "current": {
+          "text": "0",
+          "value": "0"
+        },
+        "options": [
+          {
+            "text": "0",
+            "value": "0",
+            "selected": true
+          },
+          {
+            "text": "1",
+            "value": "1",
+            "selected": false
+          },
+          {
+            "text": "2",
+            "value": "2",
+            "selected": false
+          }
+        ],
+        "hide": 0
+      },
+      {
+        "type": "custom",
+        "name": "CapacityPct",
+        "label": "Capacity %",
+        "query": "50 : 50,60 : 60,70 : 70,80 : 80,90 : 90,100 : 100,110 : 110,120 : 120,130 : 130,140 : 140,150 : 150,175 : 175,200 : 200",
+        "current": {
+          "selected": true,
+          "text": "100",
+          "value": "100"
+        },
+        "options": [
+          {
+            "selected": false,
+            "text": "50",
+            "value": "50"
+          },
+          {
+            "selected": false,
+            "text": "60",
+            "value": "60"
+          },
+          {
+            "selected": false,
+            "text": "70",
+            "value": "70"
+          },
+          {
+            "selected": false,
+            "text": "80",
+            "value": "80"
+          },
+          {
+            "selected": false,
+            "text": "90",
+            "value": "90"
+          },
+          {
+            "selected": true,
+            "text": "100",
+            "value": "100"
+          },
+          {
+            "selected": false,
+            "text": "110",
+            "value": "110"
+          },
+          {
+            "selected": false,
+            "text": "120",
+            "value": "120"
+          },
+          {
+            "selected": false,
+            "text": "130",
+            "value": "130"
+          },
+          {
+            "selected": false,
+            "text": "140",
+            "value": "140"
+          },
+          {
+            "selected": false,
+            "text": "150",
+            "value": "150"
+          },
+          {
+            "selected": false,
+            "text": "175",
+            "value": "175"
+          },
+          {
+            "selected": false,
+            "text": "200",
+            "value": "200"
+          }
+        ],
+        "hide": 0
+      },
+      {
+        "type": "textbox",
+        "name": "ExtraItems",
+        "label": "Extra items (not yet created)",
+        "query": "0",
+        "current": {
+          "text": "0",
+          "value": "0"
+        },
+        "options": [
+          {
+            "text": "0",
+            "value": "0",
+            "selected": true
+          }
+        ],
+        "hide": 0
+      },
+      {
+        "type": "textbox",
+        "name": "StartDate",
+        "label": "Start date (today or YYYY-MM-DD)",
+        "query": "today",
+        "current": {
+          "text": "today",
+          "value": "today"
+        },
+        "options": [
+          {
+            "text": "today",
+            "value": "today",
+            "selected": true
+          }
+        ],
+        "hide": 0
+      },
+      {
+        "type": "custom",
+        "name": "SpreadUnassigned",
+        "label": "Spread items without a team (automatic when none has a team)",
+        "query": "Yes : 1,No : 0",
+        "current": {
+          "selected": true,
+          "text": "No",
+          "value": "0"
+        },
+        "options": [
+          {
+            "text": "Yes",
+            "value": "1",
+            "selected": false
+          },
+          {
+            "text": "No",
+            "value": "0",
+            "selected": true
+          }
+        ],
+        "hide": 0
+      },
+      {
+        "type": "custom",
+        "name": "TrimNewTeams",
+        "label": "Ignore weeks before a team started",
+        "query": "Yes : 1,No : 0",
+        "current": {
+          "text": "Yes",
+          "value": "1"
+        },
+        "options": [
+          {
+            "text": "Yes",
+            "value": "1",
+            "selected": true
+          },
+          {
+            "text": "No",
+            "value": "0",
+            "selected": false
+          }
+        ],
+        "hide": 0
+      },
+      {
+        "type": "custom",
+        "name": "Trials",
+        "label": "Trials",
+        "query": "1000 : 1000,2000 : 2000,5000 : 5000,10000 : 10000,20000 : 20000,50000 : 50000,100000 : 100000",
+        "current": {
+          "selected": true,
+          "text": "10000",
+          "value": "10000"
+        },
+        "options": [
+          {
+            "selected": false,
+            "text": "1000",
+            "value": "1000"
+          },
+          {
+            "selected": false,
+            "text": "2000",
+            "value": "2000"
+          },
+          {
+            "selected": false,
+            "text": "5000",
+            "value": "5000"
+          },
+          {
+            "selected": true,
+            "text": "10000",
+            "value": "10000"
+          },
+          {
+            "selected": false,
+            "text": "20000",
+            "value": "20000"
+          },
+          {
+            "selected": false,
+            "text": "50000",
+            "value": "50000"
+          },
+          {
+            "selected": false,
+            "text": "100000",
+            "value": "100000"
+          }
+        ],
+        "hide": 0
+      },
+      {
+        "type": "query",
+        "name": "DistTeam",
+        "label": "Team for the distribution",
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "multi": false,
+        "includeAll": true,
+        "allValue": "(Total)",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOScopeDimensionsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Team ne '')/groupby((Team))&$select=Team&$orderby=Team",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "hide": 0,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Chance done by the target date: ${DistTeam:text}",
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 5,
+        "x": 0,
+        "y": 2
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 10,
+          "withTransforms": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "any",
+            "filters": [
+              {
+                "fieldName": "Team",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "${DistTeam}"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 0,
+          "noValue": "No forecast",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "orange",
+                "value": 0.5
+              },
+              {
+                "color": "green",
+                "value": 0.85
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^ProbOnTime$/",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "textMode": "value"
+      },
+      "description": "Share of simulated futures in which every team has finished its remaining items by the target date (the Epic finishes when its slowest team does). Follows the \"Distribution for\" selector (whole scope = every team; one team = just that team)."
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Items remaining: ${DistTeam:text}",
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 5,
+        "y": 2
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 10,
+          "withTransforms": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "any",
+            "filters": [
+              {
+                "fieldName": "Team",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "${DistTeam}"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "noValue": "No forecast",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Remaining$/",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "textMode": "value"
+      },
+      "description": "Open, non-removed User Stories and Bugs under the Epic, plus items without a team and the extra items you add. Follows the \"Distribution for\" selector (whole scope = every team; one team = just that team)."
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "P50 weeks",
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 8,
+        "y": 2
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 10,
+          "withTransforms": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "any",
+            "filters": [
+              {
+                "fieldName": "Team",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "${DistTeam}"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 1,
+          "noValue": "No forecast",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^FinishWeeksP50$/",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "textMode": "value"
+      },
+      "description": "Half of the simulated futures finish within this many weeks from today. Follows the \"Distribution for\" selector (whole scope = every team; one team = just that team)."
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "P85 weeks",
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 17,
+        "y": 2
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 10,
+          "withTransforms": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "any",
+            "filters": [
+              {
+                "fieldName": "Team",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "${DistTeam}"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 1,
+          "noValue": "No forecast",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^FinishWeeksP85$/",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "textMode": "value"
+      },
+      "description": "85% of the simulated futures finish within this many weeks. Follows the \"Distribution for\" selector (whole scope = every team; one team = just that team)."
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "P95 weeks",
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 2
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 10,
+          "withTransforms": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "any",
+            "filters": [
+              {
+                "fieldName": "Team",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "${DistTeam}"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 1,
+          "noValue": "No forecast",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^FinishWeeksP95$/",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "textMode": "value"
+      },
+      "description": "95% of the simulated futures finish within this many weeks. Follows the \"Distribution for\" selector (whole scope = every team; one team = just that team)."
+    },
+    {
+      "id": 10,
+      "type": "table",
+      "title": "Per team: delivery of the scope by the target date",
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 15,
+        "x": 0,
+        "y": 6
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOEpicForecastTyped",
+            "name": "ADOTelemetry.ADOEpicForecastTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOEpicForecastTyped",
+          "oDataQueryString": "ADOTelemetry.ADOEpicForecastTyped?parameters=Organization=${Organization:pipe},Project=${Project:pipe},EpicId=${EpicId},HistoryWeeks=${HistoryWeeks},SkipLatestWeeks=${SkipLatestWeeks},CapacityPct=${CapacityPct},Trials=${Trials},SpreadUnassigned=${SpreadUnassigned},TrimNewTeams=${TrimNewTeams},ExtraItems=${ExtraItems},TargetDate=${TargetDate},StartDate=${StartDate},Unit=${Unit},Scope=${Scope},Milestone=${Milestone:pipe},Feature=${Feature:pipe},DistTeam=${DistTeam}",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "description": "One row per team with remaining Epic items, plus the (Total) row. Weekly mean is the team throughput over the history window (all epics).",
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "exclude",
+            "match": "any",
+            "filters": [
+              {
+                "fieldName": "Team",
+                "config": {
+                  "id": "regex",
+                  "options": {
+                    "value": "^(20|#|@)"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "Team": 0,
+              "Remaining": 1,
+              "WeeklyMean": 2,
+              "FinishWeeksP50": 3,
+              "FinishWeeksP85": 4,
+              "FinishWeeksP95": 5,
+              "ProbOnTime": 6,
+              "HistoryWeeksUsed": 7
+            },
+            "renameByName": {
+              "Remaining": "Remaining items",
+              "WeeklyMean": "Items per week",
+              "FinishWeeksP50": "Weeks P50",
+              "FinishWeeksP85": "Weeks P85",
+              "FinishWeeksP95": "Weeks P95",
+              "ProbOnTime": "Chance by target date",
+              "HistoryWeeksUsed": "History weeks"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Chance by target date"
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          },
+          "decimals": 0,
+          "noValue": "No forecast (see How to read this)"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Chance by target date"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background",
+                  "mode": "basic"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 0.5
+                    },
+                    {
+                      "color": "green",
+                      "value": 0.85
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Items per week"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      }
+    },
+    {
+      "id": 11,
+      "type": "bargauge",
+      "title": "Chance each team finishes its items of the scope by the target date",
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 9,
+        "x": 15,
+        "y": 6
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 10,
+          "withTransforms": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "exclude",
+            "match": "any",
+            "filters": [
+              {
+                "fieldName": "Team",
+                "config": {
+                  "id": "regex",
+                  "options": {
+                    "value": "^(20|#|@)"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "exclude",
+            "match": "any",
+            "filters": [
+              {
+                "fieldName": "Team",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "(Total)"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "ProbOnTime"
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Team",
+                "ProbOnTime"
+              ]
+            }
+          }
+        },
+        {
+          "id": "rowsToFields",
+          "options": {
+            "mappings": [
+              {
+                "fieldName": "Team",
+                "handlerKey": "field.name"
+              },
+              {
+                "fieldName": "ProbOnTime",
+                "handlerKey": "field.value"
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.5
+              },
+              {
+                "color": "green",
+                "value": 0.85
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "noValue": "No forecast (see How to read this)"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": true,
+        "namePlacement": "left",
+        "valueMode": "color"
+      }
+    },
+    {
+      "id": 21,
+      "type": "table",
+      "title": "Remaining work items (open, in scope)",
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 24,
+        "x": 0,
+        "y": 50
+      },
+      "description": "Open work items of the chosen scope (Milestone, Epic or Feature), by team. Click the id or title to open the item in Azure DevOps. Removed and done items are not listed. A story without a Feature shows its Epic as 'Epic: ... (no feature)', or '(standalone)' when it has no parent.",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADORemainingWorkTyped",
+            "name": "ADORemainingWorkTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADORemainingWorkTyped",
+          "oDataQueryString": "ADOTelemetry.ADORemainingWorkTyped?parameters=Organization=${Organization:pipe},Project=${Project:pipe},EpicId=${EpicId},Scope=${Scope},Milestone=${Milestone:pipe},Feature=${Feature:pipe}",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "WorkItemId": 0,
+              "Title": 1,
+              "WorkItemType": 2,
+              "State": 3,
+              "Team": 4,
+              "StoryPoints": 5,
+              "Sprint": 6,
+              "Milestone": 7,
+              "FeatureTitle": 8,
+              "AgeDays": 9
+            },
+            "renameByName": {
+              "WorkItemId": "ID",
+              "WorkItemType": "Type",
+              "StoryPoints": "Points",
+              "FeatureTitle": "Feature",
+              "AgeDays": "Age (days)"
+            },
+            "excludeByName": {
+              "HasFeature": true
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "filterable": true,
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ID"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open in Azure DevOps",
+                    "url": "${__data.fields.Link}",
+                    "targetBlank": true
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 80
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Title"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open in Azure DevOps",
+                    "url": "${__data.fields.Link}",
+                    "targetBlank": true
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 520
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Link"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "viz": true,
+                  "legend": false,
+                  "tooltip": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Points"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "custom.width",
+                "value": 70
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": true,
+          "reducer": [
+            "count"
+          ],
+          "fields": [
+            "ID"
+          ],
+          "countRows": false
+        },
+        "sortBy": []
+      }
+    },
+    {
+      "id": 30,
+      "type": "text",
+      "title": "How to read this",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 81
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "**Method.** Monte Carlo (bootstrap): each simulated week draws one of the team's real weekly throughputs from the history window; a team is done when its sum reaches its remaining items; the Epic is done when its slowest team is. Counts are User Stories and Bugs, or story points when Unit is Story points (each team measured only against its own points history; unestimated items count as the team average story) (Resolved, IT Tested or Closed = done; Removed = out of scope).\n\n**Assumptions to check.** Items without a team are spread over the teams by their share of the Epic's recent throughput (switch off with *Spread items without a team*). *Extra items* adds work not yet created as stories, spread the same way. *Capacity %* scales every team's throughput (80 = a team delivering 20% less than its history). Scope growth during the period is not simulated; add it through *Extra items*. Skip 1 latest week to ignore the running week.\n\n**Distribution.** The bar chart shows, for the whole scope or the team picked in *Distribution for*, the chance of finishing in each week (the date is the end of that week, counted from today). Red steps finish by P50, orange by P85, yellow by P95, green after P95; the dashed blue vertical line is the target date; steps to its right finish later than the target.\n\n**Data.** `WorkItemScope` from cmf-audit (`--include scope`); only items open or changed since the run's `--since` are known, so keep that at 2026-07-01 or earlier.\n\n**No forecast?** A blank forecast means the scope has no finished items with a team in the history window. Check that the collector passes `--teamFromIterationPath`, raise History weeks, lower Skip latest weeks, or pick a larger scope. Items without a team are spread automatically when the scope has no team at all."
+      }
+    },
+    {
+      "id": 22,
+      "type": "gapit-htmlgraphics-panel",
+      "title": "Calendar: chance each team is done by week",
+      "description": "Rows are teams (first row: the whole scope, done when the last team is done), columns are week-ends. Each cell is the chance, from the Monte Carlo, that the team has finished its share of the scope by that date. The outlined column is the target date week.",
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 40
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 10,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "options": {
+        "codeData": "{}",
+        "css": ".cal{border-collapse:separate;border-spacing:3px;width:100%;font-size:13px}.cal th{font-weight:500;opacity:.7;text-align:center;padding:2px 4px}.cal td{text-align:center;color:#111;font-weight:600;padding:7px 4px;border-radius:4px}.cal td.t{text-align:left;color:inherit;background:none;font-weight:500;white-space:nowrap}.cal td.tot{font-weight:700}.lg{margin-top:8px;font-size:12px;opacity:.8}.lg b{border-radius:3px;font-weight:600;font-size:11px}.cal th.tg{color:#fff;opacity:1}",
+        "html": "<div></div>",
+        "onInit": "",
+        "onRender": "\nconst s=data.series[0];\nconst get=n=>{const f=s.fields.find(x=>x.name===n);return f?(f.values.toArray?f.values.toArray():Array.from(f.values)):[];};\nconst T=get('Team'),H=get('HistoryWeeksUsed'),P=get('ProbOnTime'),R=get('Remaining');\nconst cells={},weeks=new Set(),teams=new Set();let target=null;\nfor(let i=0;i<T.length;i++){if(/^20/.test(T[i])){if(!target&&R[i]>0)target=Date.parse(T[i])/1000;continue;}if(!(H[i]>1e9)||T[i].charAt(0)!=='@')continue;const nm=T[i].slice(1);cells[nm+'@'+H[i]]=P[i];weeks.add(H[i]);teams.add(nm);}\nlet W=[...weeks].sort((a,b)=>a-b);\nconst tot=w=>cells['(Total)@'+w];\nlet last=W.findIndex(w=>tot(w)>=0.99);last=last<0?W.length-1:last;\nW=W.slice(0,Math.min(W.length,Math.max(last+2,8)));\nconst tw=target?W.find(w=>w>=target-6*86400):null;\nconst names=[...teams].sort((a,b)=>a==='(Total)'?-1:b==='(Total)'?1:a.localeCompare(b));\nconst col=p=>p>=0.95?'#3fa34d':p>=0.85?'#e5c13a':p>=0.5?'#e0752d':'#d44a3a';\nconst fmt=t=>new Date(t*1000).toLocaleDateString('en-GB',{day:'2-digit',month:'short'});\nlet h='<table class=\"cal\"><tr><th></th>'+W.map(w=>'<th'+(w===tw?' class=\"tg\"':'')+'>'+fmt(w)+(w===tw?'<br>target':'')+'</th>').join('')+'</tr>';\nfor(const n of names){h+='<tr><td class=\"t'+(n==='(Total)'?' tot':'')+'\">'+(n==='(Total)'?'Whole scope':n)+'</td>'+W.map(w=>{const p=cells[n+'@'+w];return p===undefined?'<td></td>':'<td style=\"background:'+col(p)+';color:#111;'+(w===tw?'outline:2px solid #fff;':'')+'\" title=\"'+n+' done by '+fmt(w)+': '+Math.round(p*100)+'%\">'+Math.round(p*100)+'%</td>';}).join('')+'</tr>';}\nh+='</table><div class=\"lg\"><b style=\"background:#d44a3a;color:#111\">&nbsp;under 50%&nbsp;</b> <b style=\"background:#e0752d;color:#111\">&nbsp;50-85%&nbsp;</b> <b style=\"background:#e5c13a;color:#111\">&nbsp;85-95%&nbsp;</b> <b style=\"background:#3fa34d;color:#111\">&nbsp;95%+&nbsp;</b> &nbsp; chance the team has finished its share by that week-end</div>';\nhtmlNode.innerHTML=names.length?h:'No data';",
+        "centerAlignContent": false,
+        "add100Percentage": true,
+        "SVGBaseFix": true,
+        "rootCSS": ""
+      }
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Average weeks",
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 11,
+        "y": 2
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 10,
+          "withTransforms": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "any",
+            "filters": [
+              {
+                "fieldName": "Team",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "#${DistTeam}"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 1,
+          "noValue": "No forecast",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^FinishWeeksP50$/",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "textMode": "value"
+      },
+      "description": "Average finish time over all simulated trials, in weeks from today (whole scope). Follows the \"Distribution for\" selector (whole scope = every team; one team = just that team)."
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Std dev weeks",
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 14,
+        "y": 2
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 10,
+          "withTransforms": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "any",
+            "filters": [
+              {
+                "fieldName": "Team",
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "#${DistTeam}"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 1,
+          "noValue": "No forecast",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^FinishWeeksP85$/",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "textMode": "value"
+      },
+      "description": "Spread of the simulated finish time, in weeks (whole scope). Smaller means the forecast is more certain. Follows the \"Distribution for\" selector (whole scope = every team; one team = just that team)."
+    },
+    {
+      "id": 23,
+      "type": "gapit-htmlgraphics-panel",
+      "title": "Finish date distribution: average, standard deviation and cumulative chance",
+      "description": "Chance the scope finishes in each week. The blue line is the average finish date and the blue band is plus/minus one standard deviation. Follows the Distribution for selector.",
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 10,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "options": {
+        "css": "",
+        "html": "<div></div>",
+        "onInit": "",
+        "onRender": "const s=data.series[0];\nconst get=n=>{const f=s.fields.find(x=>x.name===n);return f?(f.values.toArray?f.values.toArray():Array.from(f.values)):[];};\nconst T=get('Team'),H=get('HistoryWeeksUsed'),A=get('FinishWeeksP50'),B=get('FinishWeeksP85'),C=get('FinishWeeksP95'),D=get('WeeklyMean'),R=get('Remaining');\nconst num=v=>(typeof v==='number'&&isFinite(v))?v:0;\nlet pts=[];let tg=null;\nfor(let i=0;i<T.length;i++){if(!/^20/.test(T[i]))continue;const m=num(A[i])+num(B[i])+num(C[i])+num(D[i]);if(m>0&&H[i]>1e9)pts.push({t:H[i],m:m,r:num(R[i])});else if(m===0&&num(R[i])>0&&H[i]>1e9&&!window.__tg)tg=H[i];}\npts.sort((a,b)=>a.t-b.t);\nconst tot=pts.reduce((a,p)=>a+p.m,0);\nif(!pts.length||tot<=0){htmlNode.innerHTML='No data';}else{\nconst mean=pts.reduce((a,p)=>a+p.t*p.m,0)/tot;\nconst sd=Math.sqrt(pts.reduce((a,p)=>a+(p.t-mean)*(p.t-mean)*p.m,0)/tot);\nconst WK=7*86400,sdw=sd/WK;\nconst cum=[];let c=0;for(const p of pts){c+=p.m/tot;cum.push(c);}\nconst q=lv=>{const i=cum.findIndex(x=>x>=lv);return pts[i<0?pts.length-1:i].t;};\nconst p50=q(.5),p85=q(.85),p95=q(.95);\n{const D1=86400,n=Math.round((pts[pts.length-1].t-pts[0].t)/D1)+1,sg=n<=10?0:Math.min(6,n/30);if(sg>0){const base=pts[0].t,m0=new Array(n).fill(0);pts.forEach(p=>{m0[Math.round((p.t-base)/D1)]+=p.m;});const out=new Array(n).fill(0),R=Math.ceil(3*sg);for(let j=0;j<n;j++){if(!m0[j])continue;let ws=0;const w=[];for(let i=Math.max(0,j-R);i<=Math.min(n-1,j+R);i++){const k=Math.exp(-0.5*((i-j)/sg)*((i-j)/sg));w.push([i,k]);ws+=k;}w.forEach(a=>{out[a[0]]+=m0[j]*a[1]/ws;});}pts=[];out.forEach((m,i)=>{if(m>1e-9)pts.push({t:base+i*D1,m:m,r:0});});cum.length=0;let c2=0;for(const p of pts){c2+=p.m/tot;cum.push(c2);}}}\nconst W=1000,Hh=340,L=58,Rr=66,Tp=74,Bt=68,iw=W-L-Rr,ih=Hh-Tp-Bt;\nconst DY=WK/7;const dmin=pts[0].t,dmax=pts[pts.length-1].t;const spd=(dmax-dmin)/DY+1;const bd=[1,2,7,14,28].find(z=>spd/z<=60)||28;const PL=bd===1?'day':bd===7?'week':bd===14?'2 weeks':bd+' days';const dow=new Date(dmin*1000).getUTCDay();const anc=bd>=7?dmin-((dow+6)%7)*DY:dmin;const bk=[];pts.forEach((p,i)=>{const k=Math.floor((p.t-anc)/(bd*DY)+1e-9);let e=bk[bk.length-1];if(!e||e.k!==k){e={k:k,s:anc+k*bd*DY,m:0,i:i};bk.push(e);}e.m+=p.m;e.j=i;});const bend=bk[bk.length-1].s+(bd-1)*DY;const lim=Math.max(dmax+3*DY,dmin+13*DY,bend);const tgIn=tg&&tg<=lim;const a0=Math.min(anc,dmin);const tmin=tg?Math.min(a0,tg):a0;const tmax2=tgIn?Math.max(lim,tg):lim;const t0=tmin-DY/2,t1=tmax2+DY/2;\nconst x=t=>L+(t-t0)/(t1-t0)*iw;\nconst mx=Math.max(...bk.map(e=>e.m/tot));\nconst y=v=>Tp+ih-(v/mx)*ih*0.95;\nconst bw=Math.max(2,iw/((t1-t0)/DY)*bd*(bd>1?0.85:0.7));\nconst fmt=t=>new Date(t*1000).toLocaleDateString('en-GB',{day:'2-digit',month:'short'});\nconst bc=t=>t<=p50?'#d44a3a':t<=p85?'#e0752d':t<=p95?'#e5c13a':'#3fa34d';\nlet g='<svg viewBox=\"0 0 '+W+' '+Hh+'\" width=\"100%\" height=\"100%\" preserveAspectRatio=\"xMidYMid meet\" style=\"font-size:12px\">';\nconst xa=Math.max(L,x(mean-sd)),xb=Math.min(W-Rr,x(mean+sd));\ng+='<rect x=\"'+xa+'\" y=\"'+Tp+'\" width=\"'+(xb-xa)+'\" height=\"'+ih+'\" fill=\"#5794f2\" opacity=\".18\"/>';\nfor(let k=0;k<=4;k++){const v=mx*k/4;g+='<line x1=\"'+L+'\" x2=\"'+(W-Rr)+'\" y1=\"'+y(v)+'\" y2=\"'+y(v)+'\" stroke=\"#888\" opacity=\".2\"/><text x=\"'+(L-4)+'\" y=\"'+(y(v)+4)+'\" text-anchor=\"end\" fill=\"#aaa\">'+(v*100>=10?Math.round(v*100):+(v*100).toFixed(1))+'%</text>';}\nbk.forEach(e=>{const v=e.m/tot,c1=cum[e.j],c0=c1-v,H0=Tp+ih-y(v),cx=x(e.s+(bd-1)*DY/2);let yy=Tp+ih,seg='';[[0,.5,'#d44a3a'],[.5,.85,'#e0752d'],[.85,.95,'#e5c13a'],[.95,1.0001,'#3fa34d']].forEach(b=>{const o=Math.min(c1,b[1])-Math.max(c0,b[0]);if(o>1e-9){const h=o/v*H0;yy-=h;seg+='<rect x=\"'+(cx-bw/2)+'\" y=\"'+yy+'\" width=\"'+bw+'\" height=\"'+h+'\" fill=\"'+b[2]+'\"/>';}});g+='<g><title>'+fmt(e.s)+(bd>1?' to '+fmt(e.s+(bd-1)*DY):'')+': '+(v*100).toFixed(1)+'% finish in this '+PL+'</title>'+seg+'</g>';});\nconst yc=v=>Tp+ih-v*ih;let pd='';cum.forEach((v,i)=>{pd+=(i?'L':'M')+x(pts[i].t)+' '+yc(v)+' ';});g+='<path d=\"'+pd+'\" fill=\"none\" stroke=\"#fff\" stroke-width=\"2\"/>';for(let k=0;k<=4;k++){g+='<text x=\"'+(W-Rr+4)+'\" y=\"'+(yc(k/4)+4)+'\" fill=\"#ddd\">'+(k*25)+'%</text>';}\nconst base=pts[0].t,step=Math.ceil(((t1-t0)/WK)/12);for(let t=base-Math.floor((base-t0)/WK)*WK,k=0;t<=t1;t+=WK,k++){if(k%step===0)g+='<text x=\"'+x(t)+'\" y=\"'+(Tp+ih+16)+'\" text-anchor=\"middle\" fill=\"#aaa\">'+fmt(t)+'</text>';}\nconst marks=[[mean,'mean','#5794f2'],[p50,'P50','#d44a3a'],[p85,'P85','#e0752d'],[p95,'P95','#e5c13a']];const grp=[];marks.forEach(m=>{const k=fmt(m[0]);let e=grp.find(z=>z.k===k);if(!e){e={k:k,t:m[0],n:[],c:m[2]};grp.push(e);}e.n.push(m[1]);e.c=m[2];});if(tg){grp.push({k:'target',t:Math.min(tg,t1),n:['target'],c:'#8ab8ff',sw:2,da:'6 4',tl:'target '+fmt(tg)+(tg>t1?' (off chart) →':'')});}grp.sort((a,b)=>a.t-b.t);\ngrp.forEach((e,i)=>{const xx=x(e.t),yy=14+i*14,en=xx>W-Rr-150;g+='<line x1=\"'+xx+'\" x2=\"'+xx+'\" y1=\"'+(yy+4)+'\" y2=\"'+(Tp+ih)+'\" stroke=\"'+e.c+'\" stroke-width=\"'+(e.sw||1.5)+'\" stroke-dasharray=\"'+(e.da||'2 3')+'\"/>';g+='<text x=\"'+(xx+(en?-5:5))+'\" y=\"'+yy+'\" text-anchor=\"'+(en?'end':'start')+'\" fill=\"'+e.c+'\" font-weight=\"600\">'+(e.tl||(e.n.join(' / ')+' '+e.k))+'</text>';});\ng+='<line x1=\"'+x(mean)+'\" x2=\"'+x(mean)+'\" y1=\"'+Tp+'\" y2=\"'+(Tp+ih)+'\" stroke=\"#5794f2\" stroke-width=\"2.5\"/>';\ng+='<text x=\"'+((xa+xb)/2)+'\" y=\"'+(Tp+ih+34)+'\" text-anchor=\"middle\" fill=\"#5794f2\">±1 std dev = ±'+sdw.toFixed(1)+' weeks ('+fmt(mean-sd)+' to '+fmt(mean+sd)+')</text>';\nconst ym=Tp+ih/2;g+='<text transform=\"rotate(-90 14 '+ym+')\" x=\"14\" y=\"'+ym+'\" text-anchor=\"middle\" fill=\"#aaa\">% of runs finishing that '+PL+' (bars)</text><text transform=\"rotate(90 '+(W-12)+' '+ym+')\" x=\"'+(W-12)+'\" y=\"'+ym+'\" text-anchor=\"middle\" fill=\"#ddd\">% of runs finished by that date (curve)</text><text x=\"'+(L+iw/2)+'\" y=\"'+(Hh-4)+'\" text-anchor=\"middle\" fill=\"#aaa\">Finish date</text>';g+='<style>.hv .tip{display:none}.hv:hover .tip{display:block}.hv:hover .hb{fill:#fff;opacity:.08}</style>';\nbk.forEach(e=>{const cx=x(e.s+(bd-1)*DY/2),cy=yc(cum[e.j]),lab=fmt(e.s)+(bd>1?' to '+fmt(e.s+(bd-1)*DY):'')+': done by '+(cum[e.j]*100).toFixed(1)+'% (this '+PL+' '+(e.m/tot*100).toFixed(1)+'%)',tw=lab.length*6.6+16,tx=cx+tw+14>W?cx-tw-10:cx+10;\ng+='<g class=\"hv\"><rect class=\"hb\" x=\"'+(cx-bw/2-2)+'\" y=\"'+Tp+'\" width=\"'+(bw+4)+'\" height=\"'+ih+'\" fill=\"transparent\"/><g class=\"tip\" pointer-events=\"none\"><circle cx=\"'+cx+'\" cy=\"'+cy+'\" r=\"5\" fill=\"#fff\" stroke=\"#111\"/><rect x=\"'+tx+'\" y=\"'+(Math.max(Tp,cy-30))+'\" width=\"'+tw+'\" height=\"22\" rx=\"4\" fill=\"#111217\" stroke=\"#888\"/><text x=\"'+(tx+8)+'\" y=\"'+(Math.max(Tp,cy-30)+15)+'\" fill=\"#fff\">'+lab+'</text></g></g>';});\ng+='</svg>';\nhtmlNode.innerHTML='<div style=\"height:100%;display:flex;flex-direction:column\"><div style=\"flex:1;min-height:0\">'+g+'</div><div style=\"font-size:12px;opacity:.8;margin-top:4px\">Bars (lightly smoothed over neighbouring days when the spread is wide; P50/P85/P95 and the mean are exact): share of trials that finish in each period (bar size adapts to the spread: days when tight, weeks when wide). Colours split each bar by cumulative chance: red = first 50% of runs, orange = 50 to 85%, yellow = 85 to 95%, green = last 5%. Blue line: average finish date. Blue band: average ±1 standard deviation. White curve (right axis): cumulative chance of being done by that day. Dashed line: target date.</div></div>';\n}",
+        "centerAlignContent": false,
+        "add100Percentage": true,
+        "SVGBaseFix": true,
+        "rootCSS": ""
+      }
+    },
+    {
+      "id": 24,
+      "type": "gapit-htmlgraphics-panel",
+      "title": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "refId": "A",
+          "queryType": "randomWalk",
+          "seriesCount": 1
+        }
+      ],
+      "options": {
+        "css": "",
+        "html": "<div></div>",
+        "onInit": "",
+        "onRender": "const q=new URLSearchParams(window.location.search);\nconst cur=q.get('var-TargetDate')||'2026-11-25';\nhtmlNode.innerHTML='<label style=\"display:flex;align-items:center;gap:10px;font-size:14px;height:100%\">Target date <input id=\"tdp\" type=\"date\" value=\"'+cur+'\" style=\"color-scheme:dark;background:#111217;color:#ddd;border:1px solid #444;border-radius:4px;padding:5px 8px;font-size:14px\"> <span style=\"opacity:.6;font-size:12px\">pick a date, the dashboard reloads with it</span></label>';\nconst el=htmlNode.querySelector('#tdp');\nel.addEventListener('change',()=>{if(!el.value)return;const u=new URL(window.location.href);u.searchParams.set('var-TargetDate',el.value);window.location.href=u.toString();});",
+        "centerAlignContent": false,
+        "add100Percentage": true,
+        "SVGBaseFix": true,
+        "rootCSS": ""
+      }
+    },
+    {
+      "id": 25,
+      "type": "gapit-htmlgraphics-panel",
+      "title": "Release and deployment calendar (code freeze and planned release)",
+      "description": "Month view of the upcoming packages. Colour = stream (click a stream in the legend to hide or show it); filled = planned release, outlined = code freeze; red outline and ! = overdue release. Hover for details, click an item to open the Epic forecast for that date.",
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "gridPos": {
+        "h": 17,
+        "w": 24,
+        "x": 0,
+        "y": 64
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOReleasesTyped",
+            "name": "ADOTelemetry.ADOReleasesTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOReleasesTyped",
+          "oDataQueryString": "ADOTelemetry.ADOReleasesTyped?$filter=Status ne 'Released' and ('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote}))&$select=Version,Line,Stream,Status,CodeFreeze,PlannedRelease,ScheduleChanges&$orderby=CodeFreeze&$top=100",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "options": {
+        "css": ".rc{display:flex;flex-direction:column;height:100%;font-size:12px}.rc-head{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}.rc-title{font-size:15px;font-weight:600;margin-left:8px}.rc-leg{margin-left:auto;opacity:.85}.rc-b{background:rgba(128,128,128,.15);border:1px solid rgba(128,128,128,.4);color:inherit;border-radius:4px;padding:3px 10px;cursor:pointer}.rc-b:hover{background:rgba(128,128,128,.3)}.rc-d{display:inline-block;width:9px;height:9px;border-radius:2px;margin:0 4px 0 12px;vertical-align:middle}.rc-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;flex:1;min-height:0;grid-auto-rows:auto}.rc-dh{text-align:center;opacity:.7;font-weight:500;padding:2px 0}.rc-c{background:rgba(128,128,128,.08);border:1px solid rgba(128,128,128,.25);border-radius:4px;padding:2px 3px;min-height:64px;overflow:hidden}.rc-c.rc-w{background:rgba(128,128,128,.14)}.rc-c.rc-o{opacity:.45}.rc-c.rc-t{outline:2px solid #5794f2}.rc-n{font-weight:600;opacity:.8;margin-bottom:1px}.rc-e{border-radius:3px;padding:1px 5px;margin:1px 0;color:#111;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}.rc-e:hover{filter:brightness(1.15)}.rc-m{opacity:.7;padding:0 5px}.rc-e.rc-rl{background:var(--c)}.rc-e.rc-fr{background:transparent;color:inherit;border:1px solid var(--c);box-shadow:inset 4px 0 0 var(--c)}.rc-e.rc-ov{outline:2px solid #d44a3a}.rc-s{cursor:pointer;margin-left:10px;white-space:nowrap}.rc-s.off{opacity:.35;text-decoration:line-through}.rc-k{margin-left:14px;opacity:.8}.rc-kf{background:transparent!important;border:1px solid currentColor}.rc-kr{background:currentColor}.rc-foot{margin-top:5px;opacity:.7}",
+        "html": "<div></div>",
+        "onInit": "",
+        "onRender": "const CSS=\".rc{display:flex;flex-direction:column;height:100%;font-size:12px}.rc-head{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}.rc-title{font-size:15px;font-weight:600;margin-left:8px}.rc-leg{margin-left:auto;opacity:.85}.rc-b{background:rgba(128,128,128,.15);border:1px solid rgba(128,128,128,.4);color:inherit;border-radius:4px;padding:3px 10px;cursor:pointer}.rc-b:hover{background:rgba(128,128,128,.3)}.rc-d{display:inline-block;width:9px;height:9px;border-radius:2px;margin:0 4px 0 12px;vertical-align:middle}.rc-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;flex:1;min-height:0;grid-auto-rows:auto}.rc-dh{text-align:center;opacity:.7;font-weight:500;padding:2px 0}.rc-c{background:rgba(128,128,128,.08);border:1px solid rgba(128,128,128,.25);border-radius:4px;padding:2px 3px;min-height:64px;overflow:hidden}.rc-c.rc-w{background:rgba(128,128,128,.14)}.rc-c.rc-o{opacity:.45}.rc-c.rc-t{outline:2px solid #5794f2}.rc-n{font-weight:600;opacity:.8;margin-bottom:1px}.rc-e{border-radius:3px;padding:1px 5px;margin:1px 0;color:#111;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}.rc-e:hover{filter:brightness(1.15)}.rc-m{opacity:.7;padding:0 5px}.rc-e.rc-rl{background:var(--c)}.rc-e.rc-fr{background:transparent;color:inherit;border:1px solid var(--c);box-shadow:inset 4px 0 0 var(--c)}.rc-e.rc-ov{outline:2px solid #d44a3a}.rc-s{cursor:pointer;margin-left:10px;white-space:nowrap}.rc-s.off{opacity:.35;text-decoration:line-through}.rc-k{margin-left:14px;opacity:.8}.rc-kf{background:transparent!important;border:1px solid currentColor}.rc-kr{background:currentColor}.rc-foot{margin-top:5px;opacity:.7}\";\nconst s=data.series[0];\nconst get=n=>{const f=s&&s.fields.find(x=>x.name===n);return f?(f.values.toArray?f.values.toArray():Array.from(f.values)):[];};\nconst V=get('Version'),L=get('Line'),St=get('Stream'),S=get('Status'),CF=get('CodeFreeze'),PR=get('PlannedRelease'),SC=get('ScheduleChanges');\nconst ms=v=>v==null?null:(typeof v==='number'?v:Date.parse(v));\nconst key=t=>new Date(t).toISOString().slice(0,10);\nconst ev={};\nconst add=(t,o)=>{if(t==null||isNaN(t))return;const k=key(t);(ev[k]=ev[k]||[]).push(o);};\nfor(let i=0;i<V.length;i++){const b={v:V[i],line:L[i],stream:St[i],status:S[i],ch:SC[i]};add(ms(CF[i]),Object.assign({kind:'freeze'},b));add(ms(PR[i]),Object.assign({kind:'release'},b));}\nconst st=window.__relCal=window.__relCal||{};\nif(st.y===undefined){const n=new Date();st.y=n.getUTCFullYear();st.m=n.getUTCMonth();}\nconst esc=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\"/g,'&quot;');\nconst streams=[...new Set(St.map(x=>String(x==null?'':x)))].sort();const PAL=['#5794f2','#e5a93a','#56b28f','#b877d9','#f2778a','#4fc1d6','#9bc53d','#ff9830'];const col=s=>PAL[streams.indexOf(String(s==null?'':s))%PAL.length];st.hide=st.hide||{};\nconst draw=()=>{\nconst legend=streams.map(s=>'<span class=\"rc-s'+(st.hide[s]?' off':'')+'\" data-s=\"'+esc(s)+'\"><i class=\"rc-d\" style=\"background:'+col(s)+'\"></i>'+esc(s)+'</span>').join('')+'<span class=\"rc-k\"><i class=\"rc-d rc-kf\"></i>Freeze <i class=\"rc-d rc-kr\"></i>Release <b style=\"color:#d44a3a\">!</b> overdue</span>';\nconst y=st.y,m=st.m,first=Date.UTC(y,m,1),dow=(new Date(first).getUTCDay()+6)%7,start=first-dow*864e5;\nconst days=new Date(Date.UTC(y,m+1,0)).getUTCDate(),weeks=Math.ceil((dow+days)/7),today=key(Date.now());\nconst title=new Date(first).toLocaleDateString('en-GB',{month:'long',year:'numeric',timeZone:'UTC'});\nlet nf=0,nr=0;\nlet h='<style>'+CSS+'</style><div class=\"rc\"><div class=\"rc-head\"><button class=\"rc-b\" data-a=\"p\">&#8249;</button><button class=\"rc-b\" data-a=\"t\">Today</button><button class=\"rc-b\" data-a=\"n\">&#8250;</button><span class=\"rc-title\">'+title+'</span><span class=\"rc-leg\">'+legend+'</span></div>';\nh+='<div class=\"rc-grid\">'+['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>'<div class=\"rc-dh\">'+d+'</div>').join('');\nfor(let i=0;i<weeks*7;i++){\nconst t=start+i*864e5,k=key(t),d=new Date(t),inm=d.getUTCMonth()===m,wk=d.getUTCDay()===0||d.getUTCDay()===6;\nconst es=(ev[k]||[]).filter(e=>!st.hide[String(e.stream==null?'':e.stream)]).sort((a,b)=>a.kind===b.kind?String(a.v).localeCompare(String(b.v)):(a.kind==='freeze'?-1:1));\nif(inm)es.forEach(e=>{if(e.kind==='freeze')nf++;else nr++;});\nh+='<div class=\"rc-c'+(inm?'':' rc-o')+(wk?' rc-w':'')+(k===today?' rc-t':'')+'\"><div class=\"rc-n\">'+d.getUTCDate()+'</div>';\nes.slice(0,3).forEach(e=>{const cls=(e.kind==='freeze'?'rc-fr':'rc-rl')+(e.kind==='release'&&e.status==='Overdue'?' rc-ov':'');const tip=(e.kind==='freeze'?'Code freeze':'Planned release')+' '+esc(e.v)+'\\n'+esc(e.stream)+' ('+esc(e.line)+')\\nStatus: '+esc(e.status)+'\\nSchedule changes: '+esc(e.ch)+'\\nClick to forecast against '+k;h+='<div class=\"rc-e '+cls+'\" data-d=\"'+k+'\" style=\"--c:'+col(e.stream)+'\" title=\"'+tip+'\">'+(e.status==='Overdue'&&e.kind==='release'?'! ':'')+(e.kind==='freeze'?'Freeze ':'Release ')+esc(e.v)+'</div>';});\nif(es.length>3){const rest=es.slice(3).map(e=>(e.kind==='freeze'?'Code freeze ':'Release ')+esc(e.v)).join('\\n');h+='<div class=\"rc-m\" title=\"'+rest+'\">+'+(es.length-3)+' more</div>';}\nh+='</div>';}\nh+='</div><div class=\"rc-foot\">'+nf+' code freeze'+(nf===1?'':'s')+' and '+nr+' planned release'+(nr===1?'':'s')+' this month. Click an item to forecast against its date.</div></div>';\nhtmlNode.innerHTML=h;\nhtmlNode.querySelectorAll('.rc-b').forEach(b=>b.addEventListener('click',()=>{const a=b.getAttribute('data-a');if(a==='t'){const n=new Date();st.y=n.getUTCFullYear();st.m=n.getUTCMonth();}else{const dm=a==='p'?-1:1;const nd=new Date(Date.UTC(st.y,st.m+dm,1));st.y=nd.getUTCFullYear();st.m=nd.getUTCMonth();}draw();}));\nhtmlNode.querySelectorAll('.rc-s').forEach(b=>b.addEventListener('click',()=>{const s=b.getAttribute('data-s');st.hide[s]=!st.hide[s];draw();}));\nhtmlNode.querySelectorAll('.rc-e').forEach(e=>e.addEventListener('click',()=>{const u=new URL(window.location.href);u.searchParams.set('var-TargetDate',e.getAttribute('data-d'));window.location.href=u.toString();}));\n};\ndraw();",
+        "centerAlignContent": false,
+        "add100Percentage": true,
+        "SVGBaseFix": true,
+        "rootCSS": ""
+      }
+    },
+    {
+      "id": 31,
+      "type": "table",
+      "title": "Open items in scope without a Feature (relink them in Azure DevOps)",
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 89
+      },
+      "description": "Open stories of the chosen scope that sit directly under an Epic or have no parent, so a forecast by Feature cannot select them. The Feature column shows the group they are counted in.",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADORemainingWorkTyped",
+            "name": "ADORemainingWorkTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADORemainingWorkTyped",
+          "oDataQueryString": "ADOTelemetry.ADORemainingWorkTyped?parameters=Organization=${Organization:pipe},Project=${Project:pipe},EpicId=${EpicId},Scope=${Scope},Milestone=${Milestone:pipe},Feature=${Feature:pipe}&$filter=HasFeature eq 0",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "WorkItemId": 0,
+              "Title": 1,
+              "WorkItemType": 2,
+              "State": 3,
+              "Team": 4,
+              "StoryPoints": 5,
+              "Sprint": 6,
+              "Milestone": 7,
+              "FeatureTitle": 8,
+              "AgeDays": 9
+            },
+            "renameByName": {
+              "WorkItemId": "ID",
+              "WorkItemType": "Type",
+              "StoryPoints": "Points",
+              "FeatureTitle": "Feature",
+              "AgeDays": "Age (days)"
+            },
+            "excludeByName": {
+              "HasFeature": true
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "filterable": true,
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ID"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open in Azure DevOps",
+                    "url": "${__data.fields.Link}",
+                    "targetBlank": true
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 80
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Title"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open in Azure DevOps",
+                    "url": "${__data.fields.Link}",
+                    "targetBlank": true
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 520
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Link"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "viz": true,
+                  "legend": false,
+                  "tooltip": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Points"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "custom.width",
+                "value": 70
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": true,
+          "reducer": [
+            "count"
+          ],
+          "fields": [
+            "ID"
+          ],
+          "countRows": false
+        },
+        "sortBy": []
+      }
+    }
+  ],
+  "annotations": {
+    "list": []
+  },
+  "links": [],
+  "version": 1
+}
