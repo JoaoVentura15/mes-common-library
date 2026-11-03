@@ -1,0 +1,239 @@
+<CMF.ExportFile version="1.0">
+  <Object type="Cmf.Foundation.BusinessObjects.CmfDataSet, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+    <CmfDataSetFields type="Collection" actualtype="Cmf.Foundation.BusinessObjects.CmfDataSetFieldCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="String" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="1" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Dimension" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="Team" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="Decimal" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="2" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Metric" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="Remaining" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="Decimal" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="3" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Metric" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="HistoryWeeksUsed" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="Decimal" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="4" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Metric" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="WeeklyMean" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="Decimal" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="5" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Metric" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="FinishWeeksP50" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="Decimal" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="6" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Metric" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="FinishWeeksP85" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="Decimal" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="7" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Metric" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="FinishWeeksP95" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="Decimal" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="8" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Metric" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="ProbOnTime" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+    </CmfDataSetFields>
+    <Folder type="Object">
+      <ObjectRef type="Cmf.Foundation.BusinessObjects.Folder, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" RefName="\Datasets\UserDefined\ADOTelemetry" />
+    </Folder>
+    <DistinctValues value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+    <IoTEventDefinition isNull="True" />
+    <IsGroupingActive value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+    <OwnerApp isNull="True" />
+    <OwnerRole isNull="True" />
+    <OwnerType value="User" type="Cmf.Foundation.BusinessObjects.DataPlatform.CmfDataSetOwnerType, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+    <OwnerUser type="Object">
+      <ObjectRef type="Cmf.Foundation.Security.User, Cmf.Foundation.Security, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" RefName="admin" />
+    </OwnerUser>
+    <Path value="UserDefined.ADOTelemetry.ADOEpicForecastTyped" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+    <QueryString value="WITH&#10;(SELECT ifNull(toDateOrNull({StartDate: String}), today())) AS SD,&#10;weeks AS&#10;(&#10;    SELECT toUInt32(greatest(1, dateDiff(&#x27;day&#x27;, SD, ifNull(toDateOrNull({TargetDate: String}), SD + 28)))) AS W&#10;),&#10;items0 AS&#10;(&#10;    SELECT WorkItemId, ifNull(Team, &#x27;&#x27;) AS TeamName,&#10;        toUInt8(multiIf({Scope: String} = &#x27;milestone&#x27;, has(splitByChar(&#x27;|&#x27;, ifNull(toString({Milestone: String}), &#x27;&#x27;)), ifNull(Milestone, &#x27;&#x27;)), {Scope: String} = &#x27;feature&#x27;, has(arrayMap(x -&gt; toUInt32OrZero(splitByString(&#x27; - &#x27;, x)[1]), splitByChar(&#x27;|&#x27;, ifNull(toString({Feature: String}), &#x27;&#x27;))), if(ifNull(FeatureId, 0) &gt; 0, toUInt32(FeatureId), toUInt32(ifNull(EpicId, 0)))), EpicId = {EpicId: UInt32}) AND (SD &gt;= today() OR ifNull(toDate(CreatedAt), toDate(&#x27;1970-01-01&#x27;)) &lt;= SD)) AS InScope,&#10;        toUInt8(Done = 1 AND NOT (SD &lt; today() AND ifNull(DoneAt &gt;= SD, 0))) AS DoneX,&#10;        if(SD &lt; today() AND ifNull(DoneAt &gt;= SD, 0), NULL, DoneAt) AS DoneAtX, StoryPoints&#10;    FROM ADOTelemetry_WorkItemScope FINAL&#10;    WHERE Removed = 0&#10;      AND ({Organization: String} = &#x27;&#x27; OR positionCaseInsensitive({Organization: String}, &#x27;__all&#x27;) &gt; 0 OR has(splitByChar(&#x27;|&#x27;, {Organization: String}), Organization)) AND ({Project: String} = &#x27;&#x27; OR positionCaseInsensitive({Project: String}, &#x27;__all&#x27;) &gt; 0 OR has(splitByChar(&#x27;|&#x27;, {Project: String}), Project))&#10;),&#10;(SELECT groupArray((TeamName, InScope, DoneX, DoneAtX, StoryPoints)) FROM items0) AS ITEMS,&#10;items AS&#10;(&#10;    SELECT t.1 AS TeamName, t.2 AS InScope, t.3 AS Done, t.4 AS DoneAt, t.5 AS StoryPoints FROM (SELECT arrayJoin(ITEMS) AS t)&#10;),&#10;cal AS&#10;(&#10;    SELECT toStartOfWeek(SD, 1) - toIntervalWeek(number + 1 + {SkipLatestWeeks: UInt32}) AS Week&#10;    FROM numbers({HistoryWeeks: UInt32})&#10;),&#10;tavg AS&#10;(&#10;    SELECT TeamName AS Team, if(countIf(StoryPoints IS NOT NULL) = 0, toFloat64(1), toFloat64(avg(StoryPoints))) AS A&#10;    FROM items&#10;    WHERE Done = 1 AND TeamName != &#x27;&#x27; AND toStartOfWeek(DoneAt, 1) IN (SELECT Week FROM cal)&#10;    GROUP BY TeamName&#10;),&#10;tstart AS&#10;(&#10;    SELECT TeamName AS Team, toStartOfWeek(minIf(DoneAt, Done = 1), 1) AS StartWeek&#10;    FROM items&#10;    WHERE TeamName != &#x27;&#x27;&#10;    GROUP BY TeamName&#10;),&#10;val AS&#10;(&#10;    SELECT i.TeamName AS Team, i.InScope AS InScope, i.Done AS Done, i.DoneAt AS DoneAt,&#10;        if({Unit: String} = &#x27;points&#x27;, toFloat64(coalesce(i.StoryPoints, if(i.Done = 1, if(t.A = 0, toFloat64(1), t.A), toFloat64(0)))), toFloat64(1)) AS V&#10;    FROM items AS i&#10;    LEFT JOIN tavg AS t ON t.Team = i.TeamName&#10;    WHERE i.TeamName != &#x27;&#x27;&#10;),&#10;own AS&#10;(&#10;    SELECT Team, assumeNotNull(sum(V)) AS N&#10;    FROM val&#10;    WHERE InScope = 1 AND Done = 0&#10;    GROUP BY Team&#10;),&#10;unassigned AS&#10;(&#10;    SELECT toUInt32(count()) AS N FROM items WHERE InScope = 1 AND Done = 0 AND TeamName = &#x27;&#x27;&#10;),&#10;(SELECT count() FROM items WHERE InScope = 1 AND Done = 1 AND TeamName != &#x27;&#x27; AND toStartOfWeek(DoneAt, 1) IN (SELECT Week FROM cal)) AS SCOPEDONE,&#10;(SELECT toUInt8(count() = 0 OR {SpreadUnassigned: UInt8} = 1) FROM items WHERE InScope = 1 AND Done = 0 AND TeamName != &#x27;&#x27;) AS SPR,&#10;share AS&#10;(&#10;    SELECT TeamName AS Team, count() / (SELECT greatest(count(), 1) FROM items WHERE (InScope = 1 OR SCOPEDONE = 0) AND Done = 1 AND TeamName != &#x27;&#x27; AND toStartOfWeek(DoneAt, 1) IN (SELECT Week FROM cal)) AS S&#10;    FROM items&#10;    WHERE (InScope = 1 OR SCOPEDONE = 0) AND Done = 1 AND TeamName != &#x27;&#x27; AND toStartOfWeek(DoneAt, 1) IN (SELECT Week FROM cal)&#10;    GROUP BY TeamName&#10;),&#10;remaining AS&#10;(&#10;    SELECT Team, toFloat64(sum(N)) AS Remaining&#10;    FROM&#10;    (&#10;        SELECT Team, N FROM own&#10;        UNION ALL&#10;        SELECT s.Team AS Team,&#10;            if({Unit: String} = &#x27;points&#x27;,&#10;                ((SELECT N FROM unassigned) * SPR + {ExtraItems: UInt32}) * s.S * if(t.A = 0, toFloat64(1), t.A),&#10;                round(((SELECT N FROM unassigned) * SPR + {ExtraItems: UInt32}) * s.S)) AS N&#10;        FROM share AS s&#10;        INNER JOIN tavg AS t ON t.Team = s.Team&#10;    )&#10;    GROUP BY Team&#10;    HAVING Remaining &gt; 0&#10;),&#10;counts AS&#10;(&#10;    SELECT Team, assumeNotNull(toStartOfWeek(DoneAt, 1)) AS Week, assumeNotNull(sum(V)) AS N&#10;    FROM val&#10;    WHERE Done = 1 AND toStartOfWeek(DoneAt, 1) IN (SELECT Week FROM cal)&#10;    GROUP BY Team, Week&#10;),&#10;(SELECT arraySort(groupArray(Week)) FROM cal) AS WKS,&#10;hist0 AS&#10;(&#10;    SELECT r.Team AS Team, r.Remaining AS Remaining,&#10;        arrayMap(c -&gt; arraySum(arrayMap(x -&gt; x.2, arrayFilter(x -&gt; ifNull(x.1 = c, 0), wk))), WKS) AS HF,&#10;        ifNull(s.StartWeek, toDate(&#x27;1970-01-01&#x27;)) AS St&#10;    FROM remaining AS r&#10;    LEFT JOIN (SELECT Team, groupArray((Week, N)) AS wk FROM counts GROUP BY Team) AS c ON c.Team = r.Team&#10;    LEFT JOIN tstart AS s ON s.Team = r.Team&#10;),&#10;hist AS&#10;(&#10;    SELECT Team, Remaining,&#10;        multiIf({TrimNewTeams: UInt8} = 0, HF,&#10;            length(arrayFilter(w -&gt; w &gt;= St, WKS)) &gt;= 3, arrayFilter((v, w) -&gt; w &gt;= St, HF, WKS),&#10;            arraySlice(HF, -3)) AS H&#10;    FROM hist0&#10;),&#10;(SELECT groupArray((Team, Remaining, H)) FROM hist) AS HIST,&#10;(SELECT W FROM weeks) AS WT,&#10;hgx AS&#10;(&#10;    SELECT Team, FW, EFW, count() AS C&#10;    FROM&#10;    (&#10;        SELECT Team, FW, max(FW) OVER (PARTITION BY Trial) AS EFW&#10;        FROM&#10;        (&#10;            SELECT Team, Trial,&#10;                assumeNotNull(if(K = 0, toUInt16(735), toUInt16(greatest(1, ceil(7 * ((K - 1) + (RemN - CS[K - 1]) / greatest(CS[K] - CS[K - 1], 0.000001))))))) AS FW&#10;            FROM&#10;            (&#10;                SELECT Team, Trial, RemN, CS, toInt32(arrayFirstIndex(x -&gt; ifNull(x &gt;= RemN, 0), CS)) AS K&#10;                FROM&#10;                (&#10;                    SELECT h.1 AS Team, t AS Trial, toFloat64(h.2) AS RemN,&#10;                        arrayCumSum(arrayMap(w -&gt; toFloat64(h.3[1 + cityHash64(h.1, t, w) % greatest(length(h.3), 1)]) * {CapacityPct: UInt32} / 100, range(104))) AS CS&#10;                    FROM (SELECT arrayJoin(HIST) AS h) AS hh&#10;                    CROSS JOIN (SELECT number AS t FROM numbers({Trials: UInt32})) AS tr&#10;                )&#10;            )&#10;        )&#10;    )&#10;    GROUP BY Team, FW, EFW&#10;),&#10;(SELECT groupArray((Team, FW, EFW, C)) FROM hgx) AS HGA,&#10;th AS&#10;(&#10;    SELECT r.1 AS Team, r.2 AS FW, sum(r.4) AS C FROM (SELECT arrayJoin(HGA) AS r) GROUP BY Team, FW&#10;    UNION ALL&#10;    SELECT &#x27;(Total)&#x27; AS Team, r.3 AS FW, intDiv(sum(r.4), greatest(length(HIST), 1)) AS C FROM (SELECT arrayJoin(HGA) AS r) GROUP BY FW&#10;),&#10;ps AS&#10;(&#10;    SELECT Team, Ws, Cs, CC, NT, Mean,&#10;        sqrt(arraySum(arrayMap((w, c) -&gt; c * (w - Mean) * (w - Mean), Ws, Cs)) / NT) AS Sd,&#10;        Ws[arrayFirstIndex(x -&gt; x &gt; floor(0.5 * NT), CC)] AS Q50,&#10;        Ws[arrayFirstIndex(x -&gt; x &gt; floor(0.85 * NT), CC)] AS Q85,&#10;        Ws[arrayFirstIndex(x -&gt; x &gt; floor(0.9 * NT), CC)] AS Q90,&#10;        Ws[arrayFirstIndex(x -&gt; x &gt; floor(0.95 * NT), CC)] AS Q95,&#10;        arraySum(arrayMap((w, c) -&gt; if(w &lt;= WT, c, 0), Ws, Cs)) / NT AS Prob&#10;    FROM&#10;    (&#10;        SELECT Team, Ws, Cs, arrayCumSum(Cs) AS CC, toFloat64(arraySum(Cs)) AS NT,&#10;            arraySum(arrayMap((w, c) -&gt; w * c, Ws, Cs)) / arraySum(Cs) AS Mean&#10;        FROM&#10;        (&#10;            SELECT Team,&#10;                arrayMap(x -&gt; x.1, arraySort(x -&gt; x.1, groupArray((FW, C)))) AS Ws,&#10;                arrayMap(x -&gt; x.2, arraySort(x -&gt; x.1, groupArray((FW, C)))) AS Cs&#10;            FROM th&#10;            GROUP BY Team&#10;        )&#10;    )&#10;),&#10;hl AS&#10;(&#10;    SELECT h.1 AS Team, h.2 AS Remaining, h.3 AS H FROM (SELECT arrayJoin(HIST) AS h)&#10;),&#10;dist AS&#10;(&#10;    SELECT p.Team AS Team, n.W AS W,&#10;        toFloat64(arraySum(arrayMap((w, c) -&gt; if(w = n.W, c, 0), p.Ws, p.Cs))) / p.NT AS P,&#10;        p.Q50 AS Q50, p.Q85 AS Q85, p.Q95 AS Q95&#10;    FROM ps AS p&#10;    CROSS JOIN (SELECT toUInt32(number + 1) AS W FROM numbers(735)) AS n&#10;    WHERE p.Team = {DistTeam: String} AND n.W &lt;= least(toUInt32(735), greatest(p.Q95 + 3, WT))&#10;),&#10;calgrid AS&#10;(&#10;    SELECT concat(&#x27;@&#x27;, p.Team) AS Team, n.W AS W, toFloat64(arraySum(arrayMap((w, c) -&gt; if(w &lt;= n.W * 7, c, 0), p.Ws, p.Cs))) / p.NT AS C&#10;    FROM ps AS p&#10;    CROSS JOIN (SELECT toUInt32(number + 1) AS W FROM numbers(40)) AS n&#10;    WHERE n.W &lt;= least(toUInt32(40), toUInt32(ceil(greatest((SELECT max(Q95) FROM ps), WT) / 7)) + 1)&#10;)&#10;SELECT&#10;    p.Team AS Team,&#10;    toFloat64(round(l.Remaining, 1)) AS Remaining,&#10;    toUInt32(length(l.H)) AS HistoryWeeksUsed,&#10;    toFloat64(round(arrayAvg(l.H), 2)) AS WeeklyMean,&#10;    toFloat64(round(p.Q50 / 7, 1)) AS FinishWeeksP50,&#10;    toFloat64(round(p.Q85 / 7, 1)) AS FinishWeeksP85,&#10;    toFloat64(round(p.Q95 / 7, 1)) AS FinishWeeksP95,&#10;    toFloat64(round(p.Prob, 4)) AS ProbOnTime&#10;FROM ps AS p&#10;INNER JOIN hl AS l ON l.Team = p.Team&#10;UNION ALL&#10;SELECT&#10;    &#x27;(Total)&#x27; AS Team,&#10;    toFloat64(round(arraySum(arrayMap(h -&gt; ifNull(h.2, 0), HIST)) + if(SPR = 1 OR {Unit: String} = &#x27;points&#x27;, 0, (SELECT N FROM unassigned)), 1)) AS Remaining,&#10;    toUInt32(0) AS HistoryWeeksUsed,&#10;    toFloat64(0) AS WeeklyMean,&#10;    toFloat64(round(q.Q50 / 7, 1)) AS FinishWeeksP50,&#10;    toFloat64(round(q.Q85 / 7, 1)) AS FinishWeeksP85,&#10;    toFloat64(round(q.Q95 / 7, 1)) AS FinishWeeksP95,&#10;    toFloat64(round(q.Prob, 4)) AS ProbOnTime&#10;FROM ps AS q&#10;WHERE q.Team = &#x27;(Total)&#x27;&#10;UNION ALL&#10;SELECT&#10;    concat(&#x27;#&#x27;, q.Team) AS Team,&#10;    toFloat64(0) AS Remaining,&#10;    toUInt32(0) AS HistoryWeeksUsed,&#10;    toFloat64(0) AS WeeklyMean,&#10;    toFloat64(round(q.Mean / 7, 2)) AS FinishWeeksP50,&#10;    toFloat64(round(q.Sd / 7, 2)) AS FinishWeeksP85,&#10;    toFloat64(round(q.Q90 / 7, 1)) AS FinishWeeksP95,&#10;    toFloat64(0) AS ProbOnTime&#10;FROM ps AS q&#10;UNION ALL&#10;SELECT&#10;    toString(addDays(SD, W)) AS Team,&#10;    toFloat64(0) AS Remaining,&#10;    toUInt32(toUnixTimestamp(toDateTime(addDays(SD, W)))) AS HistoryWeeksUsed,&#10;    toFloat64(if(W &gt; Q95, round(P, 4), 0)) AS WeeklyMean,&#10;    toFloat64(if(W &lt;= Q50, round(P, 4), 0)) AS FinishWeeksP50,&#10;    toFloat64(if(W &gt; Q50 AND W &lt;= Q85, round(P, 4), 0)) AS FinishWeeksP85,&#10;    toFloat64(if(W &gt; Q85 AND W &lt;= Q95, round(P, 4), 0)) AS FinishWeeksP95,&#10;    toFloat64(round(P, 4)) AS ProbOnTime&#10;FROM dist&#10;UNION ALL&#10;SELECT&#10;    toString(toDate(ifNull(toDateOrNull({TargetDate: String}), SD + 28))) AS Team,&#10;    toFloat64(if(i = 0, 0.000001, (SELECT greatest(max(P), 0.01) FROM dist) * 1.05)) AS Remaining,&#10;    toUInt32(toUnixTimestamp(toDateTime(toDate(ifNull(toDateOrNull({TargetDate: String}), SD + 28)))) + i + 1) AS HistoryWeeksUsed,&#10;    toFloat64(0) AS WeeklyMean,&#10;    toFloat64(0) AS FinishWeeksP50,&#10;    toFloat64(0) AS FinishWeeksP85,&#10;    toFloat64(0) AS FinishWeeksP95,&#10;    toFloat64(0) AS ProbOnTime&#10;FROM (SELECT arrayJoin([0, 1]) AS i)&#10;UNION ALL&#10;SELECT&#10;    Team AS Team,&#10;    toFloat64(0) AS Remaining,&#10;    toUInt32(toUnixTimestamp(toDateTime(addDays(SD, W * 7)))) AS HistoryWeeksUsed,&#10;    toFloat64(0) AS WeeklyMean,&#10;    toFloat64(0) AS FinishWeeksP50,&#10;    toFloat64(0) AS FinishWeeksP85,&#10;    toFloat64(0) AS FinishWeeksP95,&#10;    toFloat64(round(C, 4)) AS ProbOnTime&#10;FROM calgrid&#10;ORDER BY Team" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+    <Table isNull="True" />
+    <TopRows isNull="True" />
+    <Type value="Query" type="Cmf.Foundation.BusinessObjects.DataPlatform.CmfDataSetType, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+    <State value="Completed" type="Cmf.Foundation.BusinessObjects.DataPlatform.CmfDataSetState, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+    <StateMessage isNull="True" />
+    <DataSource value="CDM" type="Cmf.DataPlatform.Shared.CmfDataSetDataSource, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+    <Source value="CDM" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+    <DefaultParameters isNull="True" />
+    <CurrentMainState isNull="True" />
+    <CurrentStates isNull="True" />
+    <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+    <RelationCollection isNull="True" />
+    <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+    <Description value="Monte Carlo forecast of an epic, a feature (or the epic/standalone group of stories without one) or a set of milestones, per team (parameters: Organization, Project, Scope, EpicId, Feature, Milestone, TargetDate, Unit, HistoryWeeks, SkipLatestWeeks, CapacityPct, Trials, SpreadUnassigned, ExtraItems, DistTeam, TrimNewTeams, StartDate; empty Organization/Project = all)" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+    <DocumentationURL isNull="True" />
+    <Image isNull="True" />
+    <EntityPicture isNull="True" />
+    <Name value="ADOEpicForecastTyped" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+    <DataGroupName isNull="True" />
+  </Object>
+</CMF.ExportFile>
