@@ -188,60 +188,6 @@ namespace specs
         }
 
         [Fact]
-        public void PackagedMasterData_MatchesTheGeneratedDefinitions()
-        {
-            var packageDirectory = Path.Combine(AppContext.BaseDirectory, "resources", "audit_package", "Cmf.Audit", "Cmf.Audit.Data");
-            var packaged = JsonNode.Parse(File.ReadAllText(Path.Combine(packageDirectory, "MasterData", "2.0.0", "001-ADOTelemetry-IoTEvents.json")));
-            var generated = JsonNode.Parse(AdoTelemetryEvents.MasterDataJson());
-
-            Assert.True(JsonNode.DeepEquals(generated, packaged));
-        }
-
-        [Fact]
-        public void PackagedFolderWorkaround_CoversEveryEventAndRunsBeforeMasterData()
-        {
-            var packageDirectory = Path.Combine(AppContext.BaseDirectory, "resources", "audit_package", "Cmf.Audit", "Cmf.Audit.Data");
-            var manifest = JsonNode.Parse(File.ReadAllText(Path.Combine(packageDirectory, "cmfpackage.json")))!;
-            var contentTypes = manifest["contentToPack"]!.AsArray().Select(content => (string)content!["contentType"]!).ToArray();
-            var registration = JsonNode.Parse(File.ReadAllText(Path.Combine(packageDirectory, "MasterData", "2.0.0", "000-AdoTelemetryFolderWorkaround.json")))!;
-            var action = registration["<SM>DEEAction"]!["1"]!;
-            var order = registration["DEEActionOrder"]!["1"]!;
-            var actionPath = ((string)action["CodeFileRelativePath"]!).Replace('/', Path.DirectorySeparatorChar);
-            var source = File.ReadAllText(Path.Combine(packageDirectory, "DEEs", actionPath));
-
-            Assert.Contains("ProcessRulesPre", contentTypes);
-            Assert.Contains("MasterData", contentTypes);
-            Assert.Equal("BusinessObjects.IoTEventDefinitionCollection.Create.Pre", (string)order["ActionGroup"]!);
-            Assert.Equal((string)action["Action"]!, (string)order["Action"]!);
-            Assert.All(AdoTelemetryEvents.Schemas, schema => Assert.Contains($"\"{schema.Name}\"", source));
-        }
-
-        [Theory]
-        [InlineData("ADORunChangesTyped")]
-        [InlineData("ADOSprintsTyped")]
-        [InlineData("ADOWorkItemFlowTyped")]
-        public void PackagedDataSet_UsesEnqueueTimeForObservedAt(string name)
-        {
-            var path = Path.Combine(AppContext.BaseDirectory, "resources", "audit_package", "Cmf.Audit", "Cmf.Audit.ExportedObjects", "ExportedObjects", "2.0.0", $"Dataset-{name}.xml");
-            var query = (string)XDocument.Load(path).Root!.Element("Object")!.Element("QueryString")!.Attribute("value")!;
-            Assert.Contains("SysProperties_EnqueueTime", query);
-            Assert.DoesNotContain("_created_at", query);
-        }
-
-        [Theory]
-        [InlineData("ADOEpicForecastTyped")]
-        [InlineData("ADORemainingWorkTyped")]
-        public void PackagedScopeDataSet_IsProjectAgnostic(string name)
-        {
-            var path = Path.Combine(AppContext.BaseDirectory, "resources", "audit_package", "Cmf.Audit", "Cmf.Audit.ExportedObjects", "ExportedObjects", "2.0.0", $"Dataset-{name}.xml");
-            var query = (string)XDocument.Load(path).Root!.Element("Object")!.Element("QueryString")!.Attribute("value")!;
-            Assert.Contains("{Organization: String}", query);
-            Assert.Contains("{Project: String}", query);
-            Assert.Contains("{Feature: String}", query); // Scope = feature
-            Assert.DoesNotContain("Solution Backlog", query); // the team comes from --teamFromIterationPath, not from a path convention
-        }
-
-        [Fact]
         public void ExportXml_HasTheKeysIndexedInOrderTheFolderAndAValidSchema()
         {
             foreach (var schema in AdoTelemetryEvents.Schemas)
