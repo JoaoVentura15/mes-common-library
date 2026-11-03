@@ -63,7 +63,7 @@ namespace audit.Objects
 
             cmd.AddOption(new Option<string>(
                 aliases: ["--securityAccessToken"],
-                description: "MES security portal access token. Prefer setting the CMF_AUDIT_SECURITY_TOKEN environment variable, so the token does not appear in process lists or shell history",
+                description: "MES security portal refresh token. Prefer setting the CMF_AUDIT_SECURITY_TOKEN environment variable, so the token does not appear in process lists or shell history",
                 getDefaultValue: () => Environment.GetEnvironmentVariable(ENV_SECURITY_TOKEN) ?? ""));
 
             cmd.AddOption(new Option<bool>(
