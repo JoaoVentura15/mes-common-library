@@ -87,7 +87,7 @@ namespace specs
                 Assert.Contains("CmfAuditRegistry: 'https://registry.example/npm/'", installAudit);
 
                 // the pipeline references .vars/global.yml, so it is created with the package to install
-                Assert.Contains("CmfAuditPackageToInstall: 'Cmf.Audit@1.0.0'", File.ReadAllText(Path.Combine(builds, ".vars", "global.yml")));
+                Assert.Contains("CmfAuditPackageToInstall: 'Cmf.Audit@2.0.0'", File.ReadAllText(Path.Combine(builds, ".vars", "global.yml")));
                 Assert.False(File.Exists(Path.Combine(builds, "CD-Containers.yml")));
 
                 // running it again changes nothing
@@ -125,7 +125,7 @@ namespace specs
                 // the project's own variables are kept, and the package to install is declared next to them
                 var globalYml = File.ReadAllText(Path.Combine(builds, ".vars", "global.yml"));
                 Assert.Contains("BuildRunner: 'image'", globalYml);
-                Assert.Contains("CmfAuditPackageToInstall: 'Cmf.Audit@1.0.0'", globalYml);
+                Assert.Contains("CmfAuditPackageToInstall: 'Cmf.Audit@2.0.0'", globalYml);
                 Assert.True(File.Exists(Path.Combine(builds, "CD-AuditReview.yml")));
                 Assert.Equal(InitTests.RootCmfPackage, File.ReadAllText(Path.Combine(root, "cmfpackage.json")));
 
@@ -151,7 +151,7 @@ namespace specs
                 InitTests.RunInit(root, Args(includeInCdContainers: false));
 
                 Assert.Equal(InitTests.CdContainers, File.ReadAllText(Path.Combine(builds, "CD-Containers.yml")));
-                Assert.Contains("CmfAuditPackageToInstall: 'Cmf.Audit@1.0.0'", File.ReadAllText(Path.Combine(builds, ".vars", "global.yml")));
+                Assert.Contains("CmfAuditPackageToInstall: 'Cmf.Audit@2.0.0'", File.ReadAllText(Path.Combine(builds, ".vars", "global.yml")));
                 Assert.True(File.Exists(Path.Combine(builds, "CD-AuditReview.yml")));
             }
             finally
