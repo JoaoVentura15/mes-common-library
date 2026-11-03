@@ -149,7 +149,7 @@ namespace specs
         [Fact]
         public void MergeIntoCdContainers_PreservesCrLf()
         {
-            var merged = PipelineYamlMerger.MergeIntoCdContainers(CdContainers.Replace("\n", "\r\n"), "$(CustomerEnvironmentName)");
+            var merged = PipelineYamlMerger.MergeIntoCdContainers(CdContainers.Replace("\r\n", "\n").Replace("\n", "\r\n"), "$(CustomerEnvironmentName)");
 
             Assert.DoesNotContain("\n", merged.Replace("\r\n", ""));
         }
@@ -281,6 +281,20 @@ namespace specs
                     Assert.True(File.Exists(Path.Combine(builds, file)), file);
                 }
 
+                var telemetryPipeline = File.ReadAllText(Path.Combine(builds, "CD-AdoTelemetry.yml"));
+                var telemetryTask = File.ReadAllText(Path.Combine(builds, ".tasks", "collect-ado-telemetry.yml"));
+                Assert.Contains("always: true", telemetryPipeline);
+                Assert.Contains(".vars/global.yml", telemetryPipeline);
+                Assert.Contains(".tasks/cmf-login.yml", telemetryPipeline);
+                Assert.Contains("CustomerPortalPAT: $(CustomerPortalPAT)", telemetryPipeline);
+                Assert.Contains(".tasks/collect-ado-telemetry.yml", telemetryPipeline);
+                Assert.Contains("--strictCollection", telemetryTask);
+                Assert.Contains("--refreshOpenPullRequests", telemetryTask);
+                Assert.Contains("--refreshChangedWorkItems", telemetryTask);
+                Assert.Contains("'runs,steps,tests,changes,prs,approvals,tags'", telemetryTask);
+                Assert.Contains("--pools", telemetryTask);
+                Assert.Contains("SYSTEM_ACCESSTOKEN: $(System.AccessToken)", telemetryTask);
+
                 // shared tasks the project already had are kept
                 Assert.Equal("# project version\n", File.ReadAllText(Path.Combine(builds, ".tasks", "use-node-version.yml")));
 
@@ -300,7 +314,7 @@ namespace specs
                 Assert.DoesNotContain("login --token", installAudit);
 
                 Assert.True(PipelineYamlMerger.IsAuditMerged(File.ReadAllText(Path.Combine(builds, "CD-Containers.yml"))));
-                Assert.Contains("CmfAuditPackageToInstall: 'Cmf.Audit@1.0.0'", File.ReadAllText(Path.Combine(builds, ".vars", "global.yml")));
+                Assert.Contains("CmfAuditPackageToInstall: 'Cmf.Audit@2.0.0'", File.ReadAllText(Path.Combine(builds, ".vars", "global.yml")));
 
                 // the audit package has its own lifecycle: not a dependency of the root package
                 Assert.Equal(RootCmfPackage, File.ReadAllText(Path.Combine(root, "cmfpackage.json")));
@@ -322,7 +336,7 @@ namespace specs
                 var builds = Path.Combine(root, "Builds");
                 Assert.True(File.Exists(Path.Combine(builds, "CD-AuditReview.yml")));
                 Assert.Equal(CdContainers, File.ReadAllText(Path.Combine(builds, "CD-Containers.yml")));
-                Assert.Contains("CmfAuditPackageToInstall: 'Cmf.Audit@1.0.0'", File.ReadAllText(Path.Combine(builds, ".vars", "global.yml")));
+                Assert.Contains("CmfAuditPackageToInstall: 'Cmf.Audit@2.0.0'", File.ReadAllText(Path.Combine(builds, ".vars", "global.yml")));
             }
             finally
             {
@@ -330,10 +344,12 @@ namespace specs
             }
         }
 
-        [Fact]
-        public void Init_NotAzureDevOps_OnlyCopiesAuditPackage()
+        [Theory]
+        [InlineData("11.2.3")]
+        [InlineData("11.3.7")]
+        public void Init_NotAzureDevOps_OnlyCopiesAuditPackage(string mesVersion)
         {
-            var root = CreateProject(withBuilds: false);
+            var root = CreateProject(withBuilds: false, mesVersion: mesVersion);
             try
             {
                 RunInit(root, new InitArguments { AzureDevOps = false });
@@ -342,7 +358,14 @@ namespace specs
 
                 // the package matching the MES minor version, with its MES dependencies aligned with the project's patch
                 var auditPackage = JObject.Parse(File.ReadAllText(Path.Combine(root, Init.AuditPackageName, "cmfpackage.json")));
-                Assert.Equal("11.3.7", auditPackage["dependencies"]!.Single(dependency => dependency["id"]!.Value<string>() == "Cmf.Environment")["version"]!.Value<string>());
+                Assert.Equal(mesVersion, auditPackage["dependencies"]!.Single(dependency => dependency["id"]!.Value<string>() == "Cmf.Environment")["version"]!.Value<string>());
+                Assert.Equal(mesVersion, auditPackage["dependencies"]!.Single(dependency => dependency["id"]!.Value<string>() == "CriticalManufacturing.DeploymentMetadata")["version"]!.Value<string>());
+                var exportedObjects = Path.Combine(root, Init.AuditPackageName, "Cmf.Audit.ExportedObjects", "ExportedObjects", "2.0.0");
+                var sourceObjects = Path.Combine(AppContext.BaseDirectory, "resources", "audit_package", Init.AuditPackageName, "Cmf.Audit.ExportedObjects", "ExportedObjects", "2.0.0");
+                foreach (var name in new[] { "Dataset-ADOPipelineRunsTyped.xml", "Dataset-AutomationConfigurationMap.xml" })
+                {
+                    Assert.Equal(File.ReadAllBytes(Path.Combine(sourceObjects, name)), File.ReadAllBytes(Path.Combine(exportedObjects, name)));
+                }
 
                 // not registered in the root package
                 Assert.Equal(RootCmfPackage, File.ReadAllText(Path.Combine(root, "cmfpackage.json")));
