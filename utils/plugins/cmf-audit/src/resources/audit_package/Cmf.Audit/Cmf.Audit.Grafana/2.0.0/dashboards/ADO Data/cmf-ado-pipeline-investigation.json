@@ -1,0 +1,2302 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Pick pipelines, see where their time goes by step category, which steps fail (try category other), then open one run as a timeline.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "panels": [],
+      "title": "Where the time goes",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Task time of the pipelines in the range (approval waits excluded). Click a pipeline name to filter the whole dashboard on it.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "right",
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Pipeline"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Filter on this",
+                    "url": "${__url.path}${__url.params:exclude:var-Pipeline}&var-Pipeline=${__value.raw}"
+                  }
+                ]
+              },
+              {
+                "id": "custom.align",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#3d6fb6",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg per run"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Failed steps"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#e5484d",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 14,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and RecordType eq 'Task' and StepName ne 'ManualValidation' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso})/groupby((Pipeline),aggregate(DurationSeconds with sum as Total,BuildId with countdistinct as Runs))",
+          "refId": "A",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and RecordType eq 'Task' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso})/groupby((Pipeline),aggregate(RecordId with countdistinct as Failed))",
+          "refId": "B",
+          "usePost": true
+        }
+      ],
+      "title": "Pipelines by agent time (click a pipeline to filter)",
+      "transformations": [
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "A"
+          },
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Pipeline",
+                "Total",
+                "Runs"
+              ]
+            }
+          }
+        },
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "B"
+          },
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Pipeline",
+                "Failed"
+              ]
+            }
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "Pipeline",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "Failed B": "Failed",
+              "Runs A": "Runs",
+              "Total A": "Total"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Avg per run",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Total"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Runs"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "Total"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "Avg per run": 3,
+              "Failed": 4,
+              "Pipeline": 0,
+              "Runs": 2,
+              "Total": 1
+            },
+            "renameByName": {
+              "Failed": "Failed steps",
+              "Total": "Total time"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 90,
+            "lineWidth": 0
+          },
+          "max": 1,
+          "min": 0,
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "detect"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f96d4",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "setup"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5fc8b5",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "build"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#3d6fb6",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "test"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#a78bfa",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "deploy"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2a33a",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "publish"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#d9804a",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cleanup"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#8e8e8e",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "teardown"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#6b7280",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "other"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#e0b400",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 10,
+        "x": 14,
+        "y": 1
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "never",
+        "stacking": "normal",
+        "xField": "Pipeline"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Pipeline:singlequote}) or Pipeline in (${Pipeline:singlequote})) and RecordType eq 'Task' and StepName ne 'ManualValidation' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso})/groupby((Pipeline,Category),aggregate(DurationSeconds with sum as Sec))",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Where the time goes, per pipeline (share of task time by category)",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Pipeline",
+                "Category",
+                "Sec"
+              ]
+            }
+          }
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "Category",
+            "rowField": "Pipeline",
+            "valueField": "Sec"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "Pipeline\\Category": "Pipeline"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Total",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "detect",
+                "setup",
+                "build",
+                "test",
+                "deploy",
+                "publish",
+                "cleanup",
+                "teardown",
+                "other"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "d_detect",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "detect"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Total"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "d_setup",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "setup"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Total"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "d_build",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "build"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Total"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "d_test",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "test"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Total"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "d_deploy",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "deploy"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Total"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "d_publish",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "publish"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Total"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "d_cleanup",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "cleanup"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Total"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "d_teardown",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "teardown"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Total"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "d_other",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "other"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Total"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Total": true,
+              "build": true,
+              "cleanup": true,
+              "deploy": true,
+              "detect": true,
+              "other": true,
+              "publish": true,
+              "setup": true,
+              "teardown": true,
+              "test": true
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "d_build": "build",
+              "d_cleanup": "cleanup",
+              "d_deploy": "deploy",
+              "d_detect": "detect",
+              "d_other": "other",
+              "d_publish": "publish",
+              "d_setup": "setup",
+              "d_teardown": "teardown",
+              "d_test": "test"
+            }
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "id": 4,
+      "panels": [],
+      "title": "Steps and failures",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "right"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Step"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Category"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/^(Total time|Avg)$/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Failed"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#e5484d",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 11
+      },
+      "id": 5,
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Pipeline:singlequote}) or Pipeline in (${Pipeline:singlequote})) and RecordType eq 'Task' and StepName ne 'ManualValidation' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso})/groupby((StepName,Category),aggregate(DurationSeconds with sum as Total,RecordId with countdistinct as Calls))&$top=500",
+          "refId": "A",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Pipeline:singlequote}) or Pipeline in (${Pipeline:singlequote})) and RecordType eq 'Task' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso})/groupby((StepName),aggregate(RecordId with countdistinct as Failed))&$top=500",
+          "refId": "B",
+          "usePost": true
+        }
+      ],
+      "title": "Steps by total time (selected pipelines)",
+      "transformations": [
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "A"
+          },
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "StepName",
+                "Category",
+                "Total",
+                "Calls"
+              ]
+            }
+          }
+        },
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "B"
+          },
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "StepName",
+                "Failed"
+              ]
+            }
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "StepName",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "Calls A": "Calls",
+              "Category A": "Category",
+              "Failed B": "Failed",
+              "Total A": "Total"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Avg",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Total"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Calls"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "Total"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "Avg": 4,
+              "Calls": 3,
+              "Category": 1,
+              "Failed": 5,
+              "StepName": 0,
+              "Total": 2
+            },
+            "renameByName": {
+              "Failed": "Failed",
+              "StepName": "Step",
+              "Total": "Total time"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Steps that ended failed, with the error code and the first error line (scrubbed of paths, accounts, hosts, addresses and secrets). Error columns stay empty for runs collected before the collector change.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "left"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time spent"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "custom.align",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Failures"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Latest build"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Filter on this",
+                    "url": "${__url.path}${__url.params:exclude:var-Build}&var-Build=${__value.raw}"
+                  }
+                ]
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "unit",
+                "value": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 11
+      },
+      "id": 6,
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineSpansTyped",
+            "name": "ADOTelemetry.ADOPipelineSpansTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineSpansTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineSpansTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Pipeline:singlequote}) or Pipeline in (${Pipeline:singlequote})) and ('__all' in (${Category:singlequote}) or Category in (${Category:singlequote})) and Kind eq 'Task' and Result eq 'failed' and startTime ge ${__from} and startTime lt ${__to})/groupby((Category,Pipeline,operationName,ErrorCode,ErrorMessage),aggregate(spanID with countdistinct as Failures,BuildId with max as LastBuild,duration with sum as Ms))&$top=500",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Failing steps and their error (use the Category filter, e.g. other)",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Category",
+                "Pipeline",
+                "operationName",
+                "ErrorCode",
+                "ErrorMessage",
+                "Failures",
+                "LastBuild",
+                "Ms"
+              ]
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "Failures"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "Category": 0,
+              "ErrorCode": 3,
+              "ErrorMessage": 4,
+              "Failures": 5,
+              "LastBuild": 7,
+              "Ms": 6,
+              "Pipeline": 1,
+              "operationName": 2
+            },
+            "renameByName": {
+              "ErrorCode": "Error code",
+              "ErrorMessage": "Error (scrubbed)",
+              "LastBuild": "Latest build",
+              "Ms": "Time spent",
+              "operationName": "Step"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 21
+      },
+      "id": 7,
+      "panels": [],
+      "title": "One run",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Pull requests created in the time range. Click the PR number or the title and choose Select this pull request: the runs table below, the trace picker and the compare view then show that pull request only.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": false
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PR"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Select this pull request (filters the runs below and the compare view)",
+                    "url": "${__url.path}${__url.params:exclude:var-PR}&var-PR=${__data.fields.PR}"
+                  }
+                ]
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.width",
+                "value": 80
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Title"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Select this pull request (filters the runs below and the compare view)",
+                    "url": "${__url.path}${__url.params:exclude:var-PR}&var-PR=${__data.fields.PR}"
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 520
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Created"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsIso"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Open for"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Target branch"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "pattern": "refs/heads/(.*)",
+                      "result": {
+                        "text": "$1"
+                      }
+                    },
+                    "type": "regex"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "id": 30,
+      "links": [
+        {
+          "title": "Clear the pull request selection",
+          "url": "${__url.path}${__url.params:exclude:var-PR}&var-PR=$__all"
+        }
+      ],
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPullRequestsTyped",
+            "name": "ADOTelemetry.ADOPullRequestsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPullRequestsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPullRequestsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and CreatedAt ge ${__from:date:iso} and CreatedAt lt ${__to:date:iso})/groupby((PullRequestId,Title,Status,MergeStatus,TargetBranch,AreaPath,WorkItemType,IsDraft,CreatedAt,OpenSeconds))&$orderby=CreatedAt desc&$top=300",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Pull requests: click a PR to see its runs and compare them (clear with the Pull request filter)",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "PullRequestId",
+                "Title",
+                "Status",
+                "MergeStatus",
+                "TargetBranch",
+                "AreaPath",
+                "WorkItemType",
+                "IsDraft",
+                "CreatedAt",
+                "OpenSeconds"
+              ]
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "CreatedAt"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "AreaPath": 6,
+              "CreatedAt": 7,
+              "IsDraft": 9,
+              "MergeStatus": 3,
+              "OpenSeconds": 8,
+              "PullRequestId": 0,
+              "Status": 2,
+              "TargetBranch": 4,
+              "Title": 1,
+              "WorkItemType": 5
+            },
+            "renameByName": {
+              "AreaPath": "Area",
+              "CreatedAt": "Created",
+              "IsDraft": "Draft",
+              "MergeStatus": "Merge",
+              "OpenSeconds": "Open for",
+              "PullRequestId": "PR",
+              "TargetBranch": "Target branch",
+              "WorkItemType": "Work item"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "left"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Build"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open the trace of this pull request",
+                    "url": "${__url.path}${__url.params:exclude:var-Trace}&var-Trace=${__data.fields.PR}"
+                  },
+                  {
+                    "title": "Open this build as its own trace",
+                    "url": "${__url.path}${__url.params:exclude:var-Trace}&var-Trace=${__value.raw}"
+                  },
+                  {
+                    "title": "Compare: use this build as run A",
+                    "url": "${__url.path}${__url.params:exclude:var-RunA}&var-RunA=${__value.raw}"
+                  },
+                  {
+                    "title": "Compare: use this build as run B",
+                    "url": "${__url.path}${__url.params:exclude:var-RunB}&var-RunB=${__value.raw}"
+                  }
+                ]
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "unit",
+                "value": "none"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/^(Duration|Queue)$/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Started"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsIso"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Result"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "canceled": {
+                        "color": "gray",
+                        "index": 2
+                      },
+                      "failed": {
+                        "color": "red",
+                        "index": 0
+                      },
+                      "succeeded": {
+                        "color": "green",
+                        "index": 1
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 31
+      },
+      "id": 8,
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Pipeline:singlequote}) or Pipeline in (${Pipeline:singlequote})) and (0 in (${PR:csv}) or PullRequestId in (${PR:csv})) and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso})/groupby((BuildId,Pipeline,Result,StartedAt,DurationSeconds,QueueSeconds,PullRequestId))&$top=500",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Runs of the selected pull request / pipelines (click a build: open its trace, or use it as compare run A or B)",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "BuildId",
+                "Pipeline",
+                "Result",
+                "StartedAt",
+                "DurationSeconds",
+                "QueueSeconds",
+                "PullRequestId",
+                "TargetBranch"
+              ]
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "StartedAt"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "BuildId": 0,
+              "DurationSeconds": 5,
+              "Pipeline": 2,
+              "PullRequestId": 1,
+              "QueueSeconds": 6,
+              "Result": 3,
+              "StartedAt": 4,
+              "TargetBranch": 7
+            },
+            "renameByName": {
+              "BuildId": "Build",
+              "DurationSeconds": "Duration",
+              "PullRequestId": "PR",
+              "QueueSeconds": "Queue",
+              "StartedAt": "Started",
+              "TargetBranch": "Target branch"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 41
+      },
+      "id": 40,
+      "panels": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 18,
+            "w": 24,
+            "x": 0,
+            "y": 41
+          },
+          "id": 12,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "PD36424FC765F148A"
+              },
+              "entitySet": {
+                "entityType": "UserDefined.ADOTelemetry.ADOPipelineSpansTyped",
+                "name": "ADOTelemetry.ADOPipelineSpansTyped"
+              },
+              "entityType": "UserDefined.ADOTelemetry.ADOPipelineSpansTyped",
+              "oDataQueryString": "ADOTelemetry.ADOPipelineSpansTyped?$filter=traceID eq '${Trace}'&$top=2000",
+              "refId": "A",
+              "usePost": true
+            }
+          ],
+          "title": "Span view of the selected run: the run, the pipelines it triggered, and their steps",
+          "type": "traces"
+        }
+      ],
+      "title": "Span view of the selected run (expand to load; pick a build in the runs table above)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Hours of runs that failed or were not released, per pipeline.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "fillOpacity": 85,
+            "gradientMode": "none",
+            "lineWidth": 0,
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Failed"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#e5534b",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Canceled"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#8e8e8e",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Partial"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2a33a",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 18,
+        "x": 0,
+        "y": 42
+      },
+      "id": 10,
+      "options": {
+        "barWidth": 0.8,
+        "groupWidth": 0.75,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "normal",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "Pipeline",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Result ne 'succeeded' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso})/groupby((Pipeline,Result),aggregate(DurationSeconds with sum as T))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Failed-run time by pipeline",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Pipeline",
+                "Result",
+                "T"
+              ]
+            }
+          }
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "Result",
+            "emptyValue": "zero",
+            "rowField": "Pipeline",
+            "valueField": "T"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Pipeline\\Result": "Pipeline",
+              "canceled": "Canceled",
+              "failed": "Failed",
+              "partiallySucceeded": "Partial"
+            }
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 49
+      },
+      "id": 41,
+      "panels": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "description": "One row per pipeline, branch and bucket (Slowest 5 percent of runs vs the rest). Click a row and choose Show this typical run.",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto",
+                "cellOptions": {
+                  "type": "auto"
+                },
+                "filterable": true
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Pipeline"
+                },
+                "properties": [
+                  {
+                    "id": "links",
+                    "value": [
+                      {
+                        "title": "Show this typical run in the span view below",
+                        "url": "${__url.path}${__url.params:exclude:var-Profile}&var-Profile=${__data.fields.traceID}"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Branch"
+                },
+                "properties": [
+                  {
+                    "id": "links",
+                    "value": [
+                      {
+                        "title": "Show this typical run in the span view below",
+                        "url": "${__url.path}${__url.params:exclude:var-Profile}&var-Profile=${__data.fields.traceID}"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Bucket"
+                },
+                "properties": [
+                  {
+                    "id": "links",
+                    "value": [
+                      {
+                        "title": "Show this typical run in the span view below",
+                        "url": "${__url.path}${__url.params:exclude:var-Profile}&var-Profile=${__data.fields.traceID}"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Median duration"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "ms"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "traceID"
+                },
+                "properties": [
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 49
+          },
+          "id": 31,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "show": false
+            },
+            "showHeader": true
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "PD36424FC765F148A"
+              },
+              "entitySet": {
+                "entityType": "UserDefined.ADOTelemetry.ADOSpanProfileTyped",
+                "name": "ADOTelemetry.ADOSpanProfileTyped"
+              },
+              "entityType": "UserDefined.ADOTelemetry.ADOSpanProfileTyped",
+              "oDataQueryString": "ADOTelemetry.ADOSpanProfileTyped?$apply=filter(parentSpanID eq '' and ('__all' in (${Pipeline:singlequote}) or Pipeline in (${Pipeline:singlequote})))/groupby((traceID,Pipeline,Branch,Bucket,Runs,duration))&$top=300",
+              "refId": "A",
+              "usePost": true
+            }
+          ],
+          "title": "Typical runs: click a row to see its median step timeline below",
+          "transformations": [
+            {
+              "id": "sortBy",
+              "options": {
+                "sort": [
+                  {
+                    "desc": true,
+                    "field": "Runs"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "indexByName": {
+                  "Branch": 1,
+                  "Bucket": 2,
+                  "Pipeline": 0,
+                  "Runs": 3,
+                  "duration": 4,
+                  "traceID": 5
+                },
+                "renameByName": {
+                  "duration": "Median duration"
+                }
+              }
+            }
+          ],
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "description": "Each bar is the median start offset and duration of that step across runs in the selected bucket. Pick a pipeline, then a typical-run profile. Compare Slowest 5% with Rest to see which steps stretch.",
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 14,
+            "w": 24,
+            "x": 0,
+            "y": 57
+          },
+          "id": 13,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "PD36424FC765F148A"
+              },
+              "entitySet": {
+                "entityType": "UserDefined.ADOTelemetry.ADOSpanProfileTyped",
+                "name": "ADOTelemetry.ADOSpanProfileTyped"
+              },
+              "entityType": "UserDefined.ADOTelemetry.ADOSpanProfileTyped",
+              "oDataQueryString": "ADOTelemetry.ADOSpanProfileTyped?$filter=traceID eq '${Profile}'&$top=1000",
+              "refId": "A",
+              "usePost": true
+            }
+          ],
+          "title": "Typical run: median step timeline (slowest 5% vs the rest, last 30 days)",
+          "type": "traces"
+        }
+      ],
+      "title": "Typical runs: pick one and see its median step timeline (expand to load)",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 50
+      },
+      "id": 42,
+      "panels": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "description": "Both runs, with the pipelines they triggered, drawn from their own start. Choose them with the Compare variables at the top (narrow with Pull request or Pipeline). Run names in the tree carry the build id. If both variables show the same build, only one run is drawn.",
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 20,
+            "w": 24,
+            "x": 0,
+            "y": 51
+          },
+          "id": 15,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "PD36424FC765F148A"
+              },
+              "entitySet": {
+                "entityType": "UserDefined.ADOTelemetry.ADORunCompareTyped",
+                "name": "ADOTelemetry.ADORunCompareTyped"
+              },
+              "entityType": "UserDefined.ADOTelemetry.ADORunCompareTyped",
+              "oDataQueryString": "ADOTelemetry.ADORunCompareTyped?$filter=traceID eq '${RunA}' or traceID eq '${RunB}'&$top=2000",
+              "refId": "A",
+              "usePost": true
+            }
+          ],
+          "title": "Run A and run B on one time axis (both start at 0): which steps moved?",
+          "type": "traces"
+        }
+      ],
+      "title": "Compare two runs of the selected pull request (expand to load; use the Build links in the runs table)",
+      "type": "row"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [
+    "ado",
+    "cmf-audit"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Organization",
+        "multi": true,
+        "name": "Organization",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=groupby((Organization))&$select=Organization&$orderby=Organization",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Project",
+        "multi": true,
+        "name": "Project",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})))/groupby((Project))&$select=Project&$orderby=Project",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Pipeline",
+        "multi": true,
+        "name": "Pipeline",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=groupby((Pipeline))&$select=Pipeline&$orderby=Pipeline",
+          "usePost": true
+        },
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": [
+            "$__all"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "includeAll": true,
+        "label": "Step category",
+        "multi": true,
+        "name": "Category",
+        "options": [],
+        "query": "detect,setup,build,test,deploy,publish,cleanup,teardown,other",
+        "type": "custom"
+      },
+      {
+        "allValue": "0",
+        "current": {
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "hide": 2,
+        "includeAll": true,
+        "label": "Pull request",
+        "multi": true,
+        "name": "PR",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Pipeline:singlequote}) or Pipeline in (${Pipeline:singlequote})) and PullRequestId gt 0)/groupby((PullRequestId),aggregate(StartedAt with max as Last))&$orderby=Last desc&$top=100&$select=PullRequestId",
+          "usePost": true
+        },
+        "refresh": 2,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "hide": 2,
+        "includeAll": false,
+        "label": "Run (build) with its child pipelines - narrow with Pull request",
+        "name": "Trace",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Pipeline:singlequote}) or Pipeline in (${Pipeline:singlequote})) and ParentBuildId eq null and (0 in (${PR:csv}) or PullRequestId in (${PR:csv})))/groupby((BuildId),aggregate(StartedAt with max as Last))&$orderby=Last desc&$top=100&$select=BuildId",
+          "usePost": true
+        },
+        "refresh": 2,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "PR-Validate | (no pull request) | Rest",
+          "value": "PR-Validate | (no pull request) | Rest"
+        },
+        "hide": 2,
+        "label": "Typical run (pipeline | branch | bucket)",
+        "name": "Profile",
+        "options": [
+          {
+            "selected": true,
+            "text": "PR-Validate | (no pull request) | Rest",
+            "value": "PR-Validate | (no pull request) | Rest"
+          }
+        ],
+        "query": "PR-Validate | (no pull request) | Rest",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "hide": 2,
+        "includeAll": false,
+        "label": "Compare: run A (build)",
+        "name": "RunA",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Pipeline:singlequote}) or Pipeline in (${Pipeline:singlequote})) and ParentBuildId eq null and (0 in (${PR:csv}) or PullRequestId in (${PR:csv})))/groupby((BuildId),aggregate(StartedAt with max as Last))&$orderby=Last desc&$top=100&$select=BuildId",
+          "usePost": true
+        },
+        "refresh": 2,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "hide": 2,
+        "includeAll": false,
+        "label": "Compare: run B (build)",
+        "name": "RunB",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Pipeline:singlequote}) or Pipeline in (${Pipeline:singlequote})) and ParentBuildId eq null and (0 in (${PR:csv}) or PullRequestId in (${PR:csv})))/groupby((BuildId),aggregate(StartedAt with max as Last))&$orderby=Last desc&$top=100&$skip=1&$select=BuildId",
+          "usePost": true
+        },
+        "refresh": 2,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "timepicker": {
+    "quick_ranges": [
+      {
+        "display": "Last 7 days",
+        "from": "now-7d",
+        "to": "now"
+      },
+      {
+        "display": "Last 14 days",
+        "from": "now-14d",
+        "to": "now"
+      },
+      {
+        "display": "Last 30 days",
+        "from": "now-30d",
+        "to": "now"
+      },
+      {
+        "display": "Last 60 days",
+        "from": "now-60d",
+        "to": "now"
+      },
+      {
+        "display": "Last 90 days",
+        "from": "now-90d",
+        "to": "now"
+      },
+      {
+        "display": "Last 120 days",
+        "from": "now-120d",
+        "to": "now"
+      },
+      {
+        "display": "Last 180 days",
+        "from": "now-180d",
+        "to": "now"
+      }
+    ]
+  },
+  "timezone": "",
+  "title": "ADO - Pipeline investigation",
+  "uid": "cmf-ado-pipeline-investigation",
+  "version": 36
+}

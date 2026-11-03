@@ -1,0 +1,5374 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "A team's own progress over time: items Resolved, cycle time, reviews, predictability and scope churn. Pick one team and compare it with itself only; not for comparing or ranking teams.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [
+    {
+      "asDropdown": true,
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "ado"
+      ],
+      "title": "ADO dashboards",
+      "type": "dashboards"
+    }
+  ],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "panels": [],
+      "title": "Delivery: items moved to Resolved",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Work items linked to merged PRs that this team moved to Resolved in the selected range.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#3fb68b",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "count"
+          ],
+          "fields": "/^WorkItemId$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Resolved ne null and Resolved ge ${__from:date:seconds} and Resolved lt ${__to:date:seconds})/groupby((WorkItemId))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Resolved items",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "WorkItemId"
+              ]
+            }
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Median of the weekly Resolved counts in the range (weeks with no resolutions are not counted): this team's own typical week.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#4f8ff7",
+            "mode": "fixed"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 1
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "median"
+          ],
+          "fields": "/^Resolved$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Resolved ne null and Resolved ge ${__from:date:seconds} and Resolved lt ${__to:date:seconds})/groupby((WorkItemId,Resolved))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Resolved per week (median)",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "WorkItemId",
+                "Resolved"
+              ]
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "Resolved"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week0",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Resolved"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week1",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week0"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week2",
+            "mode": "unary",
+            "replaceFields": false,
+            "unary": {
+              "fieldName": "Week1",
+              "operator": "floor"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week3",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week2"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week3"
+                }
+              },
+              "operator": "+",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Week": {
+                "operation": "groupby"
+              },
+              "WorkItemId": {
+                "aggregations": [
+                  "distinctCount"
+                ],
+                "operation": "aggregate"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "dateFormat": "X",
+                "destinationType": "time",
+                "targetField": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "WorkItemId (distinctCount)": "Resolved"
+            }
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Items moved to Resolved each week (bars) and the trailing 4-week average (line). Compare only with this team's own earlier weeks; teams are not comparable with each other.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 6,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "mappings": [],
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Resolved"
+            },
+            "properties": [
+              {
+                "id": "custom.drawStyle",
+                "value": "bars"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 40
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 0
+              },
+              {
+                "id": "custom.showPoints",
+                "value": "never"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f8ff7",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "4-week average"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2a33a",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 3
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Resolved ne null and Resolved ge ${__from:date:seconds} and Resolved lt ${__to:date:seconds})/groupby((WorkItemId,Resolved))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Resolved items per week",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "WorkItemId",
+                "Resolved"
+              ]
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "Resolved"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week0",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Resolved"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week1",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week0"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week2",
+            "mode": "unary",
+            "replaceFields": false,
+            "unary": {
+              "fieldName": "Week1",
+              "operator": "floor"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week3",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week2"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week3"
+                }
+              },
+              "operator": "+",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Week": {
+                "operation": "groupby"
+              },
+              "WorkItemId": {
+                "aggregations": [
+                  "distinctCount"
+                ],
+                "operation": "aggregate"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "dateFormat": "X",
+                "destinationType": "time",
+                "targetField": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "WorkItemId (distinctCount)": "Resolved"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "4-week average",
+            "mode": "windowFunctions",
+            "replaceFields": false,
+            "window": {
+              "field": "Resolved",
+              "reducer": "mean",
+              "windowAlignment": "trailing",
+              "windowSize": 4,
+              "windowSizeMode": "fixed"
+            }
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Items linked to PRs merged during the sprint (grey) and how many of them are Resolved (green). The sprint is the one the PR was merged in; Resolved normally follows within hours. Compare only with this team's own earlier sprints; teams are not comparable with each other. Needs one team selected (sprint calendars differ between teams, so there is no All view).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "axisSoftMin": 0,
+            "fillOpacity": 85,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 0,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "noValue": "Select one team: sprint calendars differ between teams, so sprints cannot be combined.",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Merged"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#8e8e8e",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Resolved"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#3fb68b",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "MergedSprintPath"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "pattern": "^[^\\\\]+\\\\(.+)$",
+                      "result": {
+                        "index": 0,
+                        "text": "$1"
+                      }
+                    },
+                    "type": "regex"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 14
+      },
+      "id": 15,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.8,
+        "fullHighlight": false,
+        "groupWidth": 0.75,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "showValue": "always",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "MergedSprintPath",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Team in (${Team:singlequote}) and MergedSprintPath ne null and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((MergedSprintPath),aggregate(WorkItemId with countdistinct as MergedItems))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Team in (${Team:singlequote}) and MergedSprintPath ne null and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and Resolved ne null)/groupby((MergedSprintPath),aggregate(WorkItemId with countdistinct as ResolvedItems))&$top=20000",
+          "refId": "B",
+          "usePost": true
+        }
+      ],
+      "title": "Resolved items per sprint",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "MergedSprintPath",
+                "MergedItems",
+                "ResolvedItems"
+              ]
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "MergedSprintPath"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "renameByName": {
+              "MergedItems": "Merged",
+              "ResolvedItems": "Resolved"
+            }
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Median time from Active to Resolved for items resolved from PRs merged in each sprint, with the mean next to it. Shown in days. Compare only with this team's own earlier sprints; teams are not comparable with each other. Needs one team selected (sprint calendars differ between teams, so there is no All view).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "days",
+            "axisPlacement": "left",
+            "axisSoftMin": 0,
+            "fillOpacity": 85,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 0,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "mappings": [],
+          "noValue": "Select one team: sprint calendars differ between teams, so sprints cannot be combined.",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Median"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f8ff7",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Mean"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#8e8e8e",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "MergedSprintPath"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "pattern": "^[^\\\\]+\\\\(.+)$",
+                      "result": {
+                        "index": 0,
+                        "text": "$1"
+                      }
+                    },
+                    "type": "regex"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 14
+      },
+      "id": 16,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.8,
+        "fullHighlight": false,
+        "groupWidth": 0.75,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "showValue": "always",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "MergedSprintPath",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Team in (${Team:singlequote}) and MergedSprintPath ne null and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and Resolved ne null and ActiveToResolved ne null)/groupby((MergedSprintPath,WorkItemId,ActiveToResolved))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Cycle time per sprint (median)",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "MergedSprintPath",
+                "ActiveToResolved"
+              ]
+            }
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "ActiveToResolved": {
+                "aggregations": [
+                  "median",
+                  "mean"
+                ],
+                "operation": "aggregate"
+              },
+              "MergedSprintPath": {
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "MergedSprintPath"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "MedianD",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "ActiveToResolved (median)"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "86400"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "MeanD",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "ActiveToResolved (mean)"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "86400"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "ActiveToResolved (mean)": true,
+              "ActiveToResolved (median)": true
+            },
+            "renameByName": {
+              "MeanD": "Mean",
+              "MedianD": "Median"
+            }
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 30,
+      "panels": [],
+      "title": "Story points: this team's own trend",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Story points of the items moved to Resolved each week (bars) and the trailing 4-week average (line). Points are the estimate when the item was resolved, counted once per work item; items without an estimate add nothing (see the stat on the right of the sprint panel). Compare only with this team's own earlier weeks; teams are not comparable with each other. With Team = All the points of all teams are added up; point scales differ between teams, so read that only as total volume and never to compare teams.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 6,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "mappings": [],
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Story points"
+            },
+            "properties": [
+              {
+                "id": "custom.drawStyle",
+                "value": "bars"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 40
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 0
+              },
+              {
+                "id": "custom.showPoints",
+                "value": "never"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f8ff7",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "4-week average"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2a33a",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 3
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 31,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Resolved ne null and Resolved ge ${__from:date:seconds} and Resolved lt ${__to:date:seconds})/groupby((WorkItemId,Resolved),aggregate(StoryPointsCounted with sum as Points))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Story points resolved per week",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "WorkItemId",
+                "Resolved",
+                "Points"
+              ]
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "Resolved"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week0",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Resolved"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week1",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week0"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week2",
+            "mode": "unary",
+            "replaceFields": false,
+            "unary": {
+              "fieldName": "Week1",
+              "operator": "floor"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week3",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week2"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week3"
+                }
+              },
+              "operator": "+",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Week": {
+                "operation": "groupby"
+              },
+              "Points": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "dateFormat": "X",
+                "destinationType": "time",
+                "targetField": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "Points (sum)": "Story points"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "4-week average",
+            "mode": "windowFunctions",
+            "replaceFields": false,
+            "window": {
+              "field": "Story points",
+              "reducer": "mean",
+              "windowAlignment": "trailing",
+              "windowSize": 4,
+              "windowSizeMode": "fixed"
+            }
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Story points of items linked to PRs merged during the sprint (grey) and of those Resolved (green); counted once per work item, using the estimate at resolution. The sprint is the one the PR was merged in. Compare only with this team's own earlier sprints; teams are not comparable with each other. Needs one team selected (sprint calendars differ between teams, so there is no All view).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "axisSoftMin": 0,
+            "fillOpacity": 85,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 0,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "noValue": "Select one team: sprint calendars differ between teams, so sprints cannot be combined.",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Merged"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#8e8e8e",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Resolved"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#3fb68b",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "MergedSprintPath"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "pattern": "^[^\\\\]+\\\\(.+)$",
+                      "result": {
+                        "index": 0,
+                        "text": "$1"
+                      }
+                    },
+                    "type": "regex"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 16,
+        "x": 0,
+        "y": 33
+      },
+      "id": 32,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.8,
+        "fullHighlight": false,
+        "groupWidth": 0.75,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "showValue": "always",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "MergedSprintPath",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Team in (${Team:singlequote}) and MergedSprintPath ne null and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((MergedSprintPath),aggregate(StoryPointsCounted with sum as MergedPoints))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Team in (${Team:singlequote}) and MergedSprintPath ne null and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and Resolved ne null)/groupby((MergedSprintPath),aggregate(StoryPointsCounted with sum as ResolvedPoints))&$top=20000",
+          "refId": "B",
+          "usePost": true
+        }
+      ],
+      "title": "Story points per sprint",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "MergedSprintPath",
+                "MergedPoints",
+                "ResolvedPoints"
+              ]
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "MergedSprintPath"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "renameByName": {
+              "MergedPoints": "Merged",
+              "ResolvedPoints": "Resolved"
+            }
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Sum of story points of the items moved to Resolved in the selected period (one estimate per work item).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#3fb68b",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 16,
+        "y": 33
+      },
+      "id": 33,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Points$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Resolved ne null and Resolved ge ${__from:date:seconds} and Resolved lt ${__to:date:seconds})/aggregate(StoryPointsCounted with sum as Points)",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Story points resolved",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Points"
+              ]
+            }
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Items moved to Resolved in the selected period that have no story points (bugs and tasks are often not estimated). Rows posted before the story points change also show here until the history is re-posted.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#f2a33a",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 16,
+        "y": 37
+      },
+      "id": 34,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "count"
+          ],
+          "fields": "/^WorkItemId$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Resolved ne null and Resolved ge ${__from:date:seconds} and Resolved lt ${__to:date:seconds} and StoryPoints eq null)/groupby((WorkItemId))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Resolved items without story points",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "WorkItemId"
+              ]
+            }
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 42
+      },
+      "id": 5,
+      "panels": [],
+      "title": "Speed: how long items take",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Per week of resolution: median (typical item) and mean (pulled up by slow items). A growing gap between them means a few items are getting stuck. Compare only with this team's own earlier weeks; teams are not comparable with each other.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "lineWidth": 2,
+            "pointSize": 6,
+            "showPoints": "always",
+            "spanNulls": true
+          },
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Median"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f8ff7",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 3
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Mean"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#8e8e8e",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 43
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ActiveToResolved ne null and Resolved ne null and Resolved ge ${__from:date:seconds} and Resolved lt ${__to:date:seconds})/groupby((WorkItemId,Resolved,ActiveToResolved))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Cycle time (Active to Resolved) per week",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "WorkItemId",
+                "Resolved",
+                "ActiveToResolved"
+              ]
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "Resolved"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week0",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Resolved"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week1",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week0"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week2",
+            "mode": "unary",
+            "replaceFields": false,
+            "unary": {
+              "fieldName": "Week1",
+              "operator": "floor"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week3",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week2"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week3"
+                }
+              },
+              "operator": "+",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "ActiveToResolved": {
+                "aggregations": [
+                  "median",
+                  "mean"
+                ],
+                "operation": "aggregate"
+              },
+              "Week": {
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "dateFormat": "X",
+                "destinationType": "time",
+                "targetField": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "ActiveToResolved (mean)": "Mean",
+              "ActiveToResolved (median)": "Median"
+            }
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "How long after the PR merge the item is moved to Resolved (median). Long waits mean finished work is not being closed out. Compare only with this team's own earlier weeks; teams are not comparable with each other.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "lineWidth": 2,
+            "pointSize": 6,
+            "showPoints": "always",
+            "spanNulls": true
+          },
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Median merge to Resolved"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#2ec4c4",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 43
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and MergeToResolved ne null and Resolved ne null and Resolved ge ${__from:date:seconds} and Resolved lt ${__to:date:seconds})/groupby((WorkItemId,Resolved,MergeToResolved))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Merge to Resolved per week",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "WorkItemId",
+                "Resolved",
+                "MergeToResolved"
+              ]
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "Resolved"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week0",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Resolved"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week1",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week0"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week2",
+            "mode": "unary",
+            "replaceFields": false,
+            "unary": {
+              "fieldName": "Week1",
+              "operator": "floor"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week3",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week2"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week3"
+                }
+              },
+              "operator": "+",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "MergeToResolved": {
+                "aggregations": [
+                  "median"
+                ],
+                "operation": "aggregate"
+              },
+              "Week": {
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "dateFormat": "X",
+                "destinationType": "time",
+                "targetField": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "MergeToResolved (median)": "Median merge to Resolved"
+            }
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 52
+      },
+      "id": 8,
+      "panels": [],
+      "title": "Reviews",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Median time from PR creation-side review start to first approval and from last approval to merge, for PRs linked to this team work. Blank weeks have no data. Compare only with this team's own earlier weeks; teams are not comparable with each other.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "lineWidth": 2,
+            "pointSize": 6,
+            "showPoints": "always",
+            "spanNulls": true
+          },
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time to first approval"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#9d7cd8",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Approval to merge"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2a33a",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 53
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Merged ne null and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and TimeToFirstApproval ne null)/groupby((PullRequestId,Merged,TimeToFirstApproval,ApprovalToMerge))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Review flow per week of merge",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "PullRequestId",
+                "Merged",
+                "TimeToFirstApproval",
+                "ApprovalToMerge"
+              ]
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "Merged"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week0",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Merged"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week1",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week0"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week2",
+            "mode": "unary",
+            "replaceFields": false,
+            "unary": {
+              "fieldName": "Week1",
+              "operator": "floor"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week3",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week2"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week3"
+                }
+              },
+              "operator": "+",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "ApprovalToMerge": {
+                "aggregations": [
+                  "median"
+                ],
+                "operation": "aggregate"
+              },
+              "TimeToFirstApproval": {
+                "aggregations": [
+                  "median"
+                ],
+                "operation": "aggregate"
+              },
+              "Week": {
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "dateFormat": "X",
+                "destinationType": "time",
+                "targetField": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "ApprovalToMerge (median)": "Approval to merge",
+              "TimeToFirstApproval (median)": "Time to first approval"
+            }
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 62
+      },
+      "id": 10,
+      "panels": [],
+      "title": "Predictability and scope",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Items that were in a sprint when their PR was created (planned) and those Resolved/Closed without moving to another sprint (delivered). Caveat: carry-over counts any iteration move, so delivery is understated. Compare only with this team's own earlier weeks; teams are not comparable with each other. Needs one team selected (sprint calendars differ between teams, so there is no All view).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisGridShow": true,
+            "axisPlacement": "left",
+            "axisSoftMin": 0,
+            "fillOpacity": 85,
+            "lineWidth": 0
+          },
+          "decimals": 0,
+          "noValue": "Select one team: sprint calendars differ between teams, so sprints cannot be combined.",
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Planned"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#8e8e8e",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Delivered"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#3fb68b",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "InitialIterationPath"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "pattern": "^[^\\\\]+\\\\(.+)$",
+                      "result": {
+                        "index": 0,
+                        "text": "$1"
+                      }
+                    },
+                    "type": "regex"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 63
+      },
+      "id": 11,
+      "options": {
+        "barWidth": 0.8,
+        "groupWidth": 0.75,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "showValue": "always",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "InitialIterationPath",
+        "xTickLabelMaxLength": 24,
+        "xTickLabelRotation": -45,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Team in (${Team:singlequote}) and InitialIterationPath ne null and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((InitialIterationPath),aggregate(WorkItemId with countdistinct as Planned))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Team in (${Team:singlequote}) and InitialIterationPath ne null and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and CarriedOver eq 0 and (State eq 'Resolved' or State eq 'Closed'))/groupby((InitialIterationPath),aggregate(WorkItemId with countdistinct as Delivered))&$top=20000",
+          "refId": "B",
+          "usePost": true
+        }
+      ],
+      "title": "Planned vs delivered per sprint",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "InitialIterationPath",
+                "Planned",
+                "Delivered"
+              ]
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "InitialIterationPath"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Share of the sprint items whose sprint changed after their PR was created (orange, left axis) and the mean number of iteration changes per item (red, right axis). Compare only with this team's own earlier sprints. Needs one team selected (sprint calendars differ between teams, so there is no All view).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisGridShow": true,
+            "axisPlacement": "left",
+            "axisSoftMin": 0,
+            "fillOpacity": 85,
+            "lineWidth": 0
+          },
+          "noValue": "Select one team: sprint calendars differ between teams, so sprints cannot be combined.",
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Carried over"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2a33a",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Iteration changes per item"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#e5534b",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "InitialIterationPath"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "pattern": "^[^\\\\]+\\\\(.+)$",
+                      "result": {
+                        "index": 0,
+                        "text": "$1"
+                      }
+                    },
+                    "type": "regex"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 72
+      },
+      "id": 12,
+      "options": {
+        "barWidth": 0.8,
+        "groupWidth": 0.75,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "showValue": "always",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "InitialIterationPath",
+        "xTickLabelMaxLength": 24,
+        "xTickLabelRotation": -45,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Team in (${Team:singlequote}) and InitialIterationPath ne null and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((InitialIterationPath),aggregate(CarriedOver with average as Carried,IterationChanges with average as Changes))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Carry-over and scope churn per sprint",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "InitialIterationPath",
+                "Carried",
+                "Changes"
+              ]
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "InitialIterationPath"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "renameByName": {
+              "Carried": "Carried over",
+              "Changes": "Iteration changes per item"
+            }
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 81
+      },
+      "id": 13,
+      "panels": [],
+      "title": "Work mix",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "What kind of work was Resolved each week (bugs, tasks, stories...). A rising share of bugs can mean quality debt is eating capacity. Compare only with this team's own earlier weeks; teams are not comparable with each other.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "fillOpacity": 85,
+            "lineWidth": 0
+          },
+          "decimals": 0,
+          "noValue": "No data",
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 82
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "stacking": "normal",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "Week\\WorkItemType",
+        "xTickLabelRotation": -45
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Resolved ne null and Resolved ge ${__from:date:seconds} and Resolved lt ${__to:date:seconds})/groupby((WorkItemId,WorkItemType,Resolved))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Resolved items by type per week (week starting)",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "WorkItemId",
+                "WorkItemType",
+                "Resolved"
+              ]
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "Resolved"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week0",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Resolved"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week1",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week0"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week2",
+            "mode": "unary",
+            "replaceFields": false,
+            "unary": {
+              "fieldName": "Week1",
+              "operator": "floor"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week3",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week2"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week3"
+                }
+              },
+              "operator": "+",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Week": {
+                "operation": "groupby"
+              },
+              "WorkItemId": {
+                "aggregations": [
+                  "distinctCount"
+                ],
+                "operation": "aggregate"
+              },
+              "WorkItemType": {
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "dateFormat": "X",
+                "destinationType": "time",
+                "targetField": "Week"
+              },
+              {
+                "dateFormat": "MM-DD",
+                "destinationType": "string",
+                "targetField": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "WorkItemType",
+            "emptyValue": "zero",
+            "rowField": "Week",
+            "valueField": "WorkItemId (distinctCount)"
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 91
+      },
+      "id": 17,
+      "panels": [],
+      "title": "Completion by initial sprint (detail table)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Distinct WIs per initial sprint, deduplicated from up to 20,000 observed PR/WI links. Multiple PR links do not multiply a WI; any recorded move across its selected links wins. Completion is a recorded resolution with no iteration move, not delivery by the sprint deadline. Unknown history and non-sprint initial paths are excluded.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": true
+          },
+          "decimals": 1,
+          "noValue": "No data"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Observed WIs"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "noValue",
+                "value": "0"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Resolved, no move"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "noValue",
+                "value": "0"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Moved WIs"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "noValue",
+                "value": "0"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Completion share"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 1
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "0%"
+                      }
+                    },
+                    "type": "special"
+                  },
+                  {
+                    "options": {
+                      "match": "nan",
+                      "result": {
+                        "text": "0%"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 92
+      },
+      "id": 18,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$filter=('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and HistoryAvailable eq 1 and InitialIterationPath ne null and contains(InitialIterationPath,'Sprint ') and ('__all' in (${InitialSprint:singlequote}) or InitialIterationPath in (${InitialSprint:singlequote}))&$select=Team,InitialIterationPath,WorkItemId,CarriedOver,Resolved&$top=20000",
+          "refId": "A",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$filter=('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and HistoryAvailable eq 1 and InitialIterationPath ne null and contains(InitialIterationPath,'Sprint ') and ('__all' in (${InitialSprint:singlequote}) or InitialIterationPath in (${InitialSprint:singlequote}))&$select=Team,InitialIterationPath,WorkItemId,CarriedOver,Resolved&$top=20000",
+          "refId": "B",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$filter=('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and HistoryAvailable eq 1 and InitialIterationPath ne null and contains(InitialIterationPath,'Sprint ') and ('__all' in (${InitialSprint:singlequote}) or InitialIterationPath in (${InitialSprint:singlequote}))&$select=Team,InitialIterationPath,WorkItemId,CarriedOver,Resolved&$top=20000",
+          "refId": "C",
+          "usePost": true
+        }
+      ],
+      "title": "${Team}: completion by initial sprint",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Team",
+                "InitialIterationPath",
+                "WorkItemId",
+                "CarriedOver",
+                "Resolved"
+              ]
+            }
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "CarriedOver": {
+                "aggregations": [
+                  "max"
+                ],
+                "operation": "aggregate"
+              },
+              "InitialIterationPath": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "Resolved": {
+                "aggregations": [
+                  "max"
+                ],
+                "operation": "aggregate"
+              },
+              "Team": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "WorkItemId": {
+                "aggregations": [],
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "B"
+          },
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": 0
+                  }
+                },
+                "fieldName": "CarriedOver (max)"
+              },
+              {
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                },
+                "fieldName": "Resolved (max)"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        },
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "C"
+          },
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": 1
+                  }
+                },
+                "fieldName": "CarriedOver (max)"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        },
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "A"
+          },
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "WorkItemId": "Observed"
+            }
+          }
+        },
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "A"
+          },
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "InitialIterationPath": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "Observed": {
+                "aggregations": [
+                  "distinctCount"
+                ],
+                "operation": "aggregate"
+              },
+              "Team": {
+                "aggregations": [],
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "B"
+          },
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "WorkItemId": "Completed"
+            }
+          }
+        },
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "B"
+          },
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Completed": {
+                "aggregations": [
+                  "distinctCount"
+                ],
+                "operation": "aggregate"
+              },
+              "InitialIterationPath": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "Team": {
+                "aggregations": [],
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "C"
+          },
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "WorkItemId": "Moved"
+            }
+          }
+        },
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "C"
+          },
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "InitialIterationPath": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "Moved": {
+                "aggregations": [
+                  "distinctCount"
+                ],
+                "operation": "aggregate"
+              },
+              "Team": {
+                "aggregations": [],
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "Completed (distinctCount)": "Completed",
+              "Moved (distinctCount)": "Moved",
+              "Observed (distinctCount)": "Observed"
+            }
+          }
+        },
+        {
+          "id": "extractFields",
+          "options": {
+            "format": "regexp",
+            "regExp": "/(?<Sprint>Sprint\\s+(?<SprintNumber>\\d+))$/",
+            "replace": false,
+            "source": "InitialIterationPath"
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "SprintNumber"
+              }
+            ]
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": false,
+                "field": "SprintNumber"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "CompletionShare",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Completed"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Observed"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "MoveShare",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Moved"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Observed"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "InitialIterationPath": true,
+              "MoveShare": true,
+              "SprintNumber": true,
+              "Team": true
+            },
+            "indexByName": {
+              "Completed": 2,
+              "CompletionShare": 4,
+              "Moved": 3,
+              "Observed": 1,
+              "Sprint": 0
+            },
+            "renameByName": {
+              "Completed": "Resolved, no move",
+              "CompletionShare": "Completion share",
+              "Moved": "Moved WIs",
+              "Observed": "Observed WIs"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 105
+      },
+      "id": 19,
+      "panels": [],
+      "title": "Resolution load (who moves work items to Resolved)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Work items moved to Resolved/Closed per person (Azure DevOps identity id; the reviewer resolves after merge), with the median merge → resolved time. A few ids doing most resolutions = a review/resolution bottleneck.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": true
+          },
+          "decimals": 1,
+          "noValue": "No data"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Work items resolved"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f8ff7",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Median merge → resolved"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "text"
+                    },
+                    {
+                      "color": "#f2a33a",
+                      "value": 86400
+                    },
+                    {
+                      "color": "#e5534b",
+                      "value": 259200
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Slowest"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Resolver"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 300
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 16,
+        "x": 0,
+        "y": 106
+      },
+      "id": 20,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and Resolver ne null)/groupby((Resolver,WorkItemId,MergeToResolved))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Resolutions per resolver",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Resolver",
+                "WorkItemId",
+                "MergeToResolved"
+              ]
+            }
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "MergeToResolved": {
+                "aggregations": [
+                  "median",
+                  "max"
+                ],
+                "operation": "aggregate"
+              },
+              "Resolver": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "WorkItemId": {
+                "aggregations": [
+                  "distinctCount"
+                ],
+                "operation": "aggregate"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "WorkItemId (distinctCount)"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "MergeToResolved (max)": "Slowest",
+              "MergeToResolved (median)": "Median merge → resolved",
+              "WorkItemId (distinctCount)": "Work items resolved"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Per team: work items resolved by its single busiest resolver vs by everyone else. A team whose bar is mostly blue depends on one person to close work.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "noValue": "No data",
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Top resolver"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4a7fd6",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Everyone else"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#808080",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 16,
+        "y": 106
+      },
+      "id": 21,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^(Top resolver|Everyone else)$/",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and Resolver ne null)/groupby((Team,Resolver),aggregate(WorkItemId with countdistinct as N))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Resolution concentration (selected team)",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Team",
+                "Resolver",
+                "N"
+              ]
+            }
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "N": {
+                "aggregations": [
+                  "max",
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "Team": {
+                "aggregations": [],
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Others",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "N (sum)"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "N (max)"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "N (sum)"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "N (sum)": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "N (max)": "Top resolver",
+              "Others": "Everyone else"
+            }
+          }
+        }
+      ],
+      "type": "piechart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 116
+      },
+      "id": 22,
+      "panels": [],
+      "title": "Rework",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Mean and maximum number of PRs linked to the same work item. Above ~1.5 on average = work items are routinely reopened with follow-up PRs.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "fillOpacity": 85,
+            "gradientMode": "none",
+            "lineWidth": 0,
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "noValue": "No data",
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Mean PRs per work item"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5794F2",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Most PRs on one work item"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#B877D9",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Team"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "match": "empty",
+                      "result": {
+                        "text": "(no team)"
+                      }
+                    },
+                    "type": "special"
+                  },
+                  {
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "(no team)"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 117
+      },
+      "id": 23,
+      "options": {
+        "barWidth": 0.8,
+        "groupWidth": 0.75,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "Team",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((Team,WorkItemId),aggregate(PullRequestId with countdistinct as PRs))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "PRs per work item, by team",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Team",
+                "PRs"
+              ]
+            }
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "PRs": {
+                "aggregations": [
+                  "mean",
+                  "max"
+                ],
+                "operation": "aggregate"
+              },
+              "Team": {
+                "aggregations": [],
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "PRs (mean)"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "PRs (max)": "Most PRs on one work item",
+              "PRs (mean)": "Mean PRs per work item"
+            }
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Work items linked to more than one PR merged in the range: candidates for rework or split work.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": true
+          },
+          "decimals": 1,
+          "fieldMinMax": true,
+          "min": 0,
+          "noValue": "No data"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRs"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2a33a",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "First → last merge"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Team"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "match": "empty",
+                      "result": {
+                        "text": "(no team)"
+                      }
+                    },
+                    "type": "special"
+                  },
+                  {
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "(no team)"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/^(Organization|Project)$/"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Work item"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "Open work item",
+                    "url": "https://dev.azure.com/${__data.fields.Organization}/${__data.fields.Project}/_workitems/edit/${__value.raw}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 117
+      },
+      "id": 24,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((Organization,Project,WorkItemId,Team,WorkItemType,State),aggregate(PullRequestId with countdistinct as PRs,Merged with max as LastMerge,Merged with min as FirstMerge))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Work items with several PRs",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Organization",
+                "Project",
+                "WorkItemId",
+                "Team",
+                "WorkItemType",
+                "State",
+                "PRs",
+                "LastMerge",
+                "FirstMerge"
+              ]
+            }
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 1
+                  }
+                },
+                "fieldName": "PRs"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Span",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "LastMerge"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "FirstMerge"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "dateFormat": "X",
+                "destinationType": "time",
+                "targetField": "LastMerge"
+              }
+            ]
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "PRs"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "FirstMerge": true
+            },
+            "indexByName": {
+              "LastMerge": 6,
+              "PRs": 1,
+              "Span": 2,
+              "State": 5,
+              "Team": 3,
+              "WorkItemId": 0,
+              "WorkItemType": 4
+            },
+            "renameByName": {
+              "LastMerge": "Last merge",
+              "Span": "First → last merge",
+              "WorkItemId": "Work item",
+              "WorkItemType": "Type"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 127
+      },
+      "id": 25,
+      "panels": [],
+      "title": "Version hygiene",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Work items Resolved/Closed with an empty Custom.PackageVersion.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#f2a33a",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 0,
+          "noValue": "No data",
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 128
+      },
+      "id": 26,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^N$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((Organization),aggregate(DoneWithoutVersion with sum as N))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Done without package version",
+      "type": "stat"
+    },
+    {
+      "description": "Work items whose package version does not match the target branch version (--branchVersions). Check the mapping before trusting this number.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#e5534b",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 0,
+          "noValue": "No data",
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 128
+      },
+      "id": 27,
+      "options": {
+        "content": "Original sprint commitment is not retained. Delivery against that commitment is **unmeasured**; branch versions are not package commitments.",
+        "mode": "markdown"
+      },
+      "title": "Commitment delivery: unmeasured",
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "CD runs whose package version could not be read (all of them today).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#9d7cd8",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 0,
+          "noValue": "No data",
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 128
+      },
+      "id": 28,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "count"
+          ],
+          "fields": "/^RecordId$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+            "name": "ADOTelemetry.ADOSprintHandoffTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+          "oDataQueryString": "ADOTelemetry.ADOSprintHandoffTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and CDVersionMissing eq 1 and EventTime ge ${__from:date:seconds} and EventTime lt ${__to:date:seconds})/groupby((RecordId))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "CD runs without version",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "RecordId"
+              ]
+            }
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Observed PR/WI links, missing latest target versions, and merged links not resolved. Branch-to-version configuration disagreements are not delivery mistakes and are excluded.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": true
+          },
+          "decimals": 1,
+          "noValue": "No data"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Team"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "match": "empty",
+                      "result": {
+                        "text": "(no team)"
+                      }
+                    },
+                    "type": "special"
+                  },
+                  {
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "(no team)"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PR links"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Done without version"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "text"
+                    },
+                    {
+                      "color": "#f2a33a",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Mismatch"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "text"
+                    },
+                    {
+                      "color": "#e5534b",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Mismatch share"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#e5534b",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Merged, not resolved"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "text"
+                    },
+                    {
+                      "color": "#f2a33a",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 132
+      },
+      "id": 29,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((Team),aggregate(Resource with countdistinct as Items,DoneWithoutVersion with sum as NoVersion,MergedNotDone with sum as NotResolved))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Linked work data quality by team",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Team",
+                "Items",
+                "NoVersion",
+                "NotResolved"
+              ]
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "NoVersion"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "Items": 1,
+              "NoVersion": 2,
+              "NotResolved": 3,
+              "Team": 0
+            },
+            "renameByName": {
+              "Items": "PR links",
+              "NoVersion": "Done without version",
+              "NotResolved": "Merged, not resolved"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 41,
+  "tags": [
+    "ado",
+    "cmf-audit"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Organization",
+        "multi": true,
+        "name": "Organization",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=groupby((Organization))&$select=Organization&$orderby=Organization",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Project",
+        "multi": true,
+        "name": "Project",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})))/groupby((Project))&$select=Project&$orderby=Project",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Team",
+        "name": "Team",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and Team ne null)/groupby((Team))&$select=Team&$orderby=Team",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "allowCustomValue": false,
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Initial sprint",
+        "multi": true,
+        "name": "InitialSprint",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and HistoryAvailable eq 1 and InitialIterationPath ne null and contains(InitialIterationPath,'Sprint '))/groupby((InitialIterationPath))&$select=InitialIterationPath&$orderby=InitialIterationPath",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "/(?<value>.*(?<text>Sprint\\s+\\d+))$/",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Repository",
+        "multi": true,
+        "name": "Repository",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})))/groupby((Repository))&$select=Repository&$orderby=Repository",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-120d",
+    "to": "now"
+  },
+  "timepicker": {
+    "quick_ranges": [
+      {
+        "display": "Last 7 days",
+        "from": "now-7d",
+        "to": "now"
+      },
+      {
+        "display": "Last 14 days",
+        "from": "now-14d",
+        "to": "now"
+      },
+      {
+        "display": "Last 30 days",
+        "from": "now-30d",
+        "to": "now"
+      },
+      {
+        "display": "Last 60 days",
+        "from": "now-60d",
+        "to": "now"
+      },
+      {
+        "display": "Last 90 days",
+        "from": "now-90d",
+        "to": "now"
+      },
+      {
+        "display": "Last 120 days",
+        "from": "now-120d",
+        "to": "now"
+      },
+      {
+        "display": "Last 180 days",
+        "from": "now-180d",
+        "to": "now"
+      }
+    ]
+  },
+  "timezone": "browser",
+  "title": "ADO - Team progress",
+  "uid": "cmf-ado-team-progress",
+  "version": 15
+}
