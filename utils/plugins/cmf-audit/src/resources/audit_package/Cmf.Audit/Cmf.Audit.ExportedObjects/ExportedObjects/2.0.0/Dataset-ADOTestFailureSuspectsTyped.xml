@@ -1,0 +1,489 @@
+<CMF.ExportFile version="1.0">
+  <Object type="Cmf.Foundation.BusinessObjects.CmfDataSet, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+    <CmfDataSetFields type="Collection" actualtype="Cmf.Foundation.BusinessObjects.CmfDataSetFieldCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="String" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="1" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Dimension" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="Organization" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="String" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="2" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Dimension" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="Project" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="String" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="3" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Dimension" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="FailingPipeline" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="String" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="4" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Dimension" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="Test" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="String" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="5" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Dimension" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="FailingSinceBuildId" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="Decimal" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="6" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Metric" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="FailedBuilds" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="Decimal" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="7" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Metric" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="LastFailed" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="String" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="8" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Dimension" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="SinceBuildPipeline" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="String" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="9" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Dimension" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="Environment" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="String" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="18" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Dimension" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="Team" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="Decimal" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="17" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Metric" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="Merged" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="String" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="16" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Dimension" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="Title" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="String" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="15" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Dimension" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="Author" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="String" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="14" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Dimension" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="TargetBranch" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="String" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="13" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Dimension" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="Repository" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="String" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="12" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Dimension" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="PullRequestId" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="String" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="11" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Dimension" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="PrevBuildId" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+      <Item type="Object">
+        <Object type="Cmf.Foundation.BusinessObjects.CmfDataSetField, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df">
+          <IsUserIdentifier value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <AggregateFunction isNull="True" />
+          <DataType value="Decimal" type="Cmf.DataPlatform.Shared.CmfDataSetFieldDataType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Hints isNull="True" />
+          <IoTEventPath isNull="True" />
+          <Order value="10" type="System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <SortDirection isNull="True" />
+          <SourceCmfDataSet isNull="True" />
+          <SourceCmfDataSetField isNull="True" />
+          <Type value="Metric" type="Cmf.DataPlatform.Shared.CmfDataSetFieldType, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <CurrentMainState isNull="True" />
+          <CurrentStates isNull="True" />
+          <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <RelationCollection isNull="True" />
+          <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+          <Description isNull="True" />
+          <DocumentationURL isNull="True" />
+          <Image isNull="True" />
+          <EntityPicture isNull="True" />
+          <Name value="SinceBuildStarted" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+          <DataGroupName isNull="True" />
+        </Object>
+      </Item>
+    </CmfDataSetFields>
+    <Folder type="Object">
+      <ObjectRef type="Cmf.Foundation.BusinessObjects.Folder, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" RefName="\Datasets\UserDefined\ADOTelemetry" />
+    </Folder>
+    <DistinctValues value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+    <IoTEventDefinition isNull="True" />
+    <IsGroupingActive value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+    <OwnerApp isNull="True" />
+    <OwnerRole isNull="True" />
+    <OwnerType value="User" type="Cmf.Foundation.BusinessObjects.DataPlatform.CmfDataSetOwnerType, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+    <OwnerUser type="Object">
+      <ObjectRef type="Cmf.Foundation.Security.User, Cmf.Foundation.Security, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" RefName="admin" />
+    </OwnerUser>
+    <Path value="UserDefined.ADOTelemetry.ADOTestFailureSuspectsTyped" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+    <QueryString value="-- ADOTestFailureSuspects: for every failing test streak, the PRs that were new in the build where the streak started.&#xA;-- &quot;New&quot; = in that build's RunChange list but not in the previous run of the same pipeline and environment.&#xA;-- Candidates only: temporal proximity, not proven causation.&#xA;WITH&#xA;streaks AS&#xA;(&#xA;    SELECT Organization, Project, coalesce(Pipeline, '') AS FailingPipeline, TestName AS Test,&#xA;        toString(FailingSinceBuildId) AS SinceBuildId,&#xA;        toFloat64(uniqExact(BuildId)) AS FailedBuilds,&#xA;        max(toFloat64(toUnixTimestamp64Milli(FailingUntil)) / 1000) AS LastFailed&#xA;    FROM ADOTelemetry_TestFailure FINAL&#xA;    WHERE coalesce(FailingSinceBuildId, 0) &gt; 0&#xA;    GROUP BY Organization, Project, FailingPipeline, Test, SinceBuildId&#xA;),&#xA;runs AS&#xA;(&#xA;    SELECT Organization, Project, BuildId, Pipeline, Environment, Started,&#xA;        lagInFrame(BuildId, 1, '') OVER (PARTITION BY Organization, Project, Pipeline, Environment ORDER BY Started&#xA;            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS PrevBuildId&#xA;    FROM&#xA;    (&#xA;        SELECT Organization, Project, toString(BuildId) AS BuildId, coalesce(Pipeline, '') AS Pipeline,&#xA;            coalesce(Environment, '') AS Environment, toFloat64(toUnixTimestamp64Milli(Started)) / 1000 AS Started&#xA;        FROM ADOTelemetry_PipelineRun FINAL&#xA;        WHERE Started IS NOT NULL AND Finished IS NOT NULL&#xA;    )&#xA;),&#xA;changes AS&#xA;(&#xA;    SELECT Organization, Project, toString(BuildId) AS BuildId,&#xA;        arrayDistinct(arrayFilter(x -&gt; x != '', splitByChar(';', coalesce(PullRequestIds, '')))) AS PRs&#xA;    FROM ADOTelemetry_RunChange FINAL&#xA;),&#xA;newPrs AS&#xA;(&#xA;    SELECT runs.Organization AS Organization, runs.Project AS Project, runs.BuildId AS BuildId, runs.Pipeline AS Pipeline,&#xA;        runs.Environment AS Environment, runs.Started AS Started, runs.PrevBuildId AS PrevBuildId,&#xA;        arrayJoin(arrayFilter(x -&gt; NOT has(prev.PRs, x), cur.PRs)) AS PullRequestId&#xA;    FROM runs&#xA;    INNER JOIN changes AS cur ON cur.Organization = runs.Organization AND cur.Project = runs.Project AND cur.BuildId = runs.BuildId&#xA;    INNER JOIN changes AS prev ON prev.Organization = runs.Organization AND prev.Project = runs.Project AND prev.BuildId = runs.PrevBuildId&#xA;    WHERE runs.PrevBuildId != ''&#xA;),&#xA;prs AS&#xA;(&#xA;    SELECT Organization, Project, coalesce(Repository, '') AS Repository, toString(PullRequestId) AS PullRequestId,&#xA;        coalesce(TargetBranch, '') AS TargetBranch, coalesce(Author, '') AS Author, coalesce(Title, '') AS Title,&#xA;        toFloat64(toUnixTimestamp64Milli(coalesce(Merged, Closed))) / 1000 AS Merged&#xA;    FROM ADOTelemetry_PullRequest FINAL&#xA;),&#xA;teams AS&#xA;(&#xA;    SELECT Organization, Project, toString(PullRequestId) AS PullRequestId,&#xA;        anyIf(Team, coalesce(Team, '') != '') AS Team&#xA;    FROM ADOTelemetry_PullRequestWorkItem FINAL&#xA;    GROUP BY Organization, Project, PullRequestId&#xA;)&#xA;SELECT streaks.Organization AS Organization, streaks.Project AS Project, streaks.FailingPipeline AS FailingPipeline,&#xA;    streaks.Test AS Test, streaks.SinceBuildId AS FailingSinceBuildId, streaks.FailedBuilds AS FailedBuilds, streaks.LastFailed AS LastFailed,&#xA;    newPrs.Pipeline AS SinceBuildPipeline, newPrs.Environment AS Environment, newPrs.Started AS SinceBuildStarted, newPrs.PrevBuildId AS PrevBuildId,&#xA;    newPrs.PullRequestId AS PullRequestId, prs.Repository AS Repository, prs.TargetBranch AS TargetBranch, prs.Author AS Author,&#xA;    prs.Title AS Title, prs.Merged AS Merged, coalesce(teams.Team, '') AS Team&#xA;FROM streaks&#xA;INNER JOIN newPrs ON newPrs.Organization = streaks.Organization AND newPrs.Project = streaks.Project AND newPrs.BuildId = streaks.SinceBuildId&#xA;LEFT JOIN prs ON prs.Organization = newPrs.Organization AND prs.Project = newPrs.Project AND prs.PullRequestId = newPrs.PullRequestId&#xA;LEFT JOIN teams ON teams.Organization = newPrs.Organization AND teams.Project = newPrs.Project AND teams.PullRequestId = newPrs.PullRequestId" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+    <Table isNull="True" />
+    <TopRows isNull="True" />
+    <Type value="Query" type="Cmf.Foundation.BusinessObjects.DataPlatform.CmfDataSetType, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+    <State value="Completed" type="Cmf.Foundation.BusinessObjects.DataPlatform.CmfDataSetState, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+    <StateMessage isNull="True" />
+    <DataSource value="CDM" type="Cmf.DataPlatform.Shared.CmfDataSetDataSource, Cmf.DataPlatform.Shared, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+    <Source value="CDM" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+    <DefaultParameters isNull="True" />
+    <CurrentMainState isNull="True" />
+    <CurrentStates isNull="True" />
+    <IsTemplate value="False" type="System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+    <RelationCollection isNull="True" />
+    <Attributes type="Collection" actualtype="Cmf.Foundation.BusinessObjects.AttributeCollection, Cmf.Foundation.BusinessObjects, Version=11.2.0.0, Culture=neutral, PublicKeyToken=6bbf07329f6aa8df" />
+    <Description isNull="True" />
+    <DocumentationURL isNull="True" />
+    <Image isNull="True" />
+    <EntityPicture isNull="True" />
+    <Name value="ADOTestFailureSuspectsTyped" type="System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+    <DataGroupName isNull="True" />
+  </Object>
+</CMF.ExportFile>
