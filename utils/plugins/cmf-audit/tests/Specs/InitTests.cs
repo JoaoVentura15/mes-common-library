@@ -361,7 +361,7 @@ namespace specs
             {
                 var exception = Assert.Throws<Cmf.CLI.Utilities.CliException>(() => RunInit(root, new InitArguments { AzureDevOps = false }));
 
-                Assert.Contains("not available for MES 9.0. Supported MES versions: 11.3", exception.Message);
+                Assert.Contains("not available for MES 9.0. Supported MES versions: 11.2, 11.3", exception.Message);
                 Assert.False(Directory.Exists(Path.Combine(root, Init.AuditPackageName)));
                 Assert.Equal(RootCmfPackage, File.ReadAllText(Path.Combine(root, "cmfpackage.json")));
             }

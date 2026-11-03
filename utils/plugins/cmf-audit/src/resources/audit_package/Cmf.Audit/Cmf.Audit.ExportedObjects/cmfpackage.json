@@ -1,16 +1,10 @@
 {
   "packageId": "Cmf.Audit.ExportedObjects",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "Cmf Audit Cmf.Audit.ExportedObjects Package",
   "packageType": "ExportedObjects",
   "isInstallable": true,
   "isUniqueInstall": true,
-  "dependencies": [
-    {
-      "id": "Cmf.Audit.Data",
-      "version": "2.0.0"
-    }
-  ],
   "contentToPack": [
     {
       "source": "ExportedObjects/$(version)/*",

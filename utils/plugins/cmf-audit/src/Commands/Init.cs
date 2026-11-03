@@ -206,6 +206,10 @@ namespace Cmf.Cli.Plugin.Audit.Commands.install
                 var source = ResolveAuditPackageTemplate(mesVersion);
                 FileSystemUtilities.CopyDirectory(source, target, this.fileSystem, null, true, false);
                 AlignMesDependencies(this.fileSystem, this.fileSystem.DirectoryInfo.New(target), mesVersion);
+                if (mesVersion.Major == 11 && mesVersion.Minor == 2)
+                {
+                    Log.Warning("The audit package includes objects exported from MES 11.3; their import on MES 11.2 is not verified.");
+                }
                 Log.Information($"Copied the '{AuditPackageName}' package for MES {mesVersion.ToString(3)} to '{target}'.");
             }
 
@@ -215,23 +219,19 @@ namespace Cmf.Cli.Plugin.Audit.Commands.install
         }
 
         /// <summary>
-        /// The Cmf.Audit package is kept per MES minor version (resources/audit_package/&lt;Major&gt;.&lt;Minor&gt;/Cmf.Audit),
-        /// as its exported objects are bound to it; the patch is aligned with the project afterwards.
+        /// Resolves the shared package template for supported MES minor versions.
         /// </summary>
         private string ResolveAuditPackageTemplate(Version mesVersion)
         {
             var templates = this.fileSystem.DirectoryInfo.New(this.fileSystem.Path.Combine(AppContext.BaseDirectory, "resources", "audit_package"));
-            var source = this.fileSystem.Path.Combine(templates.FullName, $"{mesVersion.Major}.{mesVersion.Minor}", AuditPackageName);
+            var source = this.fileSystem.Path.Combine(templates.FullName, AuditPackageName);
+            if (mesVersion.Major != 11 || (mesVersion.Minor != 2 && mesVersion.Minor != 3))
+            {
+                throw new CliException($"The '{AuditPackageName}' package is not available for MES {mesVersion.Major}.{mesVersion.Minor}. Supported MES versions: 11.2, 11.3.");
+            }
             if (!this.fileSystem.Directory.Exists(source))
             {
-                var supported = templates.Exists
-                    ? templates.GetDirectories()
-                        .Where(dir => Version.TryParse(dir.Name, out _) && this.fileSystem.Directory.Exists(this.fileSystem.Path.Combine(dir.FullName, AuditPackageName)))
-                        .Select(dir => dir.Name)
-                        .OrderBy(Version.Parse)
-                        .ToList()
-                    : [];
-                throw new CliException($"The '{AuditPackageName}' package is not available for MES {mesVersion.Major}.{mesVersion.Minor}. Supported MES versions: {(supported.Count > 0 ? string.Join(", ", supported) : "none")}.");
+                throw new CliException($"The '{AuditPackageName}' package template was not found.");
             }
             return source;
         }
@@ -251,9 +251,11 @@ namespace Cmf.Cli.Plugin.Audit.Commands.install
 
                 foreach (var dependency in (cmfPackage["dependencies"] as JArray)?.OfType<JObject>() ?? [])
                 {
+                    var dependencyId = dependency["id"]?.Value<string>();
+                    var isPlatformDependency = dependencyId is "Cmf.Environment" or "CriticalManufacturing.DeploymentMetadata";
                     if (Version.TryParse(dependency["version"]?.Value<string>(), out var dependencyVersion)
                         && dependencyVersion.Major == mesVersion.Major
-                        && dependencyVersion.Minor == mesVersion.Minor
+                        && (dependencyVersion.Minor == mesVersion.Minor || isPlatformDependency)
                         && dependencyVersion.ToString() != projectVersion)
                     {
                         Log.Debug($"Aligning '{dependency["id"]}' dependency of '{cmfPackage["packageId"]}' from {dependencyVersion} to {projectVersion}");
