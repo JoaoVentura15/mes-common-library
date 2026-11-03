@@ -1,0 +1,18 @@
+{
+  "<SM>DEEAction": {
+    "1": {
+      "Action": "ResolveAdoTelemetryFolder",
+      "Description": "Resolve the ADO telemetry IoT event definitions folder during creation",
+      "CodeFileRelativePath": "Workarounds/ResolveAdoTelemetryFolder.cs",
+      "IsEnabled": "true",
+      "Classification": ""
+    }
+  },
+  "DEEActionOrder": {
+    "1": {
+      "ActionGroup": "BusinessObjects.IoTEventDefinitionCollection.Create.Pre",
+      "Action": "ResolveAdoTelemetryFolder",
+      "Order": "1"
+    }
+  }
+}
