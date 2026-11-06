@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		local.runsettings = local.runsettings
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cmf.Community.ExternalSystemsSimulator.Tests.Biz.Common", "Cmf.Community.ExternalSystemsSimulator.Tests.Biz.Common\Cmf.Community.ExternalSystemsSimulator.Tests.Biz.Common.csproj", "{73878533-FD69-4A1D-BC1B-BB567A60E77C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cmf.Community.ExternalSystemsSimulator.Test.Utilities", "Cmf.Community.ExternalSystemsSimulator.Tests.Utilities\Cmf.Community.ExternalSystemsSimulator.Test.Utilities.csproj", "{73878533-FD69-4A1D-BC1B-BB567A60E77C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IoT", "IoT", "{51F9E6E4-394B-4DD2-AF2C-34498090738F}"
 EndProject
