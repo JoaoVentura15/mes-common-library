@@ -6,10 +6,6 @@
   "isInstallable": true,
   "isUniqueInstall": false,
   "dependencies": [
-    {
-      "id": "Cmf.Community.ExternalSystemsSimulator.IoT.Packages",
-      "version": "1136.1.0.0"
-    },
 	  {
       "id": "Cmf.Community.ExternalSystemsSimulator.IoT.Data",
       "version": "1136.1.0.0"
