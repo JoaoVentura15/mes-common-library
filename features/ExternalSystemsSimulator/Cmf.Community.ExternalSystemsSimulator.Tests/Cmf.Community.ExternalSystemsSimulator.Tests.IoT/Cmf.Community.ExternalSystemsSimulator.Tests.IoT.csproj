@@ -56,7 +56,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cmf.Community.ExternalSystemsSimulator.Tests.Biz.Common\Cmf.Community.ExternalSystemsSimulator.Tests.Biz.Common.csproj" />
+    <ProjectReference Include="../Cmf.Community.ExternalSystemsSimulator.Tests.Utilities/Cmf.Community.ExternalSystemsSimulator.Test.Utilities.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
