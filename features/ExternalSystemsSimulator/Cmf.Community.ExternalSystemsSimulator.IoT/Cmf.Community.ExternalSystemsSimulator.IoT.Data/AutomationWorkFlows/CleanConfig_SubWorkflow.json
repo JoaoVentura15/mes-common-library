@@ -1,0 +1,447 @@
+{
+  "tasks": [
+    {
+      "id": "task_10868",
+      "reference": {
+        "name": "codeExecution",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "inputs": [
+          {
+            "name": "subject",
+            "friendlyName": "subject",
+            "valueType": {
+              "friendlyName": "Subject",
+              "name": "String",
+              "type": 4,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          },
+          {
+            "name": "data",
+            "friendlyName": "data",
+            "valueType": {
+              "friendlyName": "Data",
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          },
+          {
+            "name": "IsRequest",
+            "friendlyName": "isRequest",
+            "valueType": {
+              "friendlyName": "IsRequest",
+              "name": "Boolean",
+              "type": 3,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            },
+            "defaultValue": false
+          }
+        ],
+        "outputs": [
+          {
+            "name": "reply",
+            "friendlyName": "reply",
+            "valueType": {
+              "friendlyName": "Reply",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          },
+          {
+            "name": "IsRequestOut",
+            "friendlyName": "activate",
+            "valueType": {
+              "name": "Boolean",
+              "type": 3,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null,
+              "friendlyName": "IsRequestOut"
+            },
+            "defaultValue": null
+          }
+        ],
+        "contextExpirationInMilliseconds": 10000,
+        "executionExpirationInMilliseconds": 0,
+        "tsCode": [
+          "import { Framework } from 'framework';",
+          "",
+          "export default class {",
+          "",
+          "    /** Allows accessing external functions */",
+          "    private framework: Framework;",
+          "",
+          "    constructor(framework: Framework) {",
+          "        this.framework = framework;",
+          "    }",
+          "",
+          "    /*",
+          "     * Entry point of the class (IMPORTANT: don't change the signature of this method)",
+          "     * Should return an object containing the values for each output to emit",
+          "     * If necessary, use the parameter \"outputs\" to emit data while running the code.",
+          "     */",
+          "    public async main(inputs: any, outputs: any): Promise<any> {",
+          "        // Add code here",
+          "        var data = inputs.data;",
+          "",
+          "        if(Array.isArray(data)){ //To clean just selected ones",
+          "            for(var subjectIndex in data){",
+          "                this.framework.dataStore.store(data[subjectIndex], undefined, \"Persistent\");    ",
+          "            }",
+          "        } else {",
+          "            var parsedTopic = this.parseTopic(inputs.subject);",
+          "            ",
+          "            if (parsedTopic){",
+          "                var sub = parsedTopic.subsection;",
+          "                var subject = parsedTopic.topic;",
+          "                var statSubject = subject + \"Stat\";",
+          "",
+          "                if(sub){",
+          "                    switch(sub){",
+          "                        case \"Configuration\":",
+          "                            await this.framework.dataStore.store(subject, this.GetFilteredList<any>(subject, inputs.data), \"Persistent\");",
+          "                            break;",
+          "                        case \"Statistics\":",
+          "                            await this.framework.dataStore.store(statSubject, this.GetFilteredList<any>(statSubject, inputs.data), \"Persistent\");",
+          "                            break;",
+          "                    }                    ",
+          "                } else {",
+          "                    await this.framework.dataStore.store(subject, this.GetFilteredList<any>(subject, inputs.data), \"Persistent\");",
+          "                    await this.framework.dataStore.store(statSubject, this.GetFilteredList<any>(statSubject, inputs.data), \"Persistent\");",
+          "                }                ",
+          "            } else {",
+          "                var keys = await this.framework.dataStore.listKeys(\"Persistent\");",
+          "                keys = keys.filter((key) => !key.startsWith('_'));",
+          "                this.framework.logger.warning(`Clearing all non system keys from Persistent store -> ${keys}`);",
+          "",
+          "                for(var key in keys){",
+          "                   await this.framework.dataStore.store(keys[key], undefined, \"Persistent\"); ",
+          "                }",
+          "            }",
+          "        }",
+          "        ",
+          "        this.framework.logger.info(`Current keys ${JSON.stringify(await this.framework.dataStore.listKeys(\"Persistent\"))}`);",
+          "",
+          "        if(inputs.IsRequest){",
+          "            return { reply: data,  IsRequestOut : true };",
+          "        } else {",
+          "            return { reply: data };",
+          "        }",
+          "",
+          "        // emit output during execution: outputs.output1.emit(\"something\");",
+          "        // return example: return { output1: inputs.input1, output2: \"Hello World\" };",
+          "    }",
+          "",
+          "    public parseTopic(input: string): { subsection?: string; topic?: string } {",
+          "        let prefix = \"ExternalSystemsSimulator.Clear\"",
+          "",
+          "        if (!input.startsWith(prefix)) {",
+          "            throw new Error(\"Invalid format\");",
+          "        }",
+          "",
+          "        const rest = input === prefix ? \"\" : input.slice(prefix.length + 1);",
+          "",
+          "        if (!rest) {",
+          "            return undefined;",
+          "        }",
+          "",
+          "        const parts = rest.split(\".\");",
+          "",
+          "        if (parts.length === 1) {",
+          "            return { topic: parts[0] };",
+          "        }",
+          "",
+          "        if (parts.length === 2) {",
+          "            const [subsection, topic] = parts;",
+          "            return { subsection, topic };",
+          "        }",
+          "",
+          "        throw new Error(\"Unexpected format\");",
+          "    }",
+          "",
+          "    public async GetFilteredList<T extends object>(store: string, template: Partial<T>) : Promise<T[]> {",
+          "        var tempList = await this.framework.dataStore.retrieve(store, undefined) as T[];",
+          "        ",
+          "        if(tempList){",
+          "            tempList = this.removeMatches<T>(tempList, template)",
+          "        }",
+          "        ",
+          "        if(tempList?.length > 0){",
+          "            return tempList;",
+          "        }",
+          "",
+          "        return undefined;",
+          "    }",
+          "",
+          "    public matchesTemplate(item: unknown, template: unknown): boolean {",
+          "        if (template === item) return true;",
+          "",
+          "        if (",
+          "            typeof template !== \"object\" || template === null ||",
+          "            typeof item !== \"object\" || item === null",
+          "        ) {",
+          "            return false;",
+          "        }",
+          "",
+          "        if (Array.isArray(template)) {",
+          "            if (!Array.isArray(item) || template.length !== item.length) return false;",
+          "            return template.every((v, i) => this.matchesTemplate(item[i], v));",
+          "        }",
+          "",
+          "        for (const [key, value] of Object.entries(template as Record<string, unknown>)) {",
+          "            if (!this.matchesTemplate((item as Record<string, unknown>)[key], value)) {",
+          "            return false;",
+          "            }",
+          "        }",
+          "",
+          "        return true;",
+          "    }",
+          "    ",
+          "    public removeMatches<T extends object>(items: T[], template: Partial<T>): T[] {",
+          "        return items.filter(item => !this.matchesTemplate(item, template));",
+          "    }",
+          "}",
+          ""
+        ],
+        "jsCodeBase64": "InVzZSBzdHJpY3QiOwpPYmplY3QuZGVmaW5lUHJvcGVydHkoZXhwb3J0cywgIl9fZXNNb2R1bGUiLCB7IHZhbHVlOiB0cnVlIH0pOwpjbGFzcyBkZWZhdWx0XzEgewogICAgY29uc3RydWN0b3IoZnJhbWV3b3JrKSB7CiAgICAgICAgdGhpcy5mcmFtZXdvcmsgPSBmcmFtZXdvcms7CiAgICB9CiAgICAvKgogICAgICogRW50cnkgcG9pbnQgb2YgdGhlIGNsYXNzIChJTVBPUlRBTlQ6IGRvbid0IGNoYW5nZSB0aGUgc2lnbmF0dXJlIG9mIHRoaXMgbWV0aG9kKQogICAgICogU2hvdWxkIHJldHVybiBhbiBvYmplY3QgY29udGFpbmluZyB0aGUgdmFsdWVzIGZvciBlYWNoIG91dHB1dCB0byBlbWl0CiAgICAgKiBJZiBuZWNlc3NhcnksIHVzZSB0aGUgcGFyYW1ldGVyICJvdXRwdXRzIiB0byBlbWl0IGRhdGEgd2hpbGUgcnVubmluZyB0aGUgY29kZS4KICAgICAqLwogICAgYXN5bmMgbWFpbihpbnB1dHMsIG91dHB1dHMpIHsKICAgICAgICAvLyBBZGQgY29kZSBoZXJlCiAgICAgICAgdmFyIGRhdGEgPSBpbnB1dHMuZGF0YTsKICAgICAgICBpZiAoQXJyYXkuaXNBcnJheShkYXRhKSkgeyAvL1RvIGNsZWFuIGp1c3Qgc2VsZWN0ZWQgb25lcwogICAgICAgICAgICBmb3IgKHZhciBzdWJqZWN0SW5kZXggaW4gZGF0YSkgewogICAgICAgICAgICAgICAgdGhpcy5mcmFtZXdvcmsuZGF0YVN0b3JlLnN0b3JlKGRhdGFbc3ViamVjdEluZGV4XSwgdW5kZWZpbmVkLCAiUGVyc2lzdGVudCIpOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgICAgIGVsc2UgewogICAgICAgICAgICB2YXIgcGFyc2VkVG9waWMgPSB0aGlzLnBhcnNlVG9waWMoaW5wdXRzLnN1YmplY3QpOwogICAgICAgICAgICBpZiAocGFyc2VkVG9waWMpIHsKICAgICAgICAgICAgICAgIHZhciBzdWIgPSBwYXJzZWRUb3BpYy5zdWJzZWN0aW9uOwogICAgICAgICAgICAgICAgdmFyIHN1YmplY3QgPSBwYXJzZWRUb3BpYy50b3BpYzsKICAgICAgICAgICAgICAgIHZhciBzdGF0U3ViamVjdCA9IHN1YmplY3QgKyAiU3RhdCI7CiAgICAgICAgICAgICAgICBpZiAoc3ViKSB7CiAgICAgICAgICAgICAgICAgICAgc3dpdGNoIChzdWIpIHsKICAgICAgICAgICAgICAgICAgICAgICAgY2FzZSAiQ29uZmlndXJhdGlvbiI6CiAgICAgICAgICAgICAgICAgICAgICAgICAgICBhd2FpdCB0aGlzLmZyYW1ld29yay5kYXRhU3RvcmUuc3RvcmUoc3ViamVjdCwgdGhpcy5HZXRGaWx0ZXJlZExpc3Qoc3ViamVjdCwgaW5wdXRzLmRhdGEpLCAiUGVyc2lzdGVudCIpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgYnJlYWs7CiAgICAgICAgICAgICAgICAgICAgICAgIGNhc2UgIlN0YXRpc3RpY3MiOgogICAgICAgICAgICAgICAgICAgICAgICAgICAgYXdhaXQgdGhpcy5mcmFtZXdvcmsuZGF0YVN0b3JlLnN0b3JlKHN0YXRTdWJqZWN0LCB0aGlzLkdldEZpbHRlcmVkTGlzdChzdGF0U3ViamVjdCwgaW5wdXRzLmRhdGEpLCAiUGVyc2lzdGVudCIpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgYnJlYWs7CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgZWxzZSB7CiAgICAgICAgICAgICAgICAgICAgYXdhaXQgdGhpcy5mcmFtZXdvcmsuZGF0YVN0b3JlLnN0b3JlKHN1YmplY3QsIHRoaXMuR2V0RmlsdGVyZWRMaXN0KHN1YmplY3QsIGlucHV0cy5kYXRhKSwgIlBlcnNpc3RlbnQiKTsKICAgICAgICAgICAgICAgICAgICBhd2FpdCB0aGlzLmZyYW1ld29yay5kYXRhU3RvcmUuc3RvcmUoc3RhdFN1YmplY3QsIHRoaXMuR2V0RmlsdGVyZWRMaXN0KHN0YXRTdWJqZWN0LCBpbnB1dHMuZGF0YSksICJQZXJzaXN0ZW50Iik7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICAgICAgZWxzZSB7CiAgICAgICAgICAgICAgICB2YXIga2V5cyA9IGF3YWl0IHRoaXMuZnJhbWV3b3JrLmRhdGFTdG9yZS5saXN0S2V5cygiUGVyc2lzdGVudCIpOwogICAgICAgICAgICAgICAga2V5cyA9IGtleXMuZmlsdGVyKChrZXkpID0+ICFrZXkuc3RhcnRzV2l0aCgnXycpKTsKICAgICAgICAgICAgICAgIHRoaXMuZnJhbWV3b3JrLmxvZ2dlci53YXJuaW5nKGBDbGVhcmluZyBhbGwgbm9uIHN5c3RlbSBrZXlzIGZyb20gUGVyc2lzdGVudCBzdG9yZSAtPiAke2tleXN9YCk7CiAgICAgICAgICAgICAgICBmb3IgKHZhciBrZXkgaW4ga2V5cykgewogICAgICAgICAgICAgICAgICAgIGF3YWl0IHRoaXMuZnJhbWV3b3JrLmRhdGFTdG9yZS5zdG9yZShrZXlzW2tleV0sIHVuZGVmaW5lZCwgIlBlcnNpc3RlbnQiKTsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgIH0KICAgICAgICB0aGlzLmZyYW1ld29yay5sb2dnZXIuaW5mbyhgQ3VycmVudCBrZXlzICR7SlNPTi5zdHJpbmdpZnkoYXdhaXQgdGhpcy5mcmFtZXdvcmsuZGF0YVN0b3JlLmxpc3RLZXlzKCJQZXJzaXN0ZW50IikpfWApOwogICAgICAgIGlmIChpbnB1dHMuSXNSZXF1ZXN0KSB7CiAgICAgICAgICAgIHJldHVybiB7IHJlcGx5OiBkYXRhLCBJc1JlcXVlc3RPdXQ6IHRydWUgfTsKICAgICAgICB9CiAgICAgICAgZWxzZSB7CiAgICAgICAgICAgIHJldHVybiB7IHJlcGx5OiBkYXRhIH07CiAgICAgICAgfQogICAgICAgIC8vIGVtaXQgb3V0cHV0IGR1cmluZyBleGVjdXRpb246IG91dHB1dHMub3V0cHV0MS5lbWl0KCJzb21ldGhpbmciKTsKICAgICAgICAvLyByZXR1cm4gZXhhbXBsZTogcmV0dXJuIHsgb3V0cHV0MTogaW5wdXRzLmlucHV0MSwgb3V0cHV0MjogIkhlbGxvIFdvcmxkIiB9OwogICAgfQogICAgcGFyc2VUb3BpYyhpbnB1dCkgewogICAgICAgIGxldCBwcmVmaXggPSAiRXh0ZXJuYWxTeXN0ZW1zU2ltdWxhdG9yLkNsZWFyIjsKICAgICAgICBpZiAoIWlucHV0LnN0YXJ0c1dpdGgocHJlZml4KSkgewogICAgICAgICAgICB0aHJvdyBuZXcgRXJyb3IoIkludmFsaWQgZm9ybWF0Iik7CiAgICAgICAgfQogICAgICAgIGNvbnN0IHJlc3QgPSBpbnB1dCA9PT0gcHJlZml4ID8gIiIgOiBpbnB1dC5zbGljZShwcmVmaXgubGVuZ3RoICsgMSk7CiAgICAgICAgaWYgKCFyZXN0KSB7CiAgICAgICAgICAgIHJldHVybiB1bmRlZmluZWQ7CiAgICAgICAgfQogICAgICAgIGNvbnN0IHBhcnRzID0gcmVzdC5zcGxpdCgiLiIpOwogICAgICAgIGlmIChwYXJ0cy5sZW5ndGggPT09IDEpIHsKICAgICAgICAgICAgcmV0dXJuIHsgdG9waWM6IHBhcnRzWzBdIH07CiAgICAgICAgfQogICAgICAgIGlmIChwYXJ0cy5sZW5ndGggPT09IDIpIHsKICAgICAgICAgICAgY29uc3QgW3N1YnNlY3Rpb24sIHRvcGljXSA9IHBhcnRzOwogICAgICAgICAgICByZXR1cm4geyBzdWJzZWN0aW9uLCB0b3BpYyB9OwogICAgICAgIH0KICAgICAgICB0aHJvdyBuZXcgRXJyb3IoIlVuZXhwZWN0ZWQgZm9ybWF0Iik7CiAgICB9CiAgICBhc3luYyBHZXRGaWx0ZXJlZExpc3Qoc3RvcmUsIHRlbXBsYXRlKSB7CiAgICAgICAgdmFyIHRlbXBMaXN0ID0gYXdhaXQgdGhpcy5mcmFtZXdvcmsuZGF0YVN0b3JlLnJldHJpZXZlKHN0b3JlLCB1bmRlZmluZWQpOwogICAgICAgIGlmICh0ZW1wTGlzdCkgewogICAgICAgICAgICB0ZW1wTGlzdCA9IHRoaXMucmVtb3ZlTWF0Y2hlcyh0ZW1wTGlzdCwgdGVtcGxhdGUpOwogICAgICAgIH0KICAgICAgICBpZiAoKHRlbXBMaXN0ID09PSBudWxsIHx8IHRlbXBMaXN0ID09PSB2b2lkIDAgPyB2b2lkIDAgOiB0ZW1wTGlzdC5sZW5ndGgpID4gMCkgewogICAgICAgICAgICByZXR1cm4gdGVtcExpc3Q7CiAgICAgICAgfQogICAgICAgIHJldHVybiB1bmRlZmluZWQ7CiAgICB9CiAgICBtYXRjaGVzVGVtcGxhdGUoaXRlbSwgdGVtcGxhdGUpIHsKICAgICAgICBpZiAodGVtcGxhdGUgPT09IGl0ZW0pCiAgICAgICAgICAgIHJldHVybiB0cnVlOwogICAgICAgIGlmICh0eXBlb2YgdGVtcGxhdGUgIT09ICJvYmplY3QiIHx8IHRlbXBsYXRlID09PSBudWxsIHx8CiAgICAgICAgICAgIHR5cGVvZiBpdGVtICE9PSAib2JqZWN0IiB8fCBpdGVtID09PSBudWxsKSB7CiAgICAgICAgICAgIHJldHVybiBmYWxzZTsKICAgICAgICB9CiAgICAgICAgaWYgKEFycmF5LmlzQXJyYXkodGVtcGxhdGUpKSB7CiAgICAgICAgICAgIGlmICghQXJyYXkuaXNBcnJheShpdGVtKSB8fCB0ZW1wbGF0ZS5sZW5ndGggIT09IGl0ZW0ubGVuZ3RoKQogICAgICAgICAgICAgICAgcmV0dXJuIGZhbHNlOwogICAgICAgICAgICByZXR1cm4gdGVtcGxhdGUuZXZlcnkoKHYsIGkpID0+IHRoaXMubWF0Y2hlc1RlbXBsYXRlKGl0ZW1baV0sIHYpKTsKICAgICAgICB9CiAgICAgICAgZm9yIChjb25zdCBba2V5LCB2YWx1ZV0gb2YgT2JqZWN0LmVudHJpZXModGVtcGxhdGUpKSB7CiAgICAgICAgICAgIGlmICghdGhpcy5tYXRjaGVzVGVtcGxhdGUoaXRlbVtrZXldLCB2YWx1ZSkpIHsKICAgICAgICAgICAgICAgIHJldHVybiBmYWxzZTsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgICAgICByZXR1cm4gdHJ1ZTsKICAgIH0KICAgIHJlbW92ZU1hdGNoZXMoaXRlbXMsIHRlbXBsYXRlKSB7CiAgICAgICAgcmV0dXJuIGl0ZW1zLmZpbHRlcihpdGVtID0+ICF0aGlzLm1hdGNoZXNUZW1wbGF0ZShpdGVtLCB0ZW1wbGF0ZSkpOwogICAgfQp9CmV4cG9ydHMuZGVmYXVsdCA9IGRlZmF1bHRfMTsK",
+        "___cmf___name": "Clean Config"
+      }
+    },
+    {
+      "id": "task_10891",
+      "reference": {
+        "name": "subWorkflowStart",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "outputs": [
+          {
+            "name": "subject",
+            "friendlyName": "subject",
+            "valueType": {
+              "friendlyName": "Subject",
+              "name": "String",
+              "type": 4,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          },
+          {
+            "name": "data",
+            "friendlyName": "data",
+            "valueType": {
+              "friendlyName": "Data",
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          },
+          {
+            "name": "IsRequest",
+            "friendlyName": "IsRequest",
+            "valueType": {
+              "friendlyName": "IsRequest",
+              "name": "Boolean",
+              "type": 3,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "task_10901",
+      "reference": {
+        "name": "subWorkflowEnd",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "inputs": [
+          {
+            "name": "reply",
+            "friendlyName": "reply",
+            "valueType": {
+              "friendlyName": "Reply",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          },
+          {
+            "name": "IsRequestOut",
+            "friendlyName": "IsRequestOut",
+            "valueType": {
+              "friendlyName": "IsRequestOut",
+              "name": "Boolean",
+              "type": 3,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "converters": [],
+  "links": [
+    {
+      "id": "efa4dafa-1b5e-476d-a8a3-98fc16757ca7",
+      "sourceId": "task_10891",
+      "targetId": "task_10868",
+      "inputName": "subjectIn",
+      "outputName": "subjectOut"
+    },
+    {
+      "id": "8cca456d-1b24-48dc-b8ac-2930fcf37674",
+      "sourceId": "task_10891",
+      "targetId": "task_10868",
+      "inputName": "dataIn",
+      "outputName": "dataOut"
+    },
+    {
+      "id": "9393a9ef-107c-4902-8688-2e690aaf74d8",
+      "sourceId": "task_10891",
+      "targetId": "task_10868",
+      "inputName": "IsRequestIn",
+      "outputName": "IsRequestOut"
+    },
+    {
+      "id": "499fae0d-1452-4996-af78-ea2f9134e7c3",
+      "sourceId": "task_10891",
+      "targetId": "task_10868",
+      "inputName": "activate",
+      "outputName": "activateOut"
+    },
+    {
+      "id": "4b16bfaf-b2a4-4965-85df-cd4a1708e7cd",
+      "sourceId": "task_10868",
+      "targetId": "task_10901",
+      "inputName": "reply",
+      "outputName": "replyOut"
+    },
+    {
+      "id": "998a7671-8811-4ea2-aa0e-738e09633536",
+      "sourceId": "task_10868",
+      "targetId": "task_10901",
+      "inputName": "IsRequestOut",
+      "outputName": "IsRequestOutOut"
+    },
+    {
+      "id": "808d5d24-43b0-4a0b-86b1-3ba33c38b05a",
+      "sourceId": "task_10868",
+      "targetId": "task_10901",
+      "inputName": "success",
+      "outputName": "success"
+    },
+    {
+      "id": "f86a0769-3192-4836-9fea-8b9fa737c019",
+      "sourceId": "task_10868",
+      "targetId": "task_10901",
+      "inputName": "error",
+      "outputName": "error"
+    }
+  ],
+  "layout": {
+    "general": {
+      "color": null,
+      "notes": []
+    },
+    "drawers": {
+      "DIAGRAM": {
+        "tasks": {
+          "task_10868": {
+            "collapsed": false,
+            "position": {
+              "x": 774,
+              "y": 233
+            },
+            "outdated": false
+          },
+          "task_10891": {
+            "collapsed": false,
+            "position": {
+              "x": 247,
+              "y": 238
+            },
+            "outdated": false
+          },
+          "task_10901": {
+            "collapsed": false,
+            "position": {
+              "x": 1356,
+              "y": 233
+            },
+            "outdated": false
+          }
+        },
+        "links": {
+          "efa4dafa-1b5e-476d-a8a3-98fc16757ca7": {
+            "vertices": []
+          },
+          "8cca456d-1b24-48dc-b8ac-2930fcf37674": {
+            "vertices": []
+          },
+          "9393a9ef-107c-4902-8688-2e690aaf74d8": {
+            "vertices": []
+          },
+          "499fae0d-1452-4996-af78-ea2f9134e7c3": {
+            "vertices": []
+          },
+          "4b16bfaf-b2a4-4965-85df-cd4a1708e7cd": {
+            "vertices": []
+          },
+          "998a7671-8811-4ea2-aa0e-738e09633536": {
+            "vertices": []
+          },
+          "808d5d24-43b0-4a0b-86b1-3ba33c38b05a": {
+            "vertices": []
+          },
+          "f86a0769-3192-4836-9fea-8b9fa737c019": {
+            "vertices": []
+          }
+        },
+        "notes": {},
+        "zoom": 1,
+        "pan": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    }
+  }
+}

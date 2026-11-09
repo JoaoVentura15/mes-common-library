@@ -1,0 +1,21 @@
+{
+  "WorksheetNameMapping": {
+    "1": {
+      "WorksheetName": "AutomationInstances",
+      "Value": "<DM>AutomationControllerInstance"
+    }
+  },
+  "<LOOKUP>AutomationInstances": {
+    "1": {
+      "AutomationController": "ExternalSystemsSimulator",
+      "AutomationManager": "ExternalSystemsSimulatorManager",
+      "EntityName": "ExternalSystemsSimulatorSite"
+    },
+    "2": {
+      "AutomationController": "ExternalSystemsSimulator",
+      "AutomationManager": "ExternalSystemsSimulatorManager",
+      "DriverName": "RESTServer",
+      "EntityName": "ExternalSystemsSimulatorSite"
+    }
+  }
+}

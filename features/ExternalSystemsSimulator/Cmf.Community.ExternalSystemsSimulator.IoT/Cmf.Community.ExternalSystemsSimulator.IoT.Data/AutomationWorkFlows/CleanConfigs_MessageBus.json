@@ -1,0 +1,319 @@
+{
+  "tasks": [
+    {
+      "id": "task_947",
+      "reference": {
+        "name": "messageBusListener",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "autoEnable": true,
+        "subjectToSubscribe": "ExternalSystemsSimulator.Clear",
+        "replyTimeout": 60000,
+        "___cmf___name": "Message Bus Listener"
+      }
+    },
+    {
+      "id": "task_1045",
+      "reference": {
+        "name": "messageBusReply",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "defaultReply": {}
+      }
+    },
+    {
+      "id": "task_3426",
+      "reference": {
+        "name": "messageBusListener",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "autoEnable": true,
+        "subjectToSubscribe": "ExternalSystemsSimulator.Clear.>",
+        "replyTimeout": 60000,
+        "___cmf___name": "Message Bus Listener"
+      }
+    },
+    {
+      "id": "task_11134",
+      "reference": {
+        "name": "workflow",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "inputs": [
+          {
+            "name": "subject",
+            "valueType": {
+              "friendlyName": "Subject",
+              "name": "String",
+              "type": 4,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            },
+            "defaultValue": "subject",
+            "settingKey": "name"
+          },
+          {
+            "name": "data",
+            "valueType": {
+              "friendlyName": "Data",
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            },
+            "defaultValue": "data",
+            "settingKey": "name"
+          },
+          {
+            "name": "IsRequest",
+            "valueType": {
+              "friendlyName": "IsRequest",
+              "name": "Boolean",
+              "type": 3,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            },
+            "defaultValue": "IsRequest",
+            "settingKey": "name"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "reply",
+            "valueType": {
+              "friendlyName": "Reply",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            },
+            "defaultValue": "reply",
+            "settingKey": "name"
+          },
+          {
+            "name": "IsRequestOut",
+            "valueType": {
+              "friendlyName": "IsRequestOut",
+              "name": "Boolean",
+              "type": 3,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            },
+            "defaultValue": "IsRequestOut",
+            "settingKey": "name"
+          }
+        ],
+        "automationWorkflow": {
+          "displayName": "CleanConfig_SubWorkflow",
+          "isShared": false,
+          "name": null
+        },
+        "retries": 30,
+        "contextsExpirationInMilliseconds": 60000,
+        "executionExpirationInMilliseconds": 1200000,
+        "executeWhenAllInputsDefined": false,
+        "___cmf___name": "Call SubWorkflow",
+        "___cmf___description": "CleanConfig_SubWorkflow"
+      }
+    }
+  ],
+  "converters": [],
+  "links": [
+    {
+      "id": "3de96a9e-e21e-4ac3-b0df-3432fc7b65e8",
+      "sourceId": "task_947",
+      "targetId": "task_11134",
+      "inputName": "subjectIn",
+      "outputName": "subject"
+    },
+    {
+      "id": "a5bf83e5-9e9d-4fca-9675-298c7911d6dd",
+      "sourceId": "task_947",
+      "targetId": "task_11134",
+      "inputName": "dataIn",
+      "outputName": "data"
+    },
+    {
+      "id": "3f6f2833-d01e-4c0e-b337-27006203916d",
+      "sourceId": "task_947",
+      "targetId": "task_11134",
+      "inputName": "IsRequestIn",
+      "outputName": "isRequest"
+    },
+    {
+      "id": "4b9ed140-20a1-4c87-9189-05a10cba9038",
+      "sourceId": "task_947",
+      "targetId": "task_11134",
+      "inputName": "activate",
+      "outputName": "success"
+    },
+    {
+      "id": "f7bafdb2-6add-4691-b020-ffc1694f3c5c",
+      "sourceId": "task_3426",
+      "targetId": "task_11134",
+      "inputName": "subjectIn",
+      "outputName": "subject"
+    },
+    {
+      "id": "b00b5231-0af3-4894-9044-b5566e1ae6cc",
+      "sourceId": "task_3426",
+      "targetId": "task_11134",
+      "inputName": "dataIn",
+      "outputName": "data"
+    },
+    {
+      "id": "427f5e62-a220-4c71-85b8-31cc97bf91bd",
+      "sourceId": "task_3426",
+      "targetId": "task_11134",
+      "inputName": "IsRequestIn",
+      "outputName": "isRequest"
+    },
+    {
+      "id": "ea396bee-43df-47c2-ac17-cdcba5e9d269",
+      "sourceId": "task_3426",
+      "targetId": "task_11134",
+      "inputName": "activate",
+      "outputName": "success"
+    },
+    {
+      "id": "7150089e-bd08-41d4-8efb-95527b0e5265",
+      "sourceId": "task_11134",
+      "targetId": "task_1045",
+      "inputName": "reply",
+      "outputName": "replyOut"
+    },
+    {
+      "id": "3345c90f-5920-42e3-bb21-262f9d6d68ee",
+      "sourceId": "task_11134",
+      "targetId": "task_1045",
+      "inputName": "activate",
+      "outputName": "IsRequestOutOut"
+    },
+    {
+      "id": "3089e263-df94-4a8c-92f3-6aa652014448",
+      "sourceId": "task_11134",
+      "targetId": "task_1045",
+      "inputName": "activate",
+      "outputName": "error"
+    },
+    {
+      "id": "4d903b7e-474d-4a9f-8264-0793d214bb6b",
+      "sourceId": "task_11134",
+      "targetId": "task_1045",
+      "inputName": "reply",
+      "outputName": "error"
+    }
+  ],
+  "layout": {
+    "general": {
+      "color": null,
+      "notes": []
+    },
+    "drawers": {
+      "DIAGRAM": {
+        "tasks": {
+          "task_1045": {
+            "collapsed": false,
+            "position": {
+              "x": 1425,
+              "y": 275
+            },
+            "outdated": false
+          },
+          "task_3426": {
+            "collapsed": false,
+            "position": {
+              "x": 137,
+              "y": 451
+            },
+            "outdated": false
+          },
+          "task_947": {
+            "collapsed": false,
+            "position": {
+              "x": 137,
+              "y": 83
+            },
+            "outdated": false
+          },
+          "task_11134": {
+            "collapsed": false,
+            "position": {
+              "x": 748,
+              "y": 275
+            },
+            "outdated": false
+          }
+        },
+        "links": {
+          "3de96a9e-e21e-4ac3-b0df-3432fc7b65e8": {
+            "vertices": []
+          },
+          "a5bf83e5-9e9d-4fca-9675-298c7911d6dd": {
+            "vertices": []
+          },
+          "3f6f2833-d01e-4c0e-b337-27006203916d": {
+            "vertices": []
+          },
+          "4b9ed140-20a1-4c87-9189-05a10cba9038": {
+            "vertices": []
+          },
+          "f7bafdb2-6add-4691-b020-ffc1694f3c5c": {
+            "vertices": []
+          },
+          "b00b5231-0af3-4894-9044-b5566e1ae6cc": {
+            "vertices": []
+          },
+          "427f5e62-a220-4c71-85b8-31cc97bf91bd": {
+            "vertices": []
+          },
+          "ea396bee-43df-47c2-ac17-cdcba5e9d269": {
+            "vertices": []
+          },
+          "7150089e-bd08-41d4-8efb-95527b0e5265": {
+            "vertices": []
+          },
+          "3345c90f-5920-42e3-bb21-262f9d6d68ee": {
+            "vertices": []
+          },
+          "3089e263-df94-4a8c-92f3-6aa652014448": {
+            "vertices": []
+          },
+          "4d903b7e-474d-4a9f-8264-0793d214bb6b": {
+            "vertices": []
+          }
+        },
+        "notes": {},
+        "pan": {
+          "x": 41,
+          "y": 0
+        },
+        "zoom": 1
+      }
+    }
+  }
+}

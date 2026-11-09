@@ -1,0 +1,2123 @@
+{
+    "<SM>Config": {
+        "1": {
+            "ParentPath": "/Micron/BlueprintSystem/",
+            "Name": "BasicURL",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "2": {
+            "ParentPath": "/Micron/BarTender/",
+            "Name": "WebServiceURL",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "3": {
+            "ParentPath": "/Micron/Dispatching/",
+            "Name": "WebServiceURL",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "4": {
+            "ParentPath": "/Micron/CTSSyncMaps/",
+            "Name": "Endpoint",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "5": {
+            "ParentPath": "/Micron/MaterialSyncMaps/",
+            "Name": "Endpoint",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "6": {
+            "ParentPath": "/Micron/SamplingSystem/",
+            "Name": "BasicURL",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "7": {
+            "ParentPath": "/Micron/PLM/ResponseEndpoint/",
+            "Name": "BaseURL",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "8": {
+            "ParentPath": "/Micron/PLM/ResponseEndpoint/Routing/",
+            "Name": "Acknowledge",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "9": {
+            "ParentPath": "/Micron/SAP/",
+            "Name": "BasicURL",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "10": {
+            "ParentPath": "/Micron/PLM/ResponseEndpoint/Routing/",
+            "Name": "ProcessedStatus",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "11": {
+            "ParentPath": "/Micron/SAP/Routing/",
+            "Name": "BOMProductTreeStatus",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "12": {
+            "ParentPath": "/Micron/SAP/Routing/",
+            "Name": "CloseProductionOrder",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "13": {
+            "ParentPath": "/Micron/SAP/Routing/",
+            "Name": "CreateMetadata",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "14": {
+            "ParentPath": "/Micron/SAP/Routing/",
+            "Name": "OpenProductionOrder",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "15": {
+            "ParentPath": "/Micron/SAP/Routing/",
+            "Name": "ProductMasterData",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "16": {
+            "ParentPath": "/Micron/SAP/Routing/",
+            "Name": "RemoveProductionOrder",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "17": {
+            "ParentPath": "/Micron/SAP/Routing/",
+            "Name": "ReportLossAndBonus",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "18": {
+            "ParentPath": "/Micron/SAP/Routing/",
+            "Name": "ReportProductionOrder",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "19": {
+            "ParentPath": "/Micron/SAP/Routing/",
+            "Name": "ShipLot",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "20": {
+            "ParentPath": "/Micron/BatchManager/",
+            "Name": "BaseURL",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "21": {
+            "ParentPath": "/Micron/BatchManager/Routing/",
+            "Name": "AbandoningBatch",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "22": {
+            "ParentPath": "/Micron/BatchManager/Routing/",
+            "Name": "CancellingBatch",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "23": {
+            "ParentPath": "/Micron/BatchManager/Routing/",
+            "Name": "CommittingBatch",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "24": {
+            "ParentPath": "/Micron/BatchManager/Routing/",
+            "Name": "CompletingBatch",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "25": {
+            "ParentPath": "/Micron/BatchManager/Routing/",
+            "Name": "CreateBatch",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "26": {
+            "ParentPath": "/Micron/BatchManager/Routing/",
+            "Name": "DataCollectionUpload",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "27": {
+            "ParentPath": "/Micron/BatchManager/Routing/",
+            "Name": "MaterialLoadBatch",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "28": {
+            "ParentPath": "/Micron/BatchManager/Routing/",
+            "Name": "MaterialUnloadBatch",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "29": {
+            "ParentPath": "/Micron/BatchManager/Routing/",
+            "Name": "StagingBatch",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "30": {
+            "ParentPath": "/Micron/BatchManager/Routing/",
+            "Name": "StoppingBatch",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "31": {
+            "ParentPath": "/Micron/BatchManager/Routing/",
+            "Name": "TrackingOutBatch",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "32": {
+            "ParentPath": "/Micron/BatchManager/Routing/",
+            "Name": "UnstagingBatch",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "33": {
+            "ParentPath": "/Micron/BatchManager/Routing/",
+            "Name": "UpdateBatch",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "34": {
+            "ParentPath": "/Micron/MAM/",
+            "Name": "BasicURL",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "35": {
+            "ParentPath": "/Micron/MAM/Routing/",
+            "Name": "GetLotDetails",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "36": {
+            "ParentPath": "/Micron/SubconValidator/",
+            "Name": "BaseURL",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "37": {
+            "ParentPath": "/Micron/SubconValidator/Routing/",
+            "Name": "NotifySubconValidator",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "38": {
+            "ParentPath": "/Micron/SubstrateMapping/SubstrateMapRequest/",
+            "Name": "Endpoint",
+            "ValueType": "String",
+            "Value": "http://externalsystemssimulatormanager:8080/api/SubstrateMapAPI/",
+            "Confidential": "No"
+        },
+        "39": {
+            "ParentPath": "/Micron/SDM/MESAuto/",
+            "Name": "BaseURL",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        },
+        "40": {
+            "ParentPath": "/Micron/SDM/MESAuto/Routing/",
+            "Name": "SDMPORecover",
+            "ValueType": "String",
+            "Value": "",
+            "Confidential": "No"
+        }
+    },
+    "<DM>Site": {
+        "1": {
+            "Name": "ExternalSystemsSimulatorSite",
+            "Description": "",
+            "RemoteExportAddress": "",
+            "Enterprise": "",
+            "IsRemote": "No",
+            "IsTemplate": "No",
+            "EntityPicture": ""
+        }
+    },
+    "<DM>AutomationManager": {
+        "1": {
+            "Name": "ExternalSystemsSimulatorManager",
+            "IsTemplate": "No",
+            "Description": "",
+            "Type": "General",
+            "LogicalAddress": "ExternalSystemsSimulatorManager",
+            "MonitorPackageVersion": "11.3.6",
+            "ManagerPackageVersion": "11.3.6",
+            "Configuration": "",
+            "DeploymentConfiguration": {
+                "Routes": [
+                    {
+                        "Protocol": "HTTP",
+                        "Port": 8080,
+                        "IsTLSEnabled": false
+                    }
+                ],
+                "Volumes": [],
+                "ImageName": "criticalmanufacturing/connectiot:11.3.6",
+                "UserName": "Micron Backend Integration User",
+                "UserAccount": "MICRONBACKENDINTEGRATIONUSER"
+            },
+            "DeploymentMode": "AutomaticDeploy",
+            "DeploymentState": "Ready",
+            "EntityPicture": ""
+        }
+    },
+    "<DM>Document": {
+        "1": {
+            "Name": "SubstrateMapAPIData",
+            "Description": "",
+            "Type": "Generic",
+            "ContentStorageType": "Internal",
+            "Folder": "Documents",
+            "OwnerRole": "",
+            "DocumentGroup": "",
+            "Author": "",
+            "CreationDate": "01/01/2026 00:00:00",
+            "Keywords": "",
+            "DistributionListForNewEffectiveVersion": "",
+            "DistributionListForNewVersion": "",
+            "RelativeFileLocation": "ExternalSystemsSimulator/ExtendedData/SubstrateMapAPIData.json",
+            "ContentURL": "",
+            "ChangeDescription": "",
+            "DocumentationURL": "",
+            "EntityPicture": "",
+            "Filename": "SubstrateMapAPIData.json",
+            "IsTemplate": "No",
+            "ReadAndUnderstandExpiration": "",
+            "RequireSignatureForReadAndUnderstand": "No"
+        },
+        "2": {
+            "Name": "SDMPORecoverData",
+            "Description": "",
+            "Type": "Generic",
+            "ContentStorageType": "Internal",
+            "Folder": "Documents",
+            "OwnerRole": "",
+            "DocumentGroup": "",
+            "Author": "",
+            "CreationDate": "01/01/2026 00:00:00",
+            "Keywords": "",
+            "DistributionListForNewEffectiveVersion": "",
+            "DistributionListForNewVersion": "",
+            "RelativeFileLocation": "ExternalSystemsSimulator/ExtendedData/SDMPORecoverData.json",
+            "ContentURL": "",
+            "ChangeDescription": "",
+            "DocumentationURL": "",
+            "EntityPicture": "",
+            "Filename": "SDMPORecoverData.json",
+            "IsTemplate": "No",
+            "ReadAndUnderstandExpiration": "",
+            "RequireSignatureForReadAndUnderstand": "No"
+        }
+    },
+    "<DM>AutomationDriverDefinition": {
+        "1": {
+            "Name": "ExternalSystemsSimulatorRestServer",
+            "Description": "",
+            "IsTemplate": "No",
+            "Type": "General",
+            "AutomationProtocol": "RestServerProtocol",
+            "ObjectType": "Site",
+            "EntityPicture": ""
+        }
+    },
+    "AutomationProperty": {
+        "1": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "RequestId",
+            "Description": "",
+            "DevicePropertyId": "RequestId",
+            "IsReadable": "Yes",
+            "IsWritable": "Yes",
+            "DataType": "String",
+            "AutomationProtocolDataType": "String",
+            "ExtendedData": "{\n  \"requestComponentType\": \"RequestId\",\n  \"fullContent\": false\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "2": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "MessageBody",
+            "Description": "",
+            "DevicePropertyId": "MessageBody",
+            "IsReadable": "Yes",
+            "IsWritable": "Yes",
+            "DataType": "Object",
+            "AutomationProtocolDataType": "String",
+            "ExtendedData": "{\"requestComponentType\":\"Body\",\"fullContent\": true,\"$id\":\"1\"}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        }
+    },
+    "AutomationEvent": {
+        "1": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "NotifySubconValidator",
+            "Description": "SubconValidator",
+            "DeviceEventId": "/api/SubconValidator/NotifySubconValidator/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "2": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "BOMProductTreeStatus",
+            "Description": "SAP",
+            "DeviceEventId": "/api/SAP/BOMProductTreeStatus/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "3": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "CloseProductionOrder",
+            "Description": "SAP",
+            "DeviceEventId": "/api/SAP/CloseProductionOrder/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "4": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "CreateMetadata",
+            "Description": "SAP",
+            "DeviceEventId": "/api/SAP/CreateMetadata/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "5": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "OpenProductionOrder",
+            "Description": "SAP",
+            "DeviceEventId": "/api/SAP/OpenProductionOrder/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "6": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "ProductMasterData",
+            "Description": "SAP",
+            "DeviceEventId": "/api/SAP/ProductMasterData/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "7": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "RemoveProductionOrder",
+            "Description": "SAP",
+            "DeviceEventId": "/api/SAP/RemoveProductionOrder/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "8": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "ReportLossAndBonus",
+            "Description": "SAP",
+            "DeviceEventId": "/api/SAP/ReportLossAndBonus/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "9": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "ReportProductionOrder",
+            "Description": "SAP",
+            "DeviceEventId": "/api/SAP/ReportProductionOrder/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "10": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "ShipLot",
+            "Description": "SAP",
+            "DeviceEventId": "/api/SAP/ShipLot/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "11": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "SamplingSystem",
+            "Description": "SamplingSystem",
+            "DeviceEventId": "/api/SamplingSystem/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "12": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "AbandoningBatch",
+            "Description": "BatchManager",
+            "DeviceEventId": "/api/BatchManager/AbandoningBatch/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "13": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "CancellingBatch",
+            "Description": "BatchManager",
+            "DeviceEventId": "/api/BatchManager/CancellingBatch/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "14": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "CommittingBatch",
+            "Description": "BatchManager",
+            "DeviceEventId": "/api/BatchManager/CommittingBatch/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "15": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "CompletingBatch",
+            "Description": "BatchManager",
+            "DeviceEventId": "/api/BatchManager/CompletingBatch/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "16": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "CreateBatch",
+            "Description": "BatchManager",
+            "DeviceEventId": "/api/BatchManager/CreateBatch/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "17": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "DataCollectionUpload",
+            "Description": "BatchManager",
+            "DeviceEventId": "/api/BatchManager/DataCollectionUpload/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "18": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "MaterialLoadBatch",
+            "Description": "BatchManager",
+            "DeviceEventId": "/api/BatchManager/MaterialLoadBatch/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "19": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "MaterialUnloadBatch",
+            "Description": "BatchManager",
+            "DeviceEventId": "/api/BatchManager/MaterialUnloadBatch/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "20": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "StagingBatch",
+            "Description": "BatchManager",
+            "DeviceEventId": "/api/BatchManager/StagingBatch/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "21": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "StoppingBatch",
+            "Description": "BatchManager",
+            "DeviceEventId": "/api/BatchManager/StoppingBatch/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "22": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "TrackingOutBatch",
+            "Description": "BatchManager",
+            "DeviceEventId": "/api/BatchManager/TrackingOutBatch/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "23": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "UnstagingBatch",
+            "Description": "BatchManager",
+            "DeviceEventId": "/api/BatchManager/UnstagingBatch/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "24": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "UpdateBatch",
+            "Description": "BatchManager",
+            "DeviceEventId": "/api/BatchManager/UpdateBatch/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "25": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "AcknowledgeWorkPackage",
+            "Description": "PLM",
+            "DeviceEventId": "/api/PLM/AcknowledgeWorkPackage/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "26": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "GeneratePackage",
+            "Description": "PLM",
+            "DeviceEventId": "/api/PLM/GeneratePackage/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "27": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "ProcesssedWorkPackage",
+            "Description": "PLM",
+            "DeviceEventId": "/api/PLM/ProcessedWorkPackage/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "28": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "MaterialSyncMaps",
+            "Description": "MaterialSyncMaps",
+            "DeviceEventId": "/api/MaterialSyncMaps/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "29": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "GetLotDetails",
+            "Description": "MAM",
+            "DeviceEventId": "/api/MAM/GetLotDetails/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "30": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "Dispatching",
+            "Description": "Dispatching",
+            "DeviceEventId": "/api/Dispatching/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "31": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "CTSSyncMaps",
+            "Description": "CTSSyncMaps",
+            "DeviceEventId": "/api/CTSSyncMaps/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "32": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "BlueprintSystem",
+            "Description": "BlueprintSystem",
+            "DeviceEventId": "/api/BlueprintSystem/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "33": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "BarTender",
+            "Description": "BarTender",
+            "DeviceEventId": "/api/BarTender/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "34": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "SubstrateMapAPI",
+            "Description": "SubstrateMapAPI",
+            "DeviceEventId": "/api/SubstrateMapAPI/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": [],\n\t\"DocumentName\" : \"SubstrateMapAPIData\"\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "35": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "ExperimentDefinitionCreated",
+            "Description": "GSWR",
+            "DeviceEventId": "/api/GSWR/ExperimentDefinitionCreated/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "36": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "ExperimentCreated",
+            "Description": "GSWR",
+            "DeviceEventId": "/api/GSWR/ExperimentCreated/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "37": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "ExperimentStepStart",
+            "Description": "GSWR",
+            "DeviceEventId": "/api/GSWR/ExperimentStepStart/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "38": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "ExperimentStepCompleted",
+            "Description": "GSWR",
+            "DeviceEventId": "/api/GSWR/ExperimentStepCompleted/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "39": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "ExperimentClosed",
+            "Description": "GSWR",
+            "DeviceEventId": "/api/GSWR/ExperimentClosed/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "40": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "HostGetEquipConstDefinition",
+            "Description": "HostGetEquipConstDefinition",
+            "DeviceEventId": "/api/HostGetEquipConstDefinition/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "41": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "SDMPOIssue",
+            "Description": "SDMPOIssue",
+            "DeviceEventId": "/api/Material/SDMPOIssue/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "42": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "SDMAssign",
+            "Description": "SDMAssign",
+            "DeviceEventId": "/api/SDMAssign/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "43": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "SDMPORecover",
+            "Description": "SDMPORecover",
+            "DeviceEventId": "/api/Material/SDMPORecover",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": [],\n\t\"DocumentName\" : \"SDMPORecoverData\"\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "44": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "ContainerMapUpdate",
+            "Description": "ContainerMapUpdate",
+            "DeviceEventId": "/api/Carrier/ContainerMapUpdate/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "45": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "HostGetEquipConstValue",
+            "Description": "HostGetEquipConstValue",
+            "DeviceEventId": "/api/HostGetEquipConstValue/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "46": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "SyncCarrierMaps",
+            "Description": "SyncCarrierMaps",
+            "DeviceEventId": "/api/Container/SyncCarrierMaps/",
+            "IsEnabled": "Yes",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": []\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        }
+    },
+    "AutomationEventProperties": {
+        "1": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "AbandoningBatch",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "2": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "AbandoningBatch",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "3": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "AcknowledgeWorkPackage",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "4": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "AcknowledgeWorkPackage",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "5": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "BarTender",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "6": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "BarTender",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "7": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "BlueprintSystem",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "8": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "BlueprintSystem",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "9": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "BOMProductTreeStatus",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "10": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "BOMProductTreeStatus",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "11": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "CancellingBatch",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "12": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "CancellingBatch",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "13": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "CloseProductionOrder",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "14": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "CloseProductionOrder",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "15": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "CommittingBatch",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "16": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "CommittingBatch",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "17": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "CompletingBatch",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "18": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "CompletingBatch",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "19": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "CreateBatch",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "20": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "CreateBatch",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "21": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "CreateMetadata",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "22": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "CreateMetadata",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "23": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "CTSSyncMaps",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "24": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "CTSSyncMaps",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "25": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "DataCollectionUpload",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "26": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "DataCollectionUpload",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "27": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "Dispatching",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "28": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "Dispatching",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "29": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "GeneratePackage",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "30": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "GeneratePackage",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "31": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "GetLotDetails",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "32": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "GetLotDetails",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "33": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "MaterialLoadBatch",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "34": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "MaterialLoadBatch",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "35": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "MaterialSyncMaps",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "36": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "MaterialSyncMaps",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "37": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "MaterialUnloadBatch",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "38": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "MaterialUnloadBatch",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "39": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "NotifySubconValidator",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "40": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "NotifySubconValidator",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "41": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "OpenProductionOrder",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "42": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "OpenProductionOrder",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "43": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ProcesssedWorkPackage",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "44": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ProcesssedWorkPackage",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "45": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ProductMasterData",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "46": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ProductMasterData",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "47": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "RemoveProductionOrder",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "48": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "RemoveProductionOrder",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "49": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ReportLossAndBonus",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "50": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ReportLossAndBonus",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "51": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ReportProductionOrder",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "52": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ReportProductionOrder",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "53": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "SamplingSystem",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "54": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "SamplingSystem",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "55": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ShipLot",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "56": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ShipLot",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "57": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "StagingBatch",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "58": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "StagingBatch",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "59": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "StoppingBatch",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "60": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "StoppingBatch",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "61": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "SubstrateMapAPI",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "62": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "SubstrateMapAPI",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "63": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "TrackingOutBatch",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "64": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "TrackingOutBatch",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "65": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "UnstagingBatch",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "66": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "UnstagingBatch",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "67": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "UpdateBatch",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "68": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "UpdateBatch",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "69": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "HostGetEquipConstDefinition",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "70": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "HostGetEquipConstDefinition",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "71": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ExperimentDefinitionCreated",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "72": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ExperimentDefinitionCreated",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "73": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ExperimentCreated",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "74": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ExperimentCreated",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "75": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ExperimentStepStart",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "76": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ExperimentStepStart",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "77": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ExperimentStepCompleted",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "78": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ExperimentStepCompleted",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "79": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ExperimentClosed",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "80": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ExperimentClosed",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "81": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "HostGetEquipConstValue",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "82": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "HostGetEquipConstValue",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "83": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "SDMPOIssue",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "84": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "SDMPOIssue",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "85": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "SDMAssign",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "86": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "SDMAssign",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "87": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "SDMPORecover",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "88": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "SDMPORecover",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "89": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ContainerMapUpdate",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "90": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "ContainerMapUpdate",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "91": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "SyncCarrierMaps",
+            "AutomationProperty": "RequestId",
+            "Order": "1",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "92": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationEvent": "SyncCarrierMaps",
+            "AutomationProperty": "MessageBody",
+            "Order": "2",
+            "ExtendedData": "{}",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        }
+    },
+    "AutomationCommand": {
+        "1": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Name": "RequestReplyCommand",
+            "Description": "",
+            "DeviceCommandId": "RequestReplyCommand",
+            "ExtendedData": "{}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        }
+    },
+    "AutomationCommandParameter": {
+        "1": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationCommand": "RequestReplyCommand",
+            "Name": "RequestId",
+            "Description": "",
+            "DataType": "String",
+            "AutomationProtocolDataType": "String",
+            "DefaultValue": "",
+            "IsMandatory": "Yes",
+            "Order": "1",
+            "ExtendedData": "{\n  \"replyParameterType\": \"RequestId\"\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "2": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationCommand": "RequestReplyCommand",
+            "Name": "StatusCode",
+            "Description": "",
+            "DataType": "Integer",
+            "AutomationProtocolDataType": "Integer",
+            "DefaultValue": "200",
+            "IsMandatory": "Yes",
+            "Order": "2",
+            "ExtendedData": "{\n  \"replyParameterType\": \"StatusCode\"\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        },
+        "3": {
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "AutomationCommand": "RequestReplyCommand",
+            "Name": "Body",
+            "Description": "",
+            "DataType": "Object",
+            "AutomationProtocolDataType": "Object",
+            "DefaultValue": "",
+            "IsMandatory": "Yes",
+            "Order": "3",
+            "ExtendedData": "{\n  \"replyParameterType\": \"Body\"\n}",
+            "EntityPicture": "",
+            "IsTemplate": "No"
+        }
+    },
+    "<DM>AutomationController": {
+        "1": {
+            "Name": "ExternalSystemsSimulator",
+            "Description": "",
+            "IsTemplate": "No",
+            "Type": "General",
+            "ControllerPackageVersion": "11.3.6",
+            "ObjectType": "Site",
+            "TasksPackages": "[\"@criticalmanufacturing/connect-iot-controller-engine-core-tasks\",\"@criticalmanufacturing/connect-iot-custom-utilities-semiconductor-tasks\",\"@criticalmanufacturing/connect-iot-controller-engine-mes-tasks\",\"@criticalmanufacturing/connect-iot-controller-engine-dataplatform-tasks\",\"@criticalmanufacturing/connect-iot-controller-engine-common-tasks\"]",
+            "Scope": "ConnectIoT",
+            "AutomaticCheckpoints": "",
+            "DefaultWorkflowType": "DataFlow",
+            "EntityPicture": "",
+            "LinkConnector": "Smooth",
+            "LinkRouter": "Normal",
+            "TasksLibraryPackages": "[\"@criticalmanufacturing/connect-iot-controller-engine-core-tasks@11.3.6\",\"@criticalmanufacturing/connect-iot-custom-utilities-semiconductor-tasks@2.6.0\",\"@criticalmanufacturing/connect-iot-controller-engine-mes-tasks@11.3.6\",\"@criticalmanufacturing/connect-iot-controller-engine-dataplatform-tasks@11.3.6\"]",
+            "Timeout": ""
+        }
+    },
+    "AutomationControllerDriverDef": {
+        "1": {
+            "AutomationController": "ExternalSystemsSimulator",
+            "Name": "RESTServer",
+            "DisplayName": "RESTServer",
+            "AutomationDriverDefinition": "ExternalSystemsSimulatorRestServer",
+            "Color": "",
+            "Description": "",
+            "EntityPicture": "",
+            "IsTemplate": "No",
+            "Order": "1"
+        }
+    },
+    "AutomationControllerWorkflow": {
+        "1": {
+            "AutomationController": "ExternalSystemsSimulator",
+            "Name": "CommonWorkflows",
+            "DisplayName": "CommonWorkflows",
+            "Workflow": "ExternalSystemsSimulator/Workflows/Empty.json",
+            "Order": "0",
+            "Description": "",
+            "EntityPicture": "",
+            "Indentation": "0",
+            "IsFile": "Yes",
+            "IsShared": "No",
+            "IsTemplate": "No",
+            "TasksLibraryPackages": "",
+            "TasksPackages": "",
+            "WorkflowType": "DataFlow"
+        },
+        "2": {
+            "AutomationController": "ExternalSystemsSimulator",
+            "Name": "Setup_RESTServer",
+            "DisplayName": "Setup_RESTServer",
+            "Workflow": "ExternalSystemsSimulator/Workflows/Setup_RESTServer.json",
+            "Order": "1",
+            "Description": "",
+            "EntityPicture": "",
+            "Indentation": "1",
+            "IsFile": "Yes",
+            "IsShared": "No",
+            "IsTemplate": "No",
+            "TasksLibraryPackages": "",
+            "TasksPackages": "",
+            "WorkflowType": "DataFlow"
+        },
+        "3": {
+            "AutomationController": "ExternalSystemsSimulator",
+            "Name": "AllEvents",
+            "DisplayName": "AllEvents",
+            "Workflow": "ExternalSystemsSimulator/Workflows/AllEvents.json",
+            "Order": "2",
+            "Description": "",
+            "EntityPicture": "",
+            "Indentation": "1",
+            "IsFile": "Yes",
+            "IsShared": "No",
+            "IsTemplate": "No",
+            "TasksLibraryPackages": "",
+            "TasksPackages": "",
+            "WorkflowType": "DataFlow"
+        },
+        "4": {
+            "AutomationController": "ExternalSystemsSimulator",
+            "Name": "MainWorkflow",
+            "DisplayName": "MainWorkflow",
+            "Workflow": "ExternalSystemsSimulator/Workflows/MainWorkflow.json",
+            "Order": "3",
+            "Description": "",
+            "EntityPicture": "",
+            "Indentation": "1",
+            "IsFile": "Yes",
+            "IsShared": "No",
+            "IsTemplate": "No",
+            "TasksLibraryPackages": "",
+            "TasksPackages": "",
+            "WorkflowType": "DataFlow"
+        },
+        "5": {
+            "AutomationController": "ExternalSystemsSimulator",
+            "Name": "SendBodyResponse",
+            "DisplayName": "SendBodyResponse",
+            "Workflow": "ExternalSystemsSimulator/Workflows/SendBodyResponse.json",
+            "Order": "4",
+            "Description": "",
+            "EntityPicture": "",
+            "Indentation": "1",
+            "IsFile": "Yes",
+            "IsShared": "No",
+            "IsTemplate": "No",
+            "TasksLibraryPackages": "",
+            "TasksPackages": "",
+            "WorkflowType": "DataFlow"
+        },
+        "6": {
+            "AutomationController": "ExternalSystemsSimulator",
+            "Name": "DataHandlers",
+            "DisplayName": "DataHandlers",
+            "Workflow": "ExternalSystemsSimulator/Workflows/Empty.json",
+            "Order": "5",
+            "Description": "",
+            "EntityPicture": "",
+            "Indentation": "0",
+            "IsFile": "Yes",
+            "IsShared": "No",
+            "IsTemplate": "No",
+            "TasksLibraryPackages": "",
+            "TasksPackages": "",
+            "WorkflowType": "DataFlow"
+        },
+        "7": {
+            "AutomationController": "ExternalSystemsSimulator",
+            "Name": "RetrieveSimulatorConfigs",
+            "DisplayName": "RetrieveSimulatorConfigs",
+            "Workflow": "ExternalSystemsSimulator/Workflows/RetrieveSimulatorConfigs.json",
+            "Order": "6",
+            "Description": "",
+            "EntityPicture": "",
+            "Indentation": "1",
+            "IsFile": "Yes",
+            "IsShared": "No",
+            "IsTemplate": "No",
+            "TasksLibraryPackages": "",
+            "TasksPackages": "",
+            "WorkflowType": "DataFlow"
+        },
+        "8": {
+            "AutomationController": "ExternalSystemsSimulator",
+            "Name": "ConfigureSimulator_MessageBusHandler",
+            "DisplayName": "ConfigureSimulator_MessageBusHandler",
+            "Workflow": "ExternalSystemsSimulator/Workflows/ConfigureSimulator_MessageBusHandler.json",
+            "Order": "7",
+            "Description": "",
+            "EntityPicture": "",
+            "Indentation": "1",
+            "IsFile": "Yes",
+            "IsShared": "No",
+            "IsTemplate": "No",
+            "TasksLibraryPackages": "",
+            "TasksPackages": "",
+            "WorkflowType": "DataFlow"
+        },
+        "9": {
+            "AutomationController": "ExternalSystemsSimulator",
+            "Name": "CleanConfigs_MessageBus",
+            "DisplayName": "CleanConfigs_MessageBus",
+            "Workflow": "ExternalSystemsSimulator/Workflows/CleanConfigs_MessageBus.json",
+            "Order": "8",
+            "Description": "",
+            "EntityPicture": "",
+            "Indentation": "1",
+            "IsFile": "Yes",
+            "IsShared": "No",
+            "IsTemplate": "No",
+            "TasksLibraryPackages": "",
+            "TasksPackages": "",
+            "WorkflowType": "DataFlow"
+        },
+        "10": {
+            "AutomationController": "ExternalSystemsSimulator",
+            "Name": "CleanConfig_SubWorkflow",
+            "DisplayName": "CleanConfig_SubWorkflow",
+            "Workflow": "ExternalSystemsSimulator/Workflows/CleanConfig_SubWorkflow.json",
+            "Order": "9",
+            "Description": "",
+            "EntityPicture": "",
+            "Indentation": "2",
+            "IsFile": "Yes",
+            "IsShared": "No",
+            "IsTemplate": "No",
+            "TasksLibraryPackages": "",
+            "TasksPackages": "",
+            "WorkflowType": "DataFlow"
+        },
+        "11": {
+            "AutomationController": "ExternalSystemsSimulator",
+            "Name": "Actions",
+            "DisplayName": "Actions",
+            "Workflow": "ExternalSystemsSimulator/Workflows/Empty.json",
+            "Order": "10",
+            "Description": "",
+            "EntityPicture": "",
+            "Indentation": "0",
+            "IsFile": "Yes",
+            "IsShared": "No",
+            "IsTemplate": "No",
+            "TasksLibraryPackages": "",
+            "TasksPackages": "",
+            "WorkflowType": "DataFlow"
+        },
+        "12": {
+            "AutomationController": "ExternalSystemsSimulator",
+            "Name": "Actions_MainLogic",
+            "DisplayName": "Actions_MainLogic",
+            "Workflow": "ExternalSystemsSimulator/Workflows/Actions_MainLogic.json",
+            "Order": "11",
+            "Description": "",
+            "EntityPicture": "",
+            "Indentation": "1",
+            "IsFile": "Yes",
+            "IsShared": "No",
+            "IsTemplate": "No",
+            "TasksLibraryPackages": "",
+            "TasksPackages": "",
+            "WorkflowType": "DataFlow"
+        },
+        "13": {
+            "AutomationController": "ExternalSystemsSimulator",
+            "Name": "Action_SelectAction",
+            "DisplayName": "Action_SelectAction",
+            "Workflow": "ExternalSystemsSimulator/Workflows/Action_SelectAction.json",
+            "Order": "12",
+            "Description": "",
+            "EntityPicture": "",
+            "Indentation": "1",
+            "IsFile": "Yes",
+            "IsShared": "No",
+            "IsTemplate": "No",
+            "TasksLibraryPackages": "",
+            "TasksPackages": "",
+            "WorkflowType": "DataFlow"
+        },
+        "14": {
+            "AutomationController": "ExternalSystemsSimulator",
+            "Name": "Action_CustomCode",
+            "DisplayName": "Action_CustomCode",
+            "Workflow": "ExternalSystemsSimulator/Workflows/Action_CustomCode.json",
+            "Order": "13",
+            "Description": "",
+            "EntityPicture": "",
+            "Indentation": "1",
+            "IsFile": "Yes",
+            "IsShared": "No",
+            "IsTemplate": "No",
+            "TasksLibraryPackages": "",
+            "TasksPackages": "",
+            "WorkflowType": "DataFlow"
+        },
+        "15": {
+            "AutomationController": "ExternalSystemsSimulator",
+            "Name": "Action_LogEvent",
+            "DisplayName": "Action_LogEvent",
+            "Workflow": "ExternalSystemsSimulator/Workflows/Action_LogEvent.json",
+            "Order": "14",
+            "Description": "",
+            "EntityPicture": "",
+            "Indentation": "1",
+            "IsFile": "Yes",
+            "IsShared": "No",
+            "IsTemplate": "No",
+            "TasksLibraryPackages": "",
+            "TasksPackages": "",
+            "WorkflowType": "DataFlow"
+        }
+    }
+}
