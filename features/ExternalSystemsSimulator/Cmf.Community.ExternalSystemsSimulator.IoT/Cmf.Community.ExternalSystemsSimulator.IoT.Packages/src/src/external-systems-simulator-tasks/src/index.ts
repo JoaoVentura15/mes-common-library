@@ -4,3 +4,5 @@
 // full contents and packed
 
 
+export { GetEventDataTask } from "./tasks/getEventData/getEventData.task";
+
