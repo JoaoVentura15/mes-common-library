@@ -1,0 +1,54 @@
+{
+    "requestMethod": "POST",
+    "automaticReply": false,
+    "automaticReplyStatusCode": "200",
+    "timeout": "60000",
+    "DefaultBody": {
+        "SubstrateMapRequest": {
+            "MapStandard": "E142",
+            "MaterialName": null,
+            "SDMAssignUid": null,
+            "StepName": "DIE ATTACH",
+            "EqNullBin": null,
+            "ReplaceUntestedDie": null,
+            "MapNameList": [
+                "DeviceIdMap"
+            ],
+            "OriginLocation": "LowerLeft",
+            "Orientation": "0",
+            "AxisDirection": "UpRight",
+            "SubstrateSide": "TopSide",
+            "TargetOriginLocation": null,
+            "TargetOrientation": null,
+            "TargetAxisDirection": null,
+            "TargetSubstrateSide": null,
+            "MapType": "2DArray",
+            "BinType": "ASCII",
+            "SingleDieSiteColumnCount": "1",
+            "SingleDieSiteRowCount": "1",
+            "MapDirection": "LeftToRight",
+            "RefreshStripMap": "TRUE",
+            "MergeSBSMap": "TRUE",
+            "DefaultBinCode": "0",
+            "ProvideDefaultMap": "FALSE",
+            "Substrates": [
+                {
+                    "Id": "RDIMH02127",
+                    "Type": "Tray",
+                    "IdType": null,
+                    "MapData": "<MapData><Layouts><Layout Package=\"false\" LayoutId=\"Tray\" DefaultUnits=\"mm\" TopLevel=\"true\"><Dimension X=\"1\" Y=\"1\" /><ChildLayouts><ChildLayout LayoutId=\"335x289x39\" /></ChildLayouts></Layout><Layout Package=\"true\" LayoutId=\"335x289x39\" DefaultUnits=\"mm\" TopLevel=\"false\"><Dimension X=\"2\" Y=\"25\" /><Z Order=\"0\" /></Layout></Layouts><Substrates><Substrate SubstrateType=\"{{substrate.type}}\" SubstrateId=\"{{substrate.id}}\" /></Substrates><SubstrateMaps><SubstrateMap SubstrateType=\"{{substrate.type}}\" SubstrateId=\"{{substrate.id}}\" LayoutSpecifier=\"Tray/335x289x39\" Orientation=\"0\" OriginLocation=\"LowerLeft\" AxisDirection=\"UpRight\" SubstrateSide=\"TopSide\"><Overlay MapName=\"DeviceIdMap\" MapVersion=\"1\"><DeviceIdMap /></Overlay></SubstrateMap></SubstrateMaps></MapData>",
+                    "OverlayMapName": null,
+                    "SubstrateMapState": null
+                }
+            ],
+            "SpecialBinList": null,
+            "DesignId": null,
+            "XoutEnabled": "FALSE",
+            "AsmProcessId": null
+        },
+        "Status": null,
+        "Details": null
+    },
+    "DefaultStatusCode": 200,
+    "ActionsToExecute": []
+}
