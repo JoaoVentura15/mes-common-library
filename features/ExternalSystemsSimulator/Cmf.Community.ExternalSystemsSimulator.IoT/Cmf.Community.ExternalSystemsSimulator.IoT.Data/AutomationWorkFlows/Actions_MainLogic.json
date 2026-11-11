@@ -1,0 +1,620 @@
+{
+  "tasks": [
+    {
+      "id": "task_1020",
+      "reference": {
+        "name": "subWorkflowStart",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "outputs": [
+          {
+            "name": "RequestId",
+            "valueType": {
+              "name": "String",
+              "type": 4,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null,
+              "friendlyName": ""
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "CurrentEndpointConfig",
+            "valueType": {
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null,
+              "friendlyName": ""
+            },
+            "defaultValue": null
+          }
+        ],
+        "___cmf___name": "SubWorkflow Start",
+        "___cmf___color": "#808080"
+      }
+    },
+    {
+      "id": "task_1027",
+      "reference": {
+        "name": "subWorkflowEnd",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "inputs": [
+          {
+            "name": "RequestId",
+            "friendlyName": "RequestId",
+            "valueType": {
+              "name": "String",
+              "type": 4,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null,
+              "friendlyName": "RequestId"
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "CurrentEndpointConfig",
+            "friendlyName": "CurrentEndpointConfig",
+            "valueType": {
+              "friendlyName": "CurrentEndpointConfig",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          }
+        ],
+        "___cmf___name": "SubWorkflow End",
+        "___cmf___color": "#808080"
+      }
+    },
+    {
+      "id": "task_992",
+      "reference": {
+        "name": "workflow",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "inputs": [
+          {
+            "name": "ActionToExecute",
+            "valueType": {
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null,
+              "friendlyName": ""
+            },
+            "defaultValue": "ActionToExecute",
+            "settingKey": "name"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "ActionToExecuteOut",
+            "valueType": {
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null,
+              "friendlyName": "ActionToExecute"
+            },
+            "defaultValue": "ActionToExecuteOut",
+            "settingKey": "name"
+          }
+        ],
+        "automationWorkflow": {
+          "displayName": "Action_SelectAction",
+          "isShared": false,
+          "name": null
+        },
+        "retries": 30,
+        "contextsExpirationInMilliseconds": 60000,
+        "executionExpirationInMilliseconds": 1200000,
+        "executeWhenAllInputsDefined": false,
+        "___cmf___name": "Call SubWorkflow",
+        "___cmf___color": "#fbff80",
+        "___cmf___description": "Action_SelectAction"
+      }
+    },
+    {
+      "id": "task_1646",
+      "reference": {
+        "name": "codeExecution",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "inputs": [
+          {
+            "name": "RequestId",
+            "friendlyName": "RequestId",
+            "valueType": {
+              "friendlyName": "RequestId",
+              "name": "String",
+              "type": 4,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          },
+          {
+            "name": "CurrentEndpointConfig",
+            "friendlyName": "CurrentEndpointConfig",
+            "valueType": {
+              "friendlyName": "CurrentEndpointConfig",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "name": "RequestId",
+            "friendlyName": "RequestId",
+            "valueType": {
+              "friendlyName": "RequestId",
+              "name": "String",
+              "type": 4,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          },
+          {
+            "name": "CurrentEndpointConfig",
+            "friendlyName": "CurrentEndpointConfig",
+            "valueType": {
+              "friendlyName": "CurrentEndpointConfig",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          },
+          {
+            "name": "success",
+            "friendlyName": "success",
+            "valueType": {
+              "friendlyName": "Success",
+              "name": "Boolean",
+              "type": 3,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          },
+          {
+            "name": "ActionToExecute",
+            "friendlyName": "ActionToExecute",
+            "valueType": {
+              "friendlyName": "ActionToExecute",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          }
+        ],
+        "contextExpirationInMilliseconds": 10000,
+        "executionExpirationInMilliseconds": 0,
+        "tsCode": [
+          "import { Framework } from 'framework';",
+          "",
+          "export default class {",
+          "",
+          "    /** Allows accessing external functions */",
+          "    private framework: Framework;",
+          "",
+          "    constructor(framework: Framework) {",
+          "        this.framework = framework;",
+          "    }",
+          "",
+          "    /*",
+          "     * Entry point of the class (IMPORTANT: don't change the signature of this method)",
+          "     * Should return an object containing the values for each output to emit",
+          "     * If necessary, use the parameter \"outputs\" to emit data while running the code.",
+          "     */",
+          "    public async main(inputs: any, outputs: any): Promise<any> {",
+          "        // Add code here    ",
+          "        debugger;",
+          "        let currentEndpointConfig: EndpointConfig = inputs.CurrentEndpointConfig;",
+          "        let actions: Action[] = currentEndpointConfig.ActionsToExecute;",
+          "",
+          "        let actionsToExecute = actions.length;",
+          "",
+          "        for (var index in actions) {",
+          "",
+          "            var action = actions[index];",
+          "            var updatedAction = false;",
+          "            if (!action.Id) {",
+          "                action.Id = \"Action_\" + inputs.RequestId + \"_\" + index;",
+          "                updatedAction = true;",
+          "            }",
+          "",
+          "            action = await this.framework.dataStore.retrieve(action.Id, action);",
+          "            actions[index] = action;",
+          "",
+          "            //Default action state",
+          "            if (!action.ActionState) {",
+          "                action.ActionState = ActionStates.Created;",
+          "                updatedAction = true;",
+          "            }",
+          "",
+          "            if (updatedAction) {",
+          "                actions[index] = action;",
+          "                await this.framework.dataStore.store(action.Id, action, \"Persistent\");",
+          "            }",
+          "",
+          "            if (action.ActionState === ActionStates.Processed || action.ActionState === ActionStates.Failed) {",
+          "                actionsToExecute--;",
+          "            }",
+          "",
+          "            if (action.ActionState !== ActionStates.Created) {",
+          "                continue;",
+          "            }",
+          "",
+          "            if (action.DependsOn && action.DependsOn.length > 0) {",
+          "                // Check if there are any dependencies that are NOT 'Processed' yet",
+          "                const dependenciesMet = action.DependsOn.every((depId: any) => {",
+          "                    const depAction = actions.find(a => a.Id === depId);",
+          "                    return depAction && depAction.ActionState === ActionStates.Processed;",
+          "                });",
+          "                if (!dependenciesMet) {",
+          "                    // If not all dependencies are Processed, skip this action for now",
+          "                    continue;",
+          "                }",
+          "            }",
+          "",
+          "            //Update action",
+          "            //Needs to be this order to prevent concurrency issues",
+          "            action.ActionState = ActionStates.Requested;",
+          "            actions[index] = action;",
+          "            await this.framework.dataStore.store(action.Id, action, \"Persistent\");",
+          "",
+          "            this.framework.logger.info(\"Triggering \" + JSON.stringify(action));",
+          "",
+          "            currentEndpointConfig.ActionsToExecute = actions;",
+          "",
+          "            return { RequestId: inputs.RequestId, CurrentEndpointConfig: currentEndpointConfig, ActionToExecute: action }",
+          "        }",
+          "",
+          "        if (actionsToExecute == 0) {",
+          "            this.framework.logger.info(\"Finished executing all actions!\");",
+          "",
+          "            //Clean persistency",
+          "            for (var index in actions) {",
+          "                await this.framework.dataStore.store(actions[index].Id, undefined, \"Persistent\");",
+          "            }",
+          "",
+          "            return { RequestId: inputs.RequestId, CurrentEndpointConfig: inputs.CurrentEndpointConfig, success: true };",
+          "        }",
+          "",
+          "        currentEndpointConfig.ActionsToExecute = actions;",
+          "",
+          "        //Wating for actions to finish",
+          "        return {",
+          "            RequestId: inputs.RequestId,",
+          "            CurrentEndpointConfig: currentEndpointConfig",
+          "        }",
+          "",
+          "        // emit output during execution: outputs.output1.emit(\"something\");",
+          "        // return example: return { output1: inputs.input1, output2: \"Hello World\" };",
+          "    }",
+          "}",
+          "//Model for AutomationEvent ExtendedData",
+          "class CustomExtendedData {",
+          "    DefaultActions: Action[];",
+          "    DefaultBody: string;",
+          "    DefaultStatusCode: number",
+          "}",
+          "",
+          "//Model for ActionParameter for action of type LogEvent",
+          "class LogEventParameter {",
+          "    EntityType: string;",
+          "    EntityId: string | undefined;",
+          "    EntityName: string | undefined;",
+          "    ToState: string;",
+          "    IgnoreLastServiceId = false;",
+          "}",
+          "",
+          "//Model for CustomCode ",
+          "class CustomCodeParameters {",
+          "    ParameterNames: string[];",
+          "    Parameters: any[];",
+          "    Function: string;",
+          "}",
+          "",
+          "//Generic data model",
+          "class EndpointConfig {",
+          "    Id: string | undefined;",
+          "    StatusCode: number | undefined;",
+          "    BodyToSend: any;",
+          "    ActionsToExecute: Action[] | undefined;",
+          "",
+          "    constructor(init?: Partial<EndpointConfig>) {",
+          "        Object.assign(this, init);",
+          "        if (!this.Id) {",
+          "            this.Id = crypto.randomUUID();",
+          "        }",
+          "    }",
+          "",
+          "    static GetNew(statusCodeToSet: number, bodyToSet: any): EndpointConfig {",
+          "        return new EndpointConfig({",
+          "            Id: crypto.randomUUID(),",
+          "            StatusCode: statusCodeToSet,",
+          "            BodyToSend: bodyToSet,",
+          "        });",
+          "    }",
+          "}",
+          "",
+          "class Action {",
+          "    Id: string | undefined;",
+          "    ActionType: string;",
+          "    ActionState: ActionStates;",
+          "    ActionParameter: any;",
+          "    DependsOn: string[] | undefined;",
+          "",
+          "    constructor(init?: Partial<Action>) {",
+          "        if (!init || !init.ActionType || !init.ActionParameter) {",
+          "            throw new Error(\"Invalid input. Received: \" + JSON.stringify(init));",
+          "        }",
+          "        this.Id = init.Id ?? crypto.randomUUID();",
+          "        this.ActionType = init.ActionType;",
+          "        this.ActionState = init.ActionState ?? ActionStates.Created;",
+          "        this.ActionParameter = init.ActionParameter;",
+          "    }",
+          "}",
+          "",
+          "class EndpointStatistic {",
+          "    RequestId: string | undefined;",
+          "    EndpointConfig: EndpointConfig | undefined;",
+          "    ReceivedBody: any;",
+          "    ReplySent: any;",
+          "    StatusCodeSent: number | undefined;",
+          "    Error: any",
+          "}",
+          "",
+          "enum ActionStates {",
+          "    \"Created\",",
+          "    \"Requested\",",
+          "    \"Processed\",",
+          "    \"Failed\"",
+          "}",
+          ""
+        ],
+        "jsCodeBase64": "InVzZSBzdHJpY3QiOwpPYmplY3QuZGVmaW5lUHJvcGVydHkoZXhwb3J0cywgIl9fZXNNb2R1bGUiLCB7IHZhbHVlOiB0cnVlIH0pOwpjbGFzcyBkZWZhdWx0XzEgewogICAgY29uc3RydWN0b3IoZnJhbWV3b3JrKSB7CiAgICAgICAgdGhpcy5mcmFtZXdvcmsgPSBmcmFtZXdvcms7CiAgICB9CiAgICAvKgogICAgICogRW50cnkgcG9pbnQgb2YgdGhlIGNsYXNzIChJTVBPUlRBTlQ6IGRvbid0IGNoYW5nZSB0aGUgc2lnbmF0dXJlIG9mIHRoaXMgbWV0aG9kKQogICAgICogU2hvdWxkIHJldHVybiBhbiBvYmplY3QgY29udGFpbmluZyB0aGUgdmFsdWVzIGZvciBlYWNoIG91dHB1dCB0byBlbWl0CiAgICAgKiBJZiBuZWNlc3NhcnksIHVzZSB0aGUgcGFyYW1ldGVyICJvdXRwdXRzIiB0byBlbWl0IGRhdGEgd2hpbGUgcnVubmluZyB0aGUgY29kZS4KICAgICAqLwogICAgYXN5bmMgbWFpbihpbnB1dHMsIG91dHB1dHMpIHsKICAgICAgICAvLyBBZGQgY29kZSBoZXJlICAgIAogICAgICAgIGRlYnVnZ2VyOwogICAgICAgIGxldCBjdXJyZW50RW5kcG9pbnRDb25maWcgPSBpbnB1dHMuQ3VycmVudEVuZHBvaW50Q29uZmlnOwogICAgICAgIGxldCBhY3Rpb25zID0gY3VycmVudEVuZHBvaW50Q29uZmlnLkFjdGlvbnNUb0V4ZWN1dGU7CiAgICAgICAgbGV0IGFjdGlvbnNUb0V4ZWN1dGUgPSBhY3Rpb25zLmxlbmd0aDsKICAgICAgICBmb3IgKHZhciBpbmRleCBpbiBhY3Rpb25zKSB7CiAgICAgICAgICAgIHZhciBhY3Rpb24gPSBhY3Rpb25zW2luZGV4XTsKICAgICAgICAgICAgdmFyIHVwZGF0ZWRBY3Rpb24gPSBmYWxzZTsKICAgICAgICAgICAgaWYgKCFhY3Rpb24uSWQpIHsKICAgICAgICAgICAgICAgIGFjdGlvbi5JZCA9ICJBY3Rpb25fIiArIGlucHV0cy5SZXF1ZXN0SWQgKyAiXyIgKyBpbmRleDsKICAgICAgICAgICAgICAgIHVwZGF0ZWRBY3Rpb24gPSB0cnVlOwogICAgICAgICAgICB9CiAgICAgICAgICAgIGFjdGlvbiA9IGF3YWl0IHRoaXMuZnJhbWV3b3JrLmRhdGFTdG9yZS5yZXRyaWV2ZShhY3Rpb24uSWQsIGFjdGlvbik7CiAgICAgICAgICAgIGFjdGlvbnNbaW5kZXhdID0gYWN0aW9uOwogICAgICAgICAgICAvL0RlZmF1bHQgYWN0aW9uIHN0YXRlCiAgICAgICAgICAgIGlmICghYWN0aW9uLkFjdGlvblN0YXRlKSB7CiAgICAgICAgICAgICAgICBhY3Rpb24uQWN0aW9uU3RhdGUgPSBBY3Rpb25TdGF0ZXMuQ3JlYXRlZDsKICAgICAgICAgICAgICAgIHVwZGF0ZWRBY3Rpb24gPSB0cnVlOwogICAgICAgICAgICB9CiAgICAgICAgICAgIGlmICh1cGRhdGVkQWN0aW9uKSB7CiAgICAgICAgICAgICAgICBhY3Rpb25zW2luZGV4XSA9IGFjdGlvbjsKICAgICAgICAgICAgICAgIGF3YWl0IHRoaXMuZnJhbWV3b3JrLmRhdGFTdG9yZS5zdG9yZShhY3Rpb24uSWQsIGFjdGlvbiwgIlBlcnNpc3RlbnQiKTsKICAgICAgICAgICAgfQogICAgICAgICAgICBpZiAoYWN0aW9uLkFjdGlvblN0YXRlID09PSBBY3Rpb25TdGF0ZXMuUHJvY2Vzc2VkIHx8IGFjdGlvbi5BY3Rpb25TdGF0ZSA9PT0gQWN0aW9uU3RhdGVzLkZhaWxlZCkgewogICAgICAgICAgICAgICAgYWN0aW9uc1RvRXhlY3V0ZS0tOwogICAgICAgICAgICB9CiAgICAgICAgICAgIGlmIChhY3Rpb24uQWN0aW9uU3RhdGUgIT09IEFjdGlvblN0YXRlcy5DcmVhdGVkKSB7CiAgICAgICAgICAgICAgICBjb250aW51ZTsKICAgICAgICAgICAgfQogICAgICAgICAgICBpZiAoYWN0aW9uLkRlcGVuZHNPbiAmJiBhY3Rpb24uRGVwZW5kc09uLmxlbmd0aCA+IDApIHsKICAgICAgICAgICAgICAgIC8vIENoZWNrIGlmIHRoZXJlIGFyZSBhbnkgZGVwZW5kZW5jaWVzIHRoYXQgYXJlIE5PVCAnUHJvY2Vzc2VkJyB5ZXQKICAgICAgICAgICAgICAgIGNvbnN0IGRlcGVuZGVuY2llc01ldCA9IGFjdGlvbi5EZXBlbmRzT24uZXZlcnkoKGRlcElkKSA9PiB7CiAgICAgICAgICAgICAgICAgICAgY29uc3QgZGVwQWN0aW9uID0gYWN0aW9ucy5maW5kKGEgPT4gYS5JZCA9PT0gZGVwSWQpOwogICAgICAgICAgICAgICAgICAgIHJldHVybiBkZXBBY3Rpb24gJiYgZGVwQWN0aW9uLkFjdGlvblN0YXRlID09PSBBY3Rpb25TdGF0ZXMuUHJvY2Vzc2VkOwogICAgICAgICAgICAgICAgfSk7CiAgICAgICAgICAgICAgICBpZiAoIWRlcGVuZGVuY2llc01ldCkgewogICAgICAgICAgICAgICAgICAgIC8vIElmIG5vdCBhbGwgZGVwZW5kZW5jaWVzIGFyZSBQcm9jZXNzZWQsIHNraXAgdGhpcyBhY3Rpb24gZm9yIG5vdwogICAgICAgICAgICAgICAgICAgIGNvbnRpbnVlOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgICAgIC8vVXBkYXRlIGFjdGlvbgogICAgICAgICAgICAvL05lZWRzIHRvIGJlIHRoaXMgb3JkZXIgdG8gcHJldmVudCBjb25jdXJyZW5jeSBpc3N1ZXMKICAgICAgICAgICAgYWN0aW9uLkFjdGlvblN0YXRlID0gQWN0aW9uU3RhdGVzLlJlcXVlc3RlZDsKICAgICAgICAgICAgYWN0aW9uc1tpbmRleF0gPSBhY3Rpb247CiAgICAgICAgICAgIGF3YWl0IHRoaXMuZnJhbWV3b3JrLmRhdGFTdG9yZS5zdG9yZShhY3Rpb24uSWQsIGFjdGlvbiwgIlBlcnNpc3RlbnQiKTsKICAgICAgICAgICAgdGhpcy5mcmFtZXdvcmsubG9nZ2VyLmluZm8oIlRyaWdnZXJpbmcgIiArIEpTT04uc3RyaW5naWZ5KGFjdGlvbikpOwogICAgICAgICAgICBjdXJyZW50RW5kcG9pbnRDb25maWcuQWN0aW9uc1RvRXhlY3V0ZSA9IGFjdGlvbnM7CiAgICAgICAgICAgIHJldHVybiB7IFJlcXVlc3RJZDogaW5wdXRzLlJlcXVlc3RJZCwgQ3VycmVudEVuZHBvaW50Q29uZmlnOiBjdXJyZW50RW5kcG9pbnRDb25maWcsIEFjdGlvblRvRXhlY3V0ZTogYWN0aW9uIH07CiAgICAgICAgfQogICAgICAgIGlmIChhY3Rpb25zVG9FeGVjdXRlID09IDApIHsKICAgICAgICAgICAgdGhpcy5mcmFtZXdvcmsubG9nZ2VyLmluZm8oIkZpbmlzaGVkIGV4ZWN1dGluZyBhbGwgYWN0aW9ucyEiKTsKICAgICAgICAgICAgLy9DbGVhbiBwZXJzaXN0ZW5jeQogICAgICAgICAgICBmb3IgKHZhciBpbmRleCBpbiBhY3Rpb25zKSB7CiAgICAgICAgICAgICAgICBhd2FpdCB0aGlzLmZyYW1ld29yay5kYXRhU3RvcmUuc3RvcmUoYWN0aW9uc1tpbmRleF0uSWQsIHVuZGVmaW5lZCwgIlBlcnNpc3RlbnQiKTsKICAgICAgICAgICAgfQogICAgICAgICAgICByZXR1cm4geyBSZXF1ZXN0SWQ6IGlucHV0cy5SZXF1ZXN0SWQsIEN1cnJlbnRFbmRwb2ludENvbmZpZzogaW5wdXRzLkN1cnJlbnRFbmRwb2ludENvbmZpZywgc3VjY2VzczogdHJ1ZSB9OwogICAgICAgIH0KICAgICAgICBjdXJyZW50RW5kcG9pbnRDb25maWcuQWN0aW9uc1RvRXhlY3V0ZSA9IGFjdGlvbnM7CiAgICAgICAgLy9XYXRpbmcgZm9yIGFjdGlvbnMgdG8gZmluaXNoCiAgICAgICAgcmV0dXJuIHsKICAgICAgICAgICAgUmVxdWVzdElkOiBpbnB1dHMuUmVxdWVzdElkLAogICAgICAgICAgICBDdXJyZW50RW5kcG9pbnRDb25maWc6IGN1cnJlbnRFbmRwb2ludENvbmZpZwogICAgICAgIH07CiAgICAgICAgLy8gZW1pdCBvdXRwdXQgZHVyaW5nIGV4ZWN1dGlvbjogb3V0cHV0cy5vdXRwdXQxLmVtaXQoInNvbWV0aGluZyIpOwogICAgICAgIC8vIHJldHVybiBleGFtcGxlOiByZXR1cm4geyBvdXRwdXQxOiBpbnB1dHMuaW5wdXQxLCBvdXRwdXQyOiAiSGVsbG8gV29ybGQiIH07CiAgICB9Cn0KZXhwb3J0cy5kZWZhdWx0ID0gZGVmYXVsdF8xOwovL01vZGVsIGZvciBBdXRvbWF0aW9uRXZlbnQgRXh0ZW5kZWREYXRhCmNsYXNzIEN1c3RvbUV4dGVuZGVkRGF0YSB7Cn0KLy9Nb2RlbCBmb3IgQWN0aW9uUGFyYW1ldGVyIGZvciBhY3Rpb24gb2YgdHlwZSBMb2dFdmVudApjbGFzcyBMb2dFdmVudFBhcmFtZXRlciB7CiAgICBjb25zdHJ1Y3RvcigpIHsKICAgICAgICB0aGlzLklnbm9yZUxhc3RTZXJ2aWNlSWQgPSBmYWxzZTsKICAgIH0KfQovL01vZGVsIGZvciBDdXN0b21Db2RlIApjbGFzcyBDdXN0b21Db2RlUGFyYW1ldGVycyB7Cn0KLy9HZW5lcmljIGRhdGEgbW9kZWwKY2xhc3MgRW5kcG9pbnRDb25maWcgewogICAgY29uc3RydWN0b3IoaW5pdCkgewogICAgICAgIE9iamVjdC5hc3NpZ24odGhpcywgaW5pdCk7CiAgICAgICAgaWYgKCF0aGlzLklkKSB7CiAgICAgICAgICAgIHRoaXMuSWQgPSBjcnlwdG8ucmFuZG9tVVVJRCgpOwogICAgICAgIH0KICAgIH0KICAgIHN0YXRpYyBHZXROZXcoc3RhdHVzQ29kZVRvU2V0LCBib2R5VG9TZXQpIHsKICAgICAgICByZXR1cm4gbmV3IEVuZHBvaW50Q29uZmlnKHsKICAgICAgICAgICAgSWQ6IGNyeXB0by5yYW5kb21VVUlEKCksCiAgICAgICAgICAgIFN0YXR1c0NvZGU6IHN0YXR1c0NvZGVUb1NldCwKICAgICAgICAgICAgQm9keVRvU2VuZDogYm9keVRvU2V0LAogICAgICAgIH0pOwogICAgfQp9CmNsYXNzIEFjdGlvbiB7CiAgICBjb25zdHJ1Y3Rvcihpbml0KSB7CiAgICAgICAgdmFyIF9hLCBfYjsKICAgICAgICBpZiAoIWluaXQgfHwgIWluaXQuQWN0aW9uVHlwZSB8fCAhaW5pdC5BY3Rpb25QYXJhbWV0ZXIpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IEVycm9yKCJJbnZhbGlkIGlucHV0LiBSZWNlaXZlZDogIiArIEpTT04uc3RyaW5naWZ5KGluaXQpKTsKICAgICAgICB9CiAgICAgICAgdGhpcy5JZCA9IChfYSA9IGluaXQuSWQpICE9PSBudWxsICYmIF9hICE9PSB2b2lkIDAgPyBfYSA6IGNyeXB0by5yYW5kb21VVUlEKCk7CiAgICAgICAgdGhpcy5BY3Rpb25UeXBlID0gaW5pdC5BY3Rpb25UeXBlOwogICAgICAgIHRoaXMuQWN0aW9uU3RhdGUgPSAoX2IgPSBpbml0LkFjdGlvblN0YXRlKSAhPT0gbnVsbCAmJiBfYiAhPT0gdm9pZCAwID8gX2IgOiBBY3Rpb25TdGF0ZXMuQ3JlYXRlZDsKICAgICAgICB0aGlzLkFjdGlvblBhcmFtZXRlciA9IGluaXQuQWN0aW9uUGFyYW1ldGVyOwogICAgfQp9CmNsYXNzIEVuZHBvaW50U3RhdGlzdGljIHsKfQp2YXIgQWN0aW9uU3RhdGVzOwooZnVuY3Rpb24gKEFjdGlvblN0YXRlcykgewogICAgQWN0aW9uU3RhdGVzW0FjdGlvblN0YXRlc1siQ3JlYXRlZCJdID0gMF0gPSAiQ3JlYXRlZCI7CiAgICBBY3Rpb25TdGF0ZXNbQWN0aW9uU3RhdGVzWyJSZXF1ZXN0ZWQiXSA9IDFdID0gIlJlcXVlc3RlZCI7CiAgICBBY3Rpb25TdGF0ZXNbQWN0aW9uU3RhdGVzWyJQcm9jZXNzZWQiXSA9IDJdID0gIlByb2Nlc3NlZCI7CiAgICBBY3Rpb25TdGF0ZXNbQWN0aW9uU3RhdGVzWyJGYWlsZWQiXSA9IDNdID0gIkZhaWxlZCI7Cn0pKEFjdGlvblN0YXRlcyB8fCAoQWN0aW9uU3RhdGVzID0ge30pKTsK",
+        "___cmf___name": "Code"
+      }
+    }
+  ],
+  "converters": [],
+  "links": [
+    {
+      "id": "3676b4fb-6b76-4e4b-bf27-ee8267f0d3a0",
+      "sourceId": "task_1020",
+      "targetId": "task_1646",
+      "inputName": "RequestIdIn",
+      "outputName": "RequestIdOut"
+    },
+    {
+      "id": "b2eff73d-7493-49c9-a073-4b0bf1d6a83e",
+      "sourceId": "task_1020",
+      "targetId": "task_1646",
+      "inputName": "CurrentEndpointConfigIn",
+      "outputName": "CurrentEndpointConfigOut"
+    },
+    {
+      "id": "df92e04f-a4b4-4acf-9d0c-1c25cb02c4bd",
+      "sourceId": "task_1646",
+      "targetId": "task_1646",
+      "inputName": "RequestIdIn",
+      "outputName": "RequestIdOut"
+    },
+    {
+      "id": "2d907150-2d98-4fa0-8247-1c757c3e5ddc",
+      "sourceId": "task_1646",
+      "targetId": "task_1646",
+      "inputName": "CurrentEndpointConfigIn",
+      "outputName": "CurrentEndpointConfigOut"
+    },
+    {
+      "id": "f7961cba-773a-4fce-9e7a-25346ff1f9aa",
+      "sourceId": "task_1646",
+      "targetId": "task_992",
+      "inputName": "ActionToExecuteIn",
+      "outputName": "ActionToExecuteOut"
+    },
+    {
+      "id": "e04e41e7-4a81-43f0-bc82-d0b3f4a1fb90",
+      "sourceId": "task_1646",
+      "targetId": "task_992",
+      "inputName": "activate",
+      "outputName": "ActionToExecuteOut"
+    },
+    {
+      "id": "3ed12873-b9c5-4147-b3ec-db099aa2c18a",
+      "sourceId": "task_1646",
+      "targetId": "task_1027",
+      "inputName": "success",
+      "outputName": "successOut"
+    },
+    {
+      "id": "45b8f075-92d4-472b-a91f-08c7c74a99f7",
+      "sourceId": "task_1646",
+      "targetId": "task_1027",
+      "inputName": "CurrentEndpointConfig",
+      "outputName": "CurrentEndpointConfigOut"
+    },
+    {
+      "id": "d131836d-6b8c-4b9c-943a-a8162ef97ce1",
+      "sourceId": "task_1646",
+      "targetId": "task_1027",
+      "inputName": "RequestId",
+      "outputName": "RequestIdOut"
+    },
+    {
+      "id": "fc229dd2-0807-4777-8383-6a7c3f954481",
+      "sourceId": "task_1020",
+      "targetId": "task_1646",
+      "inputName": "activate",
+      "outputName": "activateOut"
+    },
+    {
+      "id": "2bb191d1-f5f3-42df-aaaf-2a1176504af4",
+      "sourceId": "task_1646",
+      "targetId": "task_1646",
+      "inputName": "activate",
+      "outputName": "success"
+    }
+  ],
+  "layout": {
+    "general": {
+      "color": null,
+      "notes": []
+    },
+    "drawers": {
+      "DIAGRAM": {
+        "tasks": {
+          "task_1027": {
+            "collapsed": false,
+            "position": {
+              "x": 1817,
+              "y": 410
+            },
+            "outdated": false
+          },
+          "task_1646": {
+            "collapsed": false,
+            "position": {
+              "x": 802,
+              "y": 403
+            },
+            "outdated": false
+          },
+          "task_1020": {
+            "collapsed": false,
+            "position": {
+              "x": 205,
+              "y": 408
+            },
+            "outdated": false
+          },
+          "task_992": {
+            "collapsed": false,
+            "position": {
+              "x": 1332,
+              "y": 693
+            },
+            "outdated": false
+          }
+        },
+        "links": {
+          "3676b4fb-6b76-4e4b-bf27-ee8267f0d3a0": {
+            "vertices": []
+          },
+          "b2eff73d-7493-49c9-a073-4b0bf1d6a83e": {
+            "vertices": []
+          },
+          "df92e04f-a4b4-4acf-9d0c-1c25cb02c4bd": {
+            "vertices": [
+              {
+                "x": 1228,
+                "y": 381
+              },
+              {
+                "x": 788,
+                "y": 378
+              }
+            ]
+          },
+          "2d907150-2d98-4fa0-8247-1c757c3e5ddc": {
+            "vertices": [
+              {
+                "x": 1291,
+                "y": 359
+              },
+              {
+                "x": 740,
+                "y": 353
+              }
+            ]
+          },
+          "f7961cba-773a-4fce-9e7a-25346ff1f9aa": {
+            "vertices": []
+          },
+          "e04e41e7-4a81-43f0-bc82-d0b3f4a1fb90": {
+            "vertices": []
+          },
+          "3ed12873-b9c5-4147-b3ec-db099aa2c18a": {
+            "vertices": []
+          },
+          "45b8f075-92d4-472b-a91f-08c7c74a99f7": {
+            "vertices": []
+          },
+          "d131836d-6b8c-4b9c-943a-a8162ef97ce1": {
+            "vertices": []
+          },
+          "fc229dd2-0807-4777-8383-6a7c3f954481": {
+            "vertices": []
+          },
+          "2bb191d1-f5f3-42df-aaaf-2a1176504af4": {
+            "vertices": [
+              {
+                "x": 1212,
+                "y": 916
+              },
+              {
+                "x": 798,
+                "y": 908
+              }
+            ]
+          }
+        },
+        "notes": {},
+        "zoom": 0.86,
+        "pan": {
+          "x": 190.85714721679688,
+          "y": 92.57142639160156
+        }
+      }
+    }
+  }
+}

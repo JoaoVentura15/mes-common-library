@@ -1,0 +1,355 @@
+{
+  "tasks": [
+    {
+      "id": "task_1981",
+      "reference": {
+        "name": "subWorkflowStart",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "outputs": [
+          {
+            "name": "Action",
+            "valueType": {
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null,
+              "friendlyName": ""
+            },
+            "defaultValue": null
+          }
+        ],
+        "___cmf___name": "SubWorkflow Start"
+      }
+    },
+    {
+      "id": "task_2009",
+      "reference": {
+        "name": "subWorkflowEnd",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "inputs": [
+          {
+            "name": "Action",
+            "friendlyName": "Action",
+            "valueType": {
+              "friendlyName": "Action",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "task_2023",
+      "reference": {
+        "name": "codeExecution",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "inputs": [
+          {
+            "name": "Action",
+            "friendlyName": "Action",
+            "valueType": {
+              "friendlyName": "Action",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "name": "Action",
+            "friendlyName": "Action",
+            "valueType": {
+              "friendlyName": "Action",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          }
+        ],
+        "contextExpirationInMilliseconds": 10000,
+        "executionExpirationInMilliseconds": 0,
+        "tsCode": [
+          "import { Framework } from 'framework';",
+          "",
+          "export default class {",
+          "",
+          "    /** Allows accessing external functions */",
+          "    private framework: Framework;",
+          "",
+          "    constructor(framework: Framework) {",
+          "        this.framework = framework;",
+          "    }",
+          "",
+          "    /*",
+          "     * Entry point of the class (IMPORTANT: don't change the signature of this method)",
+          "     * Should return an object containing the values for each output to emit",
+          "     * If necessary, use the parameter \"outputs\" to emit data while running the code.",
+          "     */",
+          "    public async main(inputs: any, outputs: any): Promise<any> {",
+          "        // Add code here",
+          "        var action : Action = inputs.Action;",
+          "",
+          "        if(action.ActionType !== \"CustomCode\"){",
+          "            throw new Error(\"Invalid action type. Expected CustomCode, got \" + action.ActionType);",
+          "        }",
+          "",
+          "        const params: CustomCodeParameters = action.ActionParameter;",
+          "        const args = [...params.ParameterNames]; // array of argument names",
+          "        const fnBody = params.Function;      // function body as string",
+          "",
+          "        // Build the function: new Function(argName1, argName2, ..., body)",
+          "        const tempFunc = new Function(...args, fnBody);",
+          "",
+          "        // Call with the provided values; adjust as needed for your use case",
+          "        const result = tempFunc(...params.Parameters);",
+          "",
+          "        this.framework.logger.info(\"Result -> \"+ result );",
+          "",
+          "        // emit output during execution: outputs.output1.emit(\"something\");",
+          "        // return example: return { output1: inputs.input1, output2: \"Hello World\" };",
+          "    }",
+          "}",
+          "//Model for AutomationEvent ExtendedData",
+          "class CustomExtendedData {",
+          "    DefaultActions: Action[];",
+          "    DefaultBody: string;",
+          "    DefaultStatusCode : number",
+          "}",
+          "",
+          "//Model for ActionParameter for action of type LogEvent",
+          "class LogEventParameter {",
+          "    EntityType : string;",
+          "    EntityId: string | undefined;",
+          "    EntityName: string | undefined;",
+          "    ToState : string;",
+          "    IgnoreLastServiceId = false;",
+          "}",
+          "",
+          "//Model for CustomCode ",
+          "class CustomCodeParameters {",
+          "    ParameterNames: string[];",
+          "    Parameters: any[];",
+          "    Function: string;",
+          "}",
+          "",
+          "//Generic data model",
+          "class EndpointConfig{",
+          "    Id: string|undefined;",
+          "    StatusCode : number|undefined;",
+          "    BodyToSend: any;",
+          "    ActionsToExecute: Action[] | undefined;",
+          "",
+          "    constructor(init?: Partial<EndpointConfig>) {",
+          "        Object.assign(this, init);",
+          "        if(!this.Id){",
+          "            this.Id = crypto.randomUUID();",
+          "        }",
+          "    }",
+          "",
+          "    static GetNew(statusCodeToSet: number, bodyToSet: any): EndpointConfig {",
+          "        return new EndpointConfig({",
+          "            Id: crypto.randomUUID(),",
+          "            StatusCode: statusCodeToSet,",
+          "            BodyToSend: bodyToSet,",
+          "        });",
+          "    }",
+          "}",
+          "",
+          "class Action {",
+          "    Id: string|undefined;",
+          "    ActionType: string;",
+          "    ActionState: ActionStates;",
+          "    ActionParameter: any;",
+          "    DependsOn: string[] | undefined;",
+          "",
+          "     constructor(init?: Partial<Action>) {",
+          "        if(!init || !init.ActionType ||!init.ActionParameter){",
+          "            throw new Error(\"Invalid input. Received: \" + JSON.stringify(init));",
+          "        }",
+          "        this.Id = init.Id ?? crypto.randomUUID();",
+          "        this.ActionType = init.ActionType;",
+          "        this.ActionState = init.ActionState ?? ActionStates.Created;",
+          "        this.ActionParameter = init.ActionParameter;",
+          "    }",
+          "}",
+          "",
+          "class EndpointStatistic {",
+          "    RequestId : string | undefined;",
+          "    EndpointConfig: EndpointConfig|undefined;",
+          "    ReceivedBody: any;",
+          "    ReplySent: any;",
+          "    StatusCodeSent: number|undefined;",
+          "    Error: any",
+          "}",
+          "",
+          "enum ActionStates {",
+          "    \"Created\",",
+          "    \"Requested\",",
+          "    \"Processed\",",
+          "    \"Failed\"",
+          "}",
+          ""
+        ],
+        "jsCodeBase64": "InVzZSBzdHJpY3QiOwpPYmplY3QuZGVmaW5lUHJvcGVydHkoZXhwb3J0cywgIl9fZXNNb2R1bGUiLCB7IHZhbHVlOiB0cnVlIH0pOwpjbGFzcyBkZWZhdWx0XzEgewogICAgY29uc3RydWN0b3IoZnJhbWV3b3JrKSB7CiAgICAgICAgdGhpcy5mcmFtZXdvcmsgPSBmcmFtZXdvcms7CiAgICB9CiAgICAvKgogICAgICogRW50cnkgcG9pbnQgb2YgdGhlIGNsYXNzIChJTVBPUlRBTlQ6IGRvbid0IGNoYW5nZSB0aGUgc2lnbmF0dXJlIG9mIHRoaXMgbWV0aG9kKQogICAgICogU2hvdWxkIHJldHVybiBhbiBvYmplY3QgY29udGFpbmluZyB0aGUgdmFsdWVzIGZvciBlYWNoIG91dHB1dCB0byBlbWl0CiAgICAgKiBJZiBuZWNlc3NhcnksIHVzZSB0aGUgcGFyYW1ldGVyICJvdXRwdXRzIiB0byBlbWl0IGRhdGEgd2hpbGUgcnVubmluZyB0aGUgY29kZS4KICAgICAqLwogICAgYXN5bmMgbWFpbihpbnB1dHMsIG91dHB1dHMpIHsKICAgICAgICAvLyBBZGQgY29kZSBoZXJlCiAgICAgICAgdmFyIGFjdGlvbiA9IGlucHV0cy5BY3Rpb247CiAgICAgICAgaWYgKGFjdGlvbi5BY3Rpb25UeXBlICE9PSAiQ3VzdG9tQ29kZSIpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IEVycm9yKCJJbnZhbGlkIGFjdGlvbiB0eXBlLiBFeHBlY3RlZCBDdXN0b21Db2RlLCBnb3QgIiArIGFjdGlvbi5BY3Rpb25UeXBlKTsKICAgICAgICB9CiAgICAgICAgY29uc3QgcGFyYW1zID0gYWN0aW9uLkFjdGlvblBhcmFtZXRlcjsKICAgICAgICBjb25zdCBhcmdzID0gWy4uLnBhcmFtcy5QYXJhbWV0ZXJOYW1lc107IC8vIGFycmF5IG9mIGFyZ3VtZW50IG5hbWVzCiAgICAgICAgY29uc3QgZm5Cb2R5ID0gcGFyYW1zLkZ1bmN0aW9uOyAvLyBmdW5jdGlvbiBib2R5IGFzIHN0cmluZwogICAgICAgIC8vIEJ1aWxkIHRoZSBmdW5jdGlvbjogbmV3IEZ1bmN0aW9uKGFyZ05hbWUxLCBhcmdOYW1lMiwgLi4uLCBib2R5KQogICAgICAgIGNvbnN0IHRlbXBGdW5jID0gbmV3IEZ1bmN0aW9uKC4uLmFyZ3MsIGZuQm9keSk7CiAgICAgICAgLy8gQ2FsbCB3aXRoIHRoZSBwcm92aWRlZCB2YWx1ZXM7IGFkanVzdCBhcyBuZWVkZWQgZm9yIHlvdXIgdXNlIGNhc2UKICAgICAgICBjb25zdCByZXN1bHQgPSB0ZW1wRnVuYyguLi5wYXJhbXMuUGFyYW1ldGVycyk7CiAgICAgICAgdGhpcy5mcmFtZXdvcmsubG9nZ2VyLmluZm8oIlJlc3VsdCAtPiAiICsgcmVzdWx0KTsKICAgICAgICAvLyBlbWl0IG91dHB1dCBkdXJpbmcgZXhlY3V0aW9uOiBvdXRwdXRzLm91dHB1dDEuZW1pdCgic29tZXRoaW5nIik7CiAgICAgICAgLy8gcmV0dXJuIGV4YW1wbGU6IHJldHVybiB7IG91dHB1dDE6IGlucHV0cy5pbnB1dDEsIG91dHB1dDI6ICJIZWxsbyBXb3JsZCIgfTsKICAgIH0KfQpleHBvcnRzLmRlZmF1bHQgPSBkZWZhdWx0XzE7Ci8vTW9kZWwgZm9yIEF1dG9tYXRpb25FdmVudCBFeHRlbmRlZERhdGEKY2xhc3MgQ3VzdG9tRXh0ZW5kZWREYXRhIHsKfQovL01vZGVsIGZvciBBY3Rpb25QYXJhbWV0ZXIgZm9yIGFjdGlvbiBvZiB0eXBlIExvZ0V2ZW50CmNsYXNzIExvZ0V2ZW50UGFyYW1ldGVyIHsKICAgIGNvbnN0cnVjdG9yKCkgewogICAgICAgIHRoaXMuSWdub3JlTGFzdFNlcnZpY2VJZCA9IGZhbHNlOwogICAgfQp9Ci8vTW9kZWwgZm9yIEN1c3RvbUNvZGUgCmNsYXNzIEN1c3RvbUNvZGVQYXJhbWV0ZXJzIHsKfQovL0dlbmVyaWMgZGF0YSBtb2RlbApjbGFzcyBFbmRwb2ludENvbmZpZyB7CiAgICBjb25zdHJ1Y3Rvcihpbml0KSB7CiAgICAgICAgT2JqZWN0LmFzc2lnbih0aGlzLCBpbml0KTsKICAgICAgICBpZiAoIXRoaXMuSWQpIHsKICAgICAgICAgICAgdGhpcy5JZCA9IGNyeXB0by5yYW5kb21VVUlEKCk7CiAgICAgICAgfQogICAgfQogICAgc3RhdGljIEdldE5ldyhzdGF0dXNDb2RlVG9TZXQsIGJvZHlUb1NldCkgewogICAgICAgIHJldHVybiBuZXcgRW5kcG9pbnRDb25maWcoewogICAgICAgICAgICBJZDogY3J5cHRvLnJhbmRvbVVVSUQoKSwKICAgICAgICAgICAgU3RhdHVzQ29kZTogc3RhdHVzQ29kZVRvU2V0LAogICAgICAgICAgICBCb2R5VG9TZW5kOiBib2R5VG9TZXQsCiAgICAgICAgfSk7CiAgICB9Cn0KY2xhc3MgQWN0aW9uIHsKICAgIGNvbnN0cnVjdG9yKGluaXQpIHsKICAgICAgICB2YXIgX2EsIF9iOwogICAgICAgIGlmICghaW5pdCB8fCAhaW5pdC5BY3Rpb25UeXBlIHx8ICFpbml0LkFjdGlvblBhcmFtZXRlcikgewogICAgICAgICAgICB0aHJvdyBuZXcgRXJyb3IoIkludmFsaWQgaW5wdXQuIFJlY2VpdmVkOiAiICsgSlNPTi5zdHJpbmdpZnkoaW5pdCkpOwogICAgICAgIH0KICAgICAgICB0aGlzLklkID0gKF9hID0gaW5pdC5JZCkgIT09IG51bGwgJiYgX2EgIT09IHZvaWQgMCA/IF9hIDogY3J5cHRvLnJhbmRvbVVVSUQoKTsKICAgICAgICB0aGlzLkFjdGlvblR5cGUgPSBpbml0LkFjdGlvblR5cGU7CiAgICAgICAgdGhpcy5BY3Rpb25TdGF0ZSA9IChfYiA9IGluaXQuQWN0aW9uU3RhdGUpICE9PSBudWxsICYmIF9iICE9PSB2b2lkIDAgPyBfYiA6IEFjdGlvblN0YXRlcy5DcmVhdGVkOwogICAgICAgIHRoaXMuQWN0aW9uUGFyYW1ldGVyID0gaW5pdC5BY3Rpb25QYXJhbWV0ZXI7CiAgICB9Cn0KY2xhc3MgRW5kcG9pbnRTdGF0aXN0aWMgewp9CnZhciBBY3Rpb25TdGF0ZXM7CihmdW5jdGlvbiAoQWN0aW9uU3RhdGVzKSB7CiAgICBBY3Rpb25TdGF0ZXNbQWN0aW9uU3RhdGVzWyJDcmVhdGVkIl0gPSAwXSA9ICJDcmVhdGVkIjsKICAgIEFjdGlvblN0YXRlc1tBY3Rpb25TdGF0ZXNbIlJlcXVlc3RlZCJdID0gMV0gPSAiUmVxdWVzdGVkIjsKICAgIEFjdGlvblN0YXRlc1tBY3Rpb25TdGF0ZXNbIlByb2Nlc3NlZCJdID0gMl0gPSAiUHJvY2Vzc2VkIjsKICAgIEFjdGlvblN0YXRlc1tBY3Rpb25TdGF0ZXNbIkZhaWxlZCJdID0gM10gPSAiRmFpbGVkIjsKfSkoQWN0aW9uU3RhdGVzIHx8IChBY3Rpb25TdGF0ZXMgPSB7fSkpOwo=",
+        "___cmf___name": "Code",
+        "___cmf___description": ""
+      }
+    }
+  ],
+  "converters": [],
+  "links": [
+    {
+      "id": "cc3082cd-a4bc-40f0-bdc0-15efdb7d2312",
+      "sourceId": "task_1981",
+      "targetId": "task_2009",
+      "inputName": "Action",
+      "outputName": "ActionOut"
+    },
+    {
+      "id": "2a5e6ed9-1e8b-4b1e-8896-25d373f004cb",
+      "sourceId": "task_2023",
+      "targetId": "task_2009",
+      "inputName": "error",
+      "outputName": "error"
+    },
+    {
+      "id": "3f1db28f-0dd7-4e49-86ca-067ec09f05e3",
+      "sourceId": "task_2023",
+      "targetId": "task_2009",
+      "inputName": "success",
+      "outputName": "success"
+    },
+    {
+      "id": "ac4a7b1f-6386-4913-a64c-b264d8b02f0c",
+      "sourceId": "task_1981",
+      "targetId": "task_2023",
+      "inputName": "ActionIn",
+      "outputName": "ActionOut"
+    },
+    {
+      "id": "2e45e6ef-0b2d-4c1b-aee9-b7b82437f0ae",
+      "sourceId": "task_1981",
+      "targetId": "task_2023",
+      "inputName": "activate",
+      "outputName": "activateOut"
+    },
+    {
+      "id": "48a1456a-3980-45ac-b2d1-93d869a6f70b",
+      "sourceId": "task_2023",
+      "targetId": "task_2009",
+      "inputName": "Action",
+      "outputName": "ActionOut"
+    },
+    {
+      "id": "6ff4f1a9-2505-4ea5-ac07-554450d90dc1",
+      "sourceId": "task_2023",
+      "targetId": "task_2009",
+      "inputName": "Action",
+      "outputName": "ActionOut"
+    },
+    {
+      "id": "e3c8d0b7-ebf3-4cc0-b47d-8e9ff5c00ec8",
+      "sourceId": "task_1981",
+      "targetId": "task_2023",
+      "inputName": "ActionIn",
+      "outputName": "ActionOut"
+    }
+  ],
+  "layout": {
+    "general": {
+      "color": null,
+      "notes": []
+    },
+    "drawers": {
+      "DIAGRAM": {
+        "tasks": {
+          "task_2023": {
+            "collapsed": false,
+            "position": {
+              "x": 898,
+              "y": 316
+            },
+            "outdated": false
+          },
+          "task_1981": {
+            "collapsed": false,
+            "position": {
+              "x": 218,
+              "y": 216
+            },
+            "outdated": false
+          },
+          "task_2009": {
+            "collapsed": false,
+            "position": {
+              "x": 1659,
+              "y": 220
+            },
+            "outdated": false
+          }
+        },
+        "links": {
+          "cc3082cd-a4bc-40f0-bdc0-15efdb7d2312": {
+            "vertices": []
+          },
+          "2a5e6ed9-1e8b-4b1e-8896-25d373f004cb": {
+            "vertices": []
+          },
+          "3f1db28f-0dd7-4e49-86ca-067ec09f05e3": {
+            "vertices": []
+          },
+          "ac4a7b1f-6386-4913-a64c-b264d8b02f0c": {
+            "vertices": []
+          },
+          "2e45e6ef-0b2d-4c1b-aee9-b7b82437f0ae": {
+            "vertices": []
+          },
+          "48a1456a-3980-45ac-b2d1-93d869a6f70b": {
+            "vertices": []
+          },
+          "6ff4f1a9-2505-4ea5-ac07-554450d90dc1": {
+            "vertices": []
+          },
+          "e3c8d0b7-ebf3-4cc0-b47d-8e9ff5c00ec8": {
+            "vertices": []
+          }
+        },
+        "notes": {},
+        "pan": {
+          "x": 0,
+          "y": 0
+        },
+        "zoom": 0.81
+      }
+    }
+  }
+}

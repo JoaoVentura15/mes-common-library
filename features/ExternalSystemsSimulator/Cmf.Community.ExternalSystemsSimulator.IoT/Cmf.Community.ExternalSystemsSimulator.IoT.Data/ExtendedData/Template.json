@@ -1,0 +1,11 @@
+{
+	"requestMethod": "POST",
+	"automaticReply": false,
+	"automaticReplyStatusCode": "200",
+	"timeout": "60000",
+    "DefaultBody": {
+        "ExampleProperty" : "{{bodyProperty.SubProperty}}"
+    },
+	"DefaultStatusCode": 200,
+	"ActionsToExecute": []
+}
