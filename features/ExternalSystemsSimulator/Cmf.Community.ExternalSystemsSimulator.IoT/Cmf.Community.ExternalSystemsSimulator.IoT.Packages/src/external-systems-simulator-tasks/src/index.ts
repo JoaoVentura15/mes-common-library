@@ -6,3 +6,5 @@
 
 export { GetEventDataTask } from "./tasks/getEventData/getEventData.task";
 
+export { CreateAndSendBodyResponseTask } from "./tasks/createAndSendBodyResponse/createAndSendBodyResponse.task";
+
