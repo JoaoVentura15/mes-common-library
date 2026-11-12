@@ -1,0 +1,91 @@
+{
+  "converters": [],
+  "tasks": [
+    {
+      "name": "getEventData",
+      "displayName": "Get Event Data",
+      "iconClass": "icon-core-tasks-connect-iot-lg-logmessage",
+      "isProtocol": false,
+      "isController": true,
+      "lifecycle": "Experimental",
+      "lifecycleMessage": "",
+      "dependsOnScope": [
+        "ConnectIoT"
+      ],
+      "inputs": {
+        "requestId": {
+          "type": "Static",
+          "dataType": "String",
+          "displayName": "Request Id",
+          "defaultValue": ""
+        },
+        "eventRawData": {
+          "type": "Static",
+          "dataType": "Object",
+          "displayName": "EventRawData"
+        },
+        "activate": {
+          "type": "Activate",
+          "dataType": "String",
+          "displayName": "Activate",
+          "defaultValue": ""
+        }
+      },
+      "outputs": {
+        "requestId": {
+          "type": "Static",
+          "dataType": "String",
+          "displayName": "RequestId"
+        },
+        "subject": {
+          "type": "Static",
+          "dataType": "String",
+          "displayName": "Subject"
+        },
+        "body": {
+          "type": "Static",
+          "dataType": "Object",
+          "displayName": "Body"
+        },
+        "runningEndpointConfig": {
+          "type": "Static",
+          "dataType": "Object",
+          "displayName": "RunningEndpointConfig"
+        },
+        "noActionToExecute": {
+          "type": "Static",
+          "dataType": "Boolean",
+          "displayName": "NoActionToExecute",
+          "defaultValue": false
+        },
+        "actions": {
+          "type": "Static",
+          "dataType": "Object",
+          "displayName": "Actions"
+        },
+        "success": {
+          "type": "Success",
+          "displayName": "Success"
+        },
+        "error": {
+          "type": "Error",
+          "displayName": "Error"
+        }
+      },
+      "settings": {
+        "General": {
+          "Example Section": [
+            {
+              "name": "Example",
+              "displayName": "Example Setting",
+              "settingKey": "example",
+              "dataType": "string",
+              "infoMessage": "Information about the example setting",
+              "defaultValue": "Hello World"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
