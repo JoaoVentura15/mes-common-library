@@ -1,7 +1,7 @@
 import { Task, System, TaskBase } from "@criticalmanufacturing/connect-iot-controller-engine";
-import { EndpointConfig } from "../../common/EndpointConfig";
-import { Action } from "../../common/Action";
-import { CustomExtendedData } from "../../common/CustomExtendedData";
+import { EndpointConfig } from "../../common/model/EndpointConfig";
+import { Action } from "../../common/model/Action";
+import { CustomExtendedData } from "../../common/model/CustomExtendedData";
 import { Cmf } from "cmf-lbos";
 
 /** Default values for settings */

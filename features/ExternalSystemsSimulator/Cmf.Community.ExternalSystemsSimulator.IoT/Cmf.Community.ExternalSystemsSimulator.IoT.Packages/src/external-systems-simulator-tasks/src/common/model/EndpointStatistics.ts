@@ -3,7 +3,7 @@ import { EndpointConfig } from "./EndpointConfig";
 export class EndpointStatistic {
     RequestId : string | undefined;
     EndpointConfig: EndpointConfig|undefined;
-    RecievedBody: any;
+    ReceivedBody: any;
     ReplySent: any;
     StatusCodeSent: number|undefined;
     Error: any

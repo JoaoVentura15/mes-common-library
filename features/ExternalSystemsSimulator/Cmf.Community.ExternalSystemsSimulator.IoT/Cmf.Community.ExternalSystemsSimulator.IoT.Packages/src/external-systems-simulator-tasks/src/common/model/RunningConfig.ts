@@ -1,7 +1,7 @@
 import { RunningMode } from "./RunningMode";
 
 export class RunningConfig {
-    DefaultStatusCode: string;
+    DefaultStatusCode: number;
     DefaultResponseBody: string;
     RunningMode: RunningMode
 }
