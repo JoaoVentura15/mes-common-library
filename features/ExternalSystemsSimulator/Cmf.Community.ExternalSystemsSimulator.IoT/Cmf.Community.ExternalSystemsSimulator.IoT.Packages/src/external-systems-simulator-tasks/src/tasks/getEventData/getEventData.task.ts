@@ -11,6 +11,7 @@ export const SETTINGS_DEFAULTS: GetEventDataSettings = {
 
 import GetObjectByNameInput = Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.GetObjectByNameInput;
 import { DataStoreLocation } from "@criticalmanufacturing/connect-iot-controller-engine";
+import { InterpolationUtilities } from "../../common/utilities/interpolationUtilities";
 
 /**
  * @whatItDoes
@@ -141,7 +142,7 @@ export class GetEventDataTask extends TaskBase implements GetEventDataSettings {
                 }
             }
 
-            endpointConfig = this.interpolateObject(endpointConfig, messageBody);
+            endpointConfig = InterpolationUtilities.interpolateObject(endpointConfig, messageBody);
             
             if(endpointConfig?.ActionsToExecute){
                 actions = endpointConfig.ActionsToExecute;
@@ -164,49 +165,6 @@ export class GetEventDataTask extends TaskBase implements GetEventDataSettings {
             this.success.emit(true);
         }
     }
-
-    public getByPath(obj: any, path: string): any {
-        // Normalize bracket notation: "Materials[0].Name" -> "Materials.0.Name"
-        const normalizedPath = path.replace(/\[(\d+)\]/g, ".$1");
-        return normalizedPath.split(".").reduce((acc, key) => (acc == null ? undefined : acc[key]), obj);
-    }
-
-    public interpolateString(
-        template: string,
-        params: Record<string, any>,
-        start = "{{",
-        end = "}}"
-    ): string {
-        const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const pattern = new RegExp(`${esc(start)}([^${esc(end[0])}]+)${esc(end)}`, "g");
-
-        return template.replace(pattern, (_, rawKey: string) => {
-            const key = rawKey.trim();               // e.g. "material.Id"
-            const value = this.getByPath(params, key);    // look up in request body
-            return value != null ? String(value) : "";
-        });
-    }
-
-    public interpolateObject<T>(template: T, params: Record<string, any>): T {
-        if (typeof template === "string") {
-            return  this.interpolateString(template, params) as unknown as T;
-        }
-
-        if (Array.isArray(template)) {
-            return template.map(item =>  this.interpolateObject(item, params)) as unknown as T;
-        }
-
-        if (template && typeof template === "object") {
-            const result: any = {};
-            for (const [k, v] of Object.entries(template)) {
-            result[k] =  this.interpolateObject(v as any, params);
-            }
-            return result;
-        }
-
-        return template;
-    }
-
 
     /** Right after settings are loaded, create the needed dynamic outputs. */
     public override async onBeforeInit(): Promise<void> {
