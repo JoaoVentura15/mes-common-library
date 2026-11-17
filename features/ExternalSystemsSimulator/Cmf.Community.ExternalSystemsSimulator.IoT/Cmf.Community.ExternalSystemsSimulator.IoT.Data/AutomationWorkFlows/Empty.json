@@ -1,0 +1,19 @@
+{
+  "tasks": [],
+  "converters": [],
+  "links": [],
+  "$id": "1",
+  "layout": {
+    "general": {
+      "color": null,
+      "notes": []
+    },
+    "drawers": {
+      "DIAGRAM": {
+        "tasks": {},
+        "links": {},
+        "notes": {}
+      }
+    }
+  }
+}

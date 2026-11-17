@@ -1,0 +1,530 @@
+{
+  "tasks": [
+    {
+      "id": "task_947",
+      "reference": {
+        "name": "messageBusListener",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "autoEnable": true,
+        "subjectToSubscribe": "ExternalSystemsSimulator.Retrieve.>",
+        "replyTimeout": 60000,
+        "___cmf___name": "Message Bus Listener"
+      }
+    },
+    {
+      "id": "task_146",
+      "reference": {
+        "name": "codeExecution",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "inputs": [
+          {
+            "name": "subject",
+            "friendlyName": "subject",
+            "valueType": {
+              "friendlyName": "Subject",
+              "name": "String",
+              "type": 4,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          },
+          {
+            "name": "data",
+            "friendlyName": "data",
+            "valueType": {
+              "friendlyName": "Data",
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          },
+          {
+            "name": "isRequest",
+            "friendlyName": "isRequest",
+            "valueType": {
+              "friendlyName": "IsRequest",
+              "name": "Boolean",
+              "type": 3,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "name": "reply",
+            "friendlyName": "reply",
+            "valueType": {
+              "friendlyName": "Reply",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          },
+          {
+            "name": "IsRequestOut",
+            "friendlyName": "activate",
+            "valueType": {
+              "type": null,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null,
+              "friendlyName": "IsRequest"
+            }
+          }
+        ],
+        "contextExpirationInMilliseconds": 10000,
+        "executionExpirationInMilliseconds": 0,
+        "tsCode": [
+          "import { Framework } from 'framework';\r",
+          "\r",
+          "export default class {\r",
+          "\r",
+          "    /** Allows accessing external functions */\r",
+          "    private framework: Framework;\r",
+          "\r",
+          "    constructor(framework: Framework) {\r",
+          "        this.framework = framework;\r",
+          "    }\r",
+          "\r",
+          "    /*\r",
+          "     * Entry point of the class (IMPORTANT: don't change the signature of this method)\r",
+          "     * Should return an object containing the values for each output to emit\r",
+          "     * If necessary, use the parameter \"outputs\" to emit data while running the code.\r",
+          "     */\r",
+          "    public async main(inputs: any, outputs: any): Promise<any> {\r",
+          "        // Add code here\r",
+          "        var parsedData = this.parseTopic(inputs.subject);\r",
+          "        var sub = parsedData?.subsection;\r",
+          "        var replyToSend = {};\r",
+          "        var toMatch = inputs.data;\r",
+          "        \r",
+          "        this.framework.logger.info(\"Subject -> \" + inputs.subject);\r",
+          "        this.framework.logger.info(\"ParsedData -> \" + JSON.stringify(parsedData)); \r",
+          "        \r",
+          "        var currentRunningConfig : RunningConfig = await this.framework.dataStore.retrieve(\"RunningConfig\", undefined) ?? new RunningConfig();\r",
+          "    \r",
+          "        if(!sub){\r",
+          "            return { reply: currentRunningConfig, IsRequestOut: inputs.isRequest};\r",
+          "        }       \r",
+          "\r",
+          "        this.framework.logger.info(\"Retrieving config for -> \" + sub + \":\" + JSON.stringify(parsedData));\r",
+          "\r",
+          "        if(parsedData  && currentRunningConfig.RunningMode == RunningMode.NoStatistics){\r",
+          "            throw new Error(\"Currently configured with no statistics\");\r",
+          "        }      \r",
+          "\r",
+          "        var subject = parsedData.topic;\r",
+          "        var statSubject = subject+\"Stat\";\r",
+          "        \r",
+          "        if(sub){\r",
+          "            switch(sub){\r",
+          "                case \"Configuration\":\r",
+          "                    let configList = await this.framework.dataStore.retrieve(subject, undefined) as EndpointConfig [];\r",
+          "                    replyToSend = toMatch ? configList?.filter(x => this.matchesTemplate(x, toMatch)) : configList;\r",
+          "                    break;\r",
+          "                case \"Statistics\":\r",
+          "                    let statList = await this.framework.dataStore.retrieve(statSubject, undefined) as EndpointStatistic[];\r",
+          "                    replyToSend = toMatch ? statList?.filter(x => this.matchesTemplate(x, toMatch)) : statList;\r",
+          "                    break;\r",
+          "            }       \r",
+          "\r",
+          "            \r",
+          "        } else {\r",
+          "            var configToMatch = toMatch?.EndpointConfig;\r",
+          "            var statToMatch = toMatch?.EndpointStatistic;\r",
+          "\r",
+          "            var configList = await this.framework.dataStore.retrieve(subject, undefined) as EndpointConfig[];\r",
+          "            var statList = await this.framework.dataStore.retrieve(statSubject, undefined) as EndpointStatistic[];\r",
+          "\r",
+          "            replyToSend = {\r",
+          "                EndpointConfig: configToMatch ? configList?.filter(x => this.matchesTemplate(x, configToMatch)) : configList,\r",
+          "                EndpointStatistic: statToMatch ? statList?.filter(x => this.matchesTemplate(x, statToMatch)) : statList\r",
+          "            };\r",
+          "        }\r",
+          "\r",
+          "        return { reply: replyToSend, IsRequestOut: inputs.isRequest };\r",
+          "\r",
+          "        // emit output during execution: outputs.output1.emit(\"something\");\r",
+          "        // return example: return { output1: inputs.input1, output2: \"Hello World\" };\r",
+          "    }\r",
+          "    \r",
+          "    public parseTopic(input: string): { subsection?: string; topic?: string } {\r",
+          "        let prefix = \"ExternalSystemsSimulator.Retrieve\"\r",
+          "\r",
+          "        if (!input.startsWith(prefix)) {\r",
+          "            throw new Error(\"Invalid format\");\r",
+          "        }\r",
+          "\r",
+          "        const rest = input === prefix ? \"\" : input.slice(prefix.length + 1);\r",
+          "\r",
+          "        if (!rest) {\r",
+          "            return undefined;\r",
+          "        }\r",
+          "\r",
+          "        const parts = rest.split(\".\");\r",
+          "\r",
+          "        if (parts.length === 1) {\r",
+          "            return { topic: parts[0] };\r",
+          "        }\r",
+          "\r",
+          "        if (parts.length === 2) {\r",
+          "            const [subsection, topic] = parts;\r",
+          "            return { subsection, topic };\r",
+          "        }\r",
+          "\r",
+          "        throw new Error(\"Unexpected format\");\r",
+          "    }\r",
+          "\r",
+          "    public matchesTemplate(item: unknown, template: unknown): boolean {\r",
+          "        if (template === item) return true;\r",
+          "\r",
+          "        if (\r",
+          "            typeof template !== \"object\" || template === null ||\r",
+          "            typeof item !== \"object\" || item === null\r",
+          "        ) {\r",
+          "            return false;\r",
+          "        }\r",
+          "\r",
+          "        if (Array.isArray(template)) {\r",
+          "            if (!Array.isArray(item) || template.length !== item.length) return false;\r",
+          "            return template.every((v, i) => this.matchesTemplate(item[i], v));\r",
+          "        }\r",
+          "\r",
+          "        for (const [key, value] of Object.entries(template as Record<string, unknown>)) {\r",
+          "            if (!this.matchesTemplate((item as Record<string, unknown>)[key], value)) {\r",
+          "            return false;\r",
+          "            }\r",
+          "        }\r",
+          "\r",
+          "        return true;\r",
+          "    }\r",
+          "    \r",
+          "    public removeMatches<T extends object>(items: T[], template: Partial<T>): T[] {\r",
+          "        return items.filter(item => !this.matchesTemplate(item, template));\r",
+          "    }\r",
+          "\r",
+          "}\r",
+          "\r",
+          "class RunningConfig {\r",
+          "    DefaultStatusCode: string;\r",
+          "    DefaultResponseBody: string;\r",
+          "    RunningMode: RunningMode\r",
+          "}\r",
+          "\r",
+          "enum RunningMode{\r",
+          "    Full,\r",
+          "    NoStatistics\r",
+          "}\r",
+          "\r",
+          "\r",
+          "//Model for AutomationEvent ExtendedData\r",
+          "class CustomExtendedData {\r",
+          "    DefaultActions: Action[];\r",
+          "    DefaultBody: string;\r",
+          "    DefaultStatusCode : number\r",
+          "}\r",
+          "\r",
+          "//Model for ActionParameter for action of type LogEvent\r",
+          "class LogEventParameter {\r",
+          "    EntityType : string;\r",
+          "    EntityId: string | undefined;\r",
+          "    EntityName: string | undefined;\r",
+          "    ToState : string;\r",
+          "    IgnoreLastServiceId = false;\r",
+          "}\r",
+          "\r",
+          "//Model for CustomCode \r",
+          "class CustomCodeParameters {\r",
+          "    ParameterNames: string[];\r",
+          "    Parameters: any[];\r",
+          "    Function: string;\r",
+          "}\r",
+          "\r",
+          "//Generic data model\r",
+          "class EndpointConfig{\r",
+          "    Id: string|undefined;\r",
+          "    StatusCode : number|undefined;\r",
+          "    BodyToSend: any;\r",
+          "    ActionsToExecute: Action[] | undefined;\r",
+          "\r",
+          "    constructor(init?: Partial<EndpointConfig>) {\r",
+          "        Object.assign(this, init);\r",
+          "        if(!this.Id){\r",
+          "            this.Id = crypto.randomUUID();\r",
+          "        }\r",
+          "    }\r",
+          "\r",
+          "    static GetNew(statusCodeToSet: number, bodyToSet: any): EndpointConfig {\r",
+          "        return new EndpointConfig({\r",
+          "            Id: crypto.randomUUID(),\r",
+          "            StatusCode: statusCodeToSet,\r",
+          "            BodyToSend: bodyToSet,\r",
+          "        });\r",
+          "    }\r",
+          "}\r",
+          "\r",
+          "class Action {\r",
+          "    Id: string|undefined;\r",
+          "    ActionType: string;\r",
+          "    ActionState: ActionStates;\r",
+          "    ActionParameter: any;\r",
+          "    DependsOn: string[] | undefined;\r",
+          "\r",
+          "     constructor(init?: Partial<Action>) {\r",
+          "        if(!init || !init.ActionType ||!init.ActionParameter){\r",
+          "            throw new Error(\"Invalid input. Received: \" + JSON.stringify(init));\r",
+          "        }\r",
+          "        this.Id = init.Id ?? crypto.randomUUID();\r",
+          "        this.ActionType = init.ActionType;\r",
+          "        this.ActionState = init.ActionState ?? ActionStates.Created;\r",
+          "        this.ActionParameter = init.ActionParameter;\r",
+          "    }\r",
+          "}\r",
+          "\r",
+          "class EndpointStatistic {\r",
+          "    RequestId : string | undefined;\r",
+          "    EndpointConfig: EndpointConfig|undefined;\r",
+          "    ReceivedBody: any;\r",
+          "    ReplySent: any;\r",
+          "    StatusCodeSent: number|undefined;\r",
+          "    Error: any\r",
+          "}\r",
+          "\r",
+          "enum ActionStates {\r",
+          "    \"Created\",\r",
+          "    \"Requested\",\r",
+          "    \"Processed\",\r",
+          "    \"Failed\"\r",
+          "}\r",
+          ""
+        ],
+        "jsCodeBase64": "InVzZSBzdHJpY3QiOwpPYmplY3QuZGVmaW5lUHJvcGVydHkoZXhwb3J0cywgIl9fZXNNb2R1bGUiLCB7IHZhbHVlOiB0cnVlIH0pOwpjbGFzcyBkZWZhdWx0XzEgewogICAgY29uc3RydWN0b3IoZnJhbWV3b3JrKSB7CiAgICAgICAgdGhpcy5mcmFtZXdvcmsgPSBmcmFtZXdvcms7CiAgICB9CiAgICAvKgogICAgICogRW50cnkgcG9pbnQgb2YgdGhlIGNsYXNzIChJTVBPUlRBTlQ6IGRvbid0IGNoYW5nZSB0aGUgc2lnbmF0dXJlIG9mIHRoaXMgbWV0aG9kKQogICAgICogU2hvdWxkIHJldHVybiBhbiBvYmplY3QgY29udGFpbmluZyB0aGUgdmFsdWVzIGZvciBlYWNoIG91dHB1dCB0byBlbWl0CiAgICAgKiBJZiBuZWNlc3NhcnksIHVzZSB0aGUgcGFyYW1ldGVyICJvdXRwdXRzIiB0byBlbWl0IGRhdGEgd2hpbGUgcnVubmluZyB0aGUgY29kZS4KICAgICAqLwogICAgYXN5bmMgbWFpbihpbnB1dHMsIG91dHB1dHMpIHsKICAgICAgICB2YXIgX2E7CiAgICAgICAgLy8gQWRkIGNvZGUgaGVyZQogICAgICAgIHZhciBwYXJzZWREYXRhID0gdGhpcy5wYXJzZVRvcGljKGlucHV0cy5zdWJqZWN0KTsKICAgICAgICB2YXIgc3ViID0gcGFyc2VkRGF0YSA9PT0gbnVsbCB8fCBwYXJzZWREYXRhID09PSB2b2lkIDAgPyB2b2lkIDAgOiBwYXJzZWREYXRhLnN1YnNlY3Rpb247CiAgICAgICAgdmFyIHJlcGx5VG9TZW5kID0ge307CiAgICAgICAgdmFyIHRvTWF0Y2ggPSBpbnB1dHMuZGF0YTsKICAgICAgICB0aGlzLmZyYW1ld29yay5sb2dnZXIuaW5mbygiU3ViamVjdCAtPiAiICsgaW5wdXRzLnN1YmplY3QpOwogICAgICAgIHRoaXMuZnJhbWV3b3JrLmxvZ2dlci5pbmZvKCJQYXJzZWREYXRhIC0+ICIgKyBKU09OLnN0cmluZ2lmeShwYXJzZWREYXRhKSk7CiAgICAgICAgdmFyIGN1cnJlbnRSdW5uaW5nQ29uZmlnID0gKF9hID0gYXdhaXQgdGhpcy5mcmFtZXdvcmsuZGF0YVN0b3JlLnJldHJpZXZlKCJSdW5uaW5nQ29uZmlnIiwgdW5kZWZpbmVkKSkgIT09IG51bGwgJiYgX2EgIT09IHZvaWQgMCA/IF9hIDogbmV3IFJ1bm5pbmdDb25maWcoKTsKICAgICAgICBpZiAoIXN1YikgewogICAgICAgICAgICByZXR1cm4geyByZXBseTogY3VycmVudFJ1bm5pbmdDb25maWcsIElzUmVxdWVzdE91dDogaW5wdXRzLmlzUmVxdWVzdCB9OwogICAgICAgIH0KICAgICAgICB0aGlzLmZyYW1ld29yay5sb2dnZXIuaW5mbygiUmV0cmlldmluZyBjb25maWcgZm9yIC0+ICIgKyBzdWIgKyAiOiIgKyBKU09OLnN0cmluZ2lmeShwYXJzZWREYXRhKSk7CiAgICAgICAgaWYgKHBhcnNlZERhdGEgJiYgY3VycmVudFJ1bm5pbmdDb25maWcuUnVubmluZ01vZGUgPT0gUnVubmluZ01vZGUuTm9TdGF0aXN0aWNzKSB7CiAgICAgICAgICAgIHRocm93IG5ldyBFcnJvcigiQ3VycmVudGx5IGNvbmZpZ3VyZWQgd2l0aCBubyBzdGF0aXN0aWNzIik7CiAgICAgICAgfQogICAgICAgIHZhciBzdWJqZWN0ID0gcGFyc2VkRGF0YS50b3BpYzsKICAgICAgICB2YXIgc3RhdFN1YmplY3QgPSBzdWJqZWN0ICsgIlN0YXQiOwogICAgICAgIGlmIChzdWIpIHsKICAgICAgICAgICAgc3dpdGNoIChzdWIpIHsKICAgICAgICAgICAgICAgIGNhc2UgIkNvbmZpZ3VyYXRpb24iOgogICAgICAgICAgICAgICAgICAgIGxldCBjb25maWdMaXN0ID0gYXdhaXQgdGhpcy5mcmFtZXdvcmsuZGF0YVN0b3JlLnJldHJpZXZlKHN1YmplY3QsIHVuZGVmaW5lZCk7CiAgICAgICAgICAgICAgICAgICAgcmVwbHlUb1NlbmQgPSB0b01hdGNoID8gY29uZmlnTGlzdCA9PT0gbnVsbCB8fCBjb25maWdMaXN0ID09PSB2b2lkIDAgPyB2b2lkIDAgOiBjb25maWdMaXN0LmZpbHRlcih4ID0+IHRoaXMubWF0Y2hlc1RlbXBsYXRlKHgsIHRvTWF0Y2gpKSA6IGNvbmZpZ0xpc3Q7CiAgICAgICAgICAgICAgICAgICAgYnJlYWs7CiAgICAgICAgICAgICAgICBjYXNlICJTdGF0aXN0aWNzIjoKICAgICAgICAgICAgICAgICAgICBsZXQgc3RhdExpc3QgPSBhd2FpdCB0aGlzLmZyYW1ld29yay5kYXRhU3RvcmUucmV0cmlldmUoc3RhdFN1YmplY3QsIHVuZGVmaW5lZCk7CiAgICAgICAgICAgICAgICAgICAgcmVwbHlUb1NlbmQgPSB0b01hdGNoID8gc3RhdExpc3QgPT09IG51bGwgfHwgc3RhdExpc3QgPT09IHZvaWQgMCA/IHZvaWQgMCA6IHN0YXRMaXN0LmZpbHRlcih4ID0+IHRoaXMubWF0Y2hlc1RlbXBsYXRlKHgsIHRvTWF0Y2gpKSA6IHN0YXRMaXN0OwogICAgICAgICAgICAgICAgICAgIGJyZWFrOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgICAgIGVsc2UgewogICAgICAgICAgICB2YXIgY29uZmlnVG9NYXRjaCA9IHRvTWF0Y2ggPT09IG51bGwgfHwgdG9NYXRjaCA9PT0gdm9pZCAwID8gdm9pZCAwIDogdG9NYXRjaC5FbmRwb2ludENvbmZpZzsKICAgICAgICAgICAgdmFyIHN0YXRUb01hdGNoID0gdG9NYXRjaCA9PT0gbnVsbCB8fCB0b01hdGNoID09PSB2b2lkIDAgPyB2b2lkIDAgOiB0b01hdGNoLkVuZHBvaW50U3RhdGlzdGljOwogICAgICAgICAgICB2YXIgY29uZmlnTGlzdCA9IGF3YWl0IHRoaXMuZnJhbWV3b3JrLmRhdGFTdG9yZS5yZXRyaWV2ZShzdWJqZWN0LCB1bmRlZmluZWQpOwogICAgICAgICAgICB2YXIgc3RhdExpc3QgPSBhd2FpdCB0aGlzLmZyYW1ld29yay5kYXRhU3RvcmUucmV0cmlldmUoc3RhdFN1YmplY3QsIHVuZGVmaW5lZCk7CiAgICAgICAgICAgIHJlcGx5VG9TZW5kID0gewogICAgICAgICAgICAgICAgRW5kcG9pbnRDb25maWc6IGNvbmZpZ1RvTWF0Y2ggPyBjb25maWdMaXN0ID09PSBudWxsIHx8IGNvbmZpZ0xpc3QgPT09IHZvaWQgMCA/IHZvaWQgMCA6IGNvbmZpZ0xpc3QuZmlsdGVyKHggPT4gdGhpcy5tYXRjaGVzVGVtcGxhdGUoeCwgY29uZmlnVG9NYXRjaCkpIDogY29uZmlnTGlzdCwKICAgICAgICAgICAgICAgIEVuZHBvaW50U3RhdGlzdGljOiBzdGF0VG9NYXRjaCA/IHN0YXRMaXN0ID09PSBudWxsIHx8IHN0YXRMaXN0ID09PSB2b2lkIDAgPyB2b2lkIDAgOiBzdGF0TGlzdC5maWx0ZXIoeCA9PiB0aGlzLm1hdGNoZXNUZW1wbGF0ZSh4LCBzdGF0VG9NYXRjaCkpIDogc3RhdExpc3QKICAgICAgICAgICAgfTsKICAgICAgICB9CiAgICAgICAgcmV0dXJuIHsgcmVwbHk6IHJlcGx5VG9TZW5kLCBJc1JlcXVlc3RPdXQ6IGlucHV0cy5pc1JlcXVlc3QgfTsKICAgICAgICAvLyBlbWl0IG91dHB1dCBkdXJpbmcgZXhlY3V0aW9uOiBvdXRwdXRzLm91dHB1dDEuZW1pdCgic29tZXRoaW5nIik7CiAgICAgICAgLy8gcmV0dXJuIGV4YW1wbGU6IHJldHVybiB7IG91dHB1dDE6IGlucHV0cy5pbnB1dDEsIG91dHB1dDI6ICJIZWxsbyBXb3JsZCIgfTsKICAgIH0KICAgIHBhcnNlVG9waWMoaW5wdXQpIHsKICAgICAgICBsZXQgcHJlZml4ID0gIkV4dGVybmFsU3lzdGVtc1NpbXVsYXRvci5SZXRyaWV2ZSI7CiAgICAgICAgaWYgKCFpbnB1dC5zdGFydHNXaXRoKHByZWZpeCkpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IEVycm9yKCJJbnZhbGlkIGZvcm1hdCIpOwogICAgICAgIH0KICAgICAgICBjb25zdCByZXN0ID0gaW5wdXQgPT09IHByZWZpeCA/ICIiIDogaW5wdXQuc2xpY2UocHJlZml4Lmxlbmd0aCArIDEpOwogICAgICAgIGlmICghcmVzdCkgewogICAgICAgICAgICByZXR1cm4gdW5kZWZpbmVkOwogICAgICAgIH0KICAgICAgICBjb25zdCBwYXJ0cyA9IHJlc3Quc3BsaXQoIi4iKTsKICAgICAgICBpZiAocGFydHMubGVuZ3RoID09PSAxKSB7CiAgICAgICAgICAgIHJldHVybiB7IHRvcGljOiBwYXJ0c1swXSB9OwogICAgICAgIH0KICAgICAgICBpZiAocGFydHMubGVuZ3RoID09PSAyKSB7CiAgICAgICAgICAgIGNvbnN0IFtzdWJzZWN0aW9uLCB0b3BpY10gPSBwYXJ0czsKICAgICAgICAgICAgcmV0dXJuIHsgc3Vic2VjdGlvbiwgdG9waWMgfTsKICAgICAgICB9CiAgICAgICAgdGhyb3cgbmV3IEVycm9yKCJVbmV4cGVjdGVkIGZvcm1hdCIpOwogICAgfQogICAgbWF0Y2hlc1RlbXBsYXRlKGl0ZW0sIHRlbXBsYXRlKSB7CiAgICAgICAgaWYgKHRlbXBsYXRlID09PSBpdGVtKQogICAgICAgICAgICByZXR1cm4gdHJ1ZTsKICAgICAgICBpZiAodHlwZW9mIHRlbXBsYXRlICE9PSAib2JqZWN0IiB8fCB0ZW1wbGF0ZSA9PT0gbnVsbCB8fAogICAgICAgICAgICB0eXBlb2YgaXRlbSAhPT0gIm9iamVjdCIgfHwgaXRlbSA9PT0gbnVsbCkgewogICAgICAgICAgICByZXR1cm4gZmFsc2U7CiAgICAgICAgfQogICAgICAgIGlmIChBcnJheS5pc0FycmF5KHRlbXBsYXRlKSkgewogICAgICAgICAgICBpZiAoIUFycmF5LmlzQXJyYXkoaXRlbSkgfHwgdGVtcGxhdGUubGVuZ3RoICE9PSBpdGVtLmxlbmd0aCkKICAgICAgICAgICAgICAgIHJldHVybiBmYWxzZTsKICAgICAgICAgICAgcmV0dXJuIHRlbXBsYXRlLmV2ZXJ5KCh2LCBpKSA9PiB0aGlzLm1hdGNoZXNUZW1wbGF0ZShpdGVtW2ldLCB2KSk7CiAgICAgICAgfQogICAgICAgIGZvciAoY29uc3QgW2tleSwgdmFsdWVdIG9mIE9iamVjdC5lbnRyaWVzKHRlbXBsYXRlKSkgewogICAgICAgICAgICBpZiAoIXRoaXMubWF0Y2hlc1RlbXBsYXRlKGl0ZW1ba2V5XSwgdmFsdWUpKSB7CiAgICAgICAgICAgICAgICByZXR1cm4gZmFsc2U7CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICAgICAgcmV0dXJuIHRydWU7CiAgICB9CiAgICByZW1vdmVNYXRjaGVzKGl0ZW1zLCB0ZW1wbGF0ZSkgewogICAgICAgIHJldHVybiBpdGVtcy5maWx0ZXIoaXRlbSA9PiAhdGhpcy5tYXRjaGVzVGVtcGxhdGUoaXRlbSwgdGVtcGxhdGUpKTsKICAgIH0KfQpleHBvcnRzLmRlZmF1bHQgPSBkZWZhdWx0XzE7CmNsYXNzIFJ1bm5pbmdDb25maWcgewp9CnZhciBSdW5uaW5nTW9kZTsKKGZ1bmN0aW9uIChSdW5uaW5nTW9kZSkgewogICAgUnVubmluZ01vZGVbUnVubmluZ01vZGVbIkZ1bGwiXSA9IDBdID0gIkZ1bGwiOwogICAgUnVubmluZ01vZGVbUnVubmluZ01vZGVbIk5vU3RhdGlzdGljcyJdID0gMV0gPSAiTm9TdGF0aXN0aWNzIjsKfSkoUnVubmluZ01vZGUgfHwgKFJ1bm5pbmdNb2RlID0ge30pKTsKLy9Nb2RlbCBmb3IgQXV0b21hdGlvbkV2ZW50IEV4dGVuZGVkRGF0YQpjbGFzcyBDdXN0b21FeHRlbmRlZERhdGEgewp9Ci8vTW9kZWwgZm9yIEFjdGlvblBhcmFtZXRlciBmb3IgYWN0aW9uIG9mIHR5cGUgTG9nRXZlbnQKY2xhc3MgTG9nRXZlbnRQYXJhbWV0ZXIgewogICAgY29uc3RydWN0b3IoKSB7CiAgICAgICAgdGhpcy5JZ25vcmVMYXN0U2VydmljZUlkID0gZmFsc2U7CiAgICB9Cn0KLy9Nb2RlbCBmb3IgQ3VzdG9tQ29kZSAKY2xhc3MgQ3VzdG9tQ29kZVBhcmFtZXRlcnMgewp9Ci8vR2VuZXJpYyBkYXRhIG1vZGVsCmNsYXNzIEVuZHBvaW50Q29uZmlnIHsKICAgIGNvbnN0cnVjdG9yKGluaXQpIHsKICAgICAgICBPYmplY3QuYXNzaWduKHRoaXMsIGluaXQpOwogICAgICAgIGlmICghdGhpcy5JZCkgewogICAgICAgICAgICB0aGlzLklkID0gY3J5cHRvLnJhbmRvbVVVSUQoKTsKICAgICAgICB9CiAgICB9CiAgICBzdGF0aWMgR2V0TmV3KHN0YXR1c0NvZGVUb1NldCwgYm9keVRvU2V0KSB7CiAgICAgICAgcmV0dXJuIG5ldyBFbmRwb2ludENvbmZpZyh7CiAgICAgICAgICAgIElkOiBjcnlwdG8ucmFuZG9tVVVJRCgpLAogICAgICAgICAgICBTdGF0dXNDb2RlOiBzdGF0dXNDb2RlVG9TZXQsCiAgICAgICAgICAgIEJvZHlUb1NlbmQ6IGJvZHlUb1NldCwKICAgICAgICB9KTsKICAgIH0KfQpjbGFzcyBBY3Rpb24gewogICAgY29uc3RydWN0b3IoaW5pdCkgewogICAgICAgIHZhciBfYSwgX2I7CiAgICAgICAgaWYgKCFpbml0IHx8ICFpbml0LkFjdGlvblR5cGUgfHwgIWluaXQuQWN0aW9uUGFyYW1ldGVyKSB7CiAgICAgICAgICAgIHRocm93IG5ldyBFcnJvcigiSW52YWxpZCBpbnB1dC4gUmVjZWl2ZWQ6ICIgKyBKU09OLnN0cmluZ2lmeShpbml0KSk7CiAgICAgICAgfQogICAgICAgIHRoaXMuSWQgPSAoX2EgPSBpbml0LklkKSAhPT0gbnVsbCAmJiBfYSAhPT0gdm9pZCAwID8gX2EgOiBjcnlwdG8ucmFuZG9tVVVJRCgpOwogICAgICAgIHRoaXMuQWN0aW9uVHlwZSA9IGluaXQuQWN0aW9uVHlwZTsKICAgICAgICB0aGlzLkFjdGlvblN0YXRlID0gKF9iID0gaW5pdC5BY3Rpb25TdGF0ZSkgIT09IG51bGwgJiYgX2IgIT09IHZvaWQgMCA/IF9iIDogQWN0aW9uU3RhdGVzLkNyZWF0ZWQ7CiAgICAgICAgdGhpcy5BY3Rpb25QYXJhbWV0ZXIgPSBpbml0LkFjdGlvblBhcmFtZXRlcjsKICAgIH0KfQpjbGFzcyBFbmRwb2ludFN0YXRpc3RpYyB7Cn0KdmFyIEFjdGlvblN0YXRlczsKKGZ1bmN0aW9uIChBY3Rpb25TdGF0ZXMpIHsKICAgIEFjdGlvblN0YXRlc1tBY3Rpb25TdGF0ZXNbIkNyZWF0ZWQiXSA9IDBdID0gIkNyZWF0ZWQiOwogICAgQWN0aW9uU3RhdGVzW0FjdGlvblN0YXRlc1siUmVxdWVzdGVkIl0gPSAxXSA9ICJSZXF1ZXN0ZWQiOwogICAgQWN0aW9uU3RhdGVzW0FjdGlvblN0YXRlc1siUHJvY2Vzc2VkIl0gPSAyXSA9ICJQcm9jZXNzZWQiOwogICAgQWN0aW9uU3RhdGVzW0FjdGlvblN0YXRlc1siRmFpbGVkIl0gPSAzXSA9ICJGYWlsZWQiOwp9KShBY3Rpb25TdGF0ZXMgfHwgKEFjdGlvblN0YXRlcyA9IHt9KSk7Cg==",
+        "___cmf___name": "Code"
+      }
+    },
+    {
+      "id": "task_5412",
+      "reference": {
+        "name": "messageBusReply",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "defaultReply": {}
+      }
+    },
+    {
+      "id": "task_4443",
+      "reference": {
+        "name": "messageBusListener",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "autoEnable": true,
+        "subjectToSubscribe": "ExternalSystemsSimulator.Retrieve",
+        "replyTimeout": 60000,
+        "___cmf___name": "Message Bus Listener"
+      }
+    }
+  ],
+  "converters": [],
+  "links": [
+    {
+      "id": "6c4cb5fd-4419-4cd4-a8bb-ceb08be786d0",
+      "sourceId": "task_947",
+      "targetId": "task_146",
+      "inputName": "subjectIn",
+      "outputName": "subject"
+    },
+    {
+      "id": "80d697ba-ea6e-40e4-92fb-f7ecbb7bc5e0",
+      "sourceId": "task_146",
+      "targetId": "task_5412",
+      "inputName": "reply",
+      "outputName": "error"
+    },
+    {
+      "id": "6b1c8e15-b7bd-43c8-941e-d470a319e6a7",
+      "sourceId": "task_146",
+      "targetId": "task_5412",
+      "inputName": "activate",
+      "outputName": "error"
+    },
+    {
+      "id": "e3e9316d-fba6-4492-94f5-702721426938",
+      "sourceId": "task_4443",
+      "targetId": "task_146",
+      "inputName": "activate",
+      "outputName": "success"
+    },
+    {
+      "id": "7506ff90-1e6b-460e-b051-d537621501e5",
+      "sourceId": "task_4443",
+      "targetId": "task_146",
+      "inputName": "subjectIn",
+      "outputName": "subject"
+    },
+    {
+      "id": "9553e948-61a5-40ee-b040-6b2018a49b96",
+      "sourceId": "task_4443",
+      "targetId": "task_146",
+      "inputName": "dataIn",
+      "outputName": "data"
+    },
+    {
+      "id": "f1a7d9f7-2efc-4d08-8f03-e68c541047bd",
+      "sourceId": "task_947",
+      "targetId": "task_146",
+      "inputName": "dataIn",
+      "outputName": "data"
+    },
+    {
+      "id": "33bb0702-415b-4d2c-bcfc-a95320108d62",
+      "sourceId": "task_4443",
+      "targetId": "task_146",
+      "inputName": "isRequestIn",
+      "outputName": "isRequest"
+    },
+    {
+      "id": "8cdc2814-6436-46c1-9a3b-cc9313ca6716",
+      "sourceId": "task_947",
+      "targetId": "task_146",
+      "inputName": "isRequestIn",
+      "outputName": "isRequest"
+    },
+    {
+      "id": "4b195a9c-c264-40f4-8ff6-d3af1f06dcea",
+      "sourceId": "task_947",
+      "targetId": "task_146",
+      "inputName": "activate",
+      "outputName": "success"
+    },
+    {
+      "id": "8d60605c-8742-4bd1-9999-2d4eac13d48c",
+      "sourceId": "task_146",
+      "targetId": "task_5412",
+      "inputName": "activate",
+      "outputName": "IsRequestOutOut"
+    },
+    {
+      "id": "d3559bcb-cebb-458c-8b42-21eb369fa336",
+      "sourceId": "task_146",
+      "targetId": "task_5412",
+      "inputName": "reply",
+      "outputName": "replyOut"
+    }
+  ],
+  "layout": {
+    "general": {
+      "color": null,
+      "notes": []
+    },
+    "drawers": {
+      "DIAGRAM": {
+        "tasks": {
+          "task_146": {
+            "collapsed": false,
+            "position": {
+              "x": 670,
+              "y": 184
+            },
+            "outdated": false
+          },
+          "task_4443": {
+            "collapsed": false,
+            "position": {
+              "x": 71,
+              "y": 79
+            },
+            "outdated": false
+          },
+          "task_947": {
+            "collapsed": false,
+            "position": {
+              "x": 71,
+              "y": 408
+            },
+            "outdated": false
+          },
+          "task_5412": {
+            "collapsed": false,
+            "position": {
+              "x": 1361,
+              "y": 185
+            },
+            "outdated": false
+          }
+        },
+        "links": {
+          "6c4cb5fd-4419-4cd4-a8bb-ceb08be786d0": {
+            "vertices": []
+          },
+          "80d697ba-ea6e-40e4-92fb-f7ecbb7bc5e0": {
+            "vertices": []
+          },
+          "6b1c8e15-b7bd-43c8-941e-d470a319e6a7": {
+            "vertices": []
+          },
+          "e3e9316d-fba6-4492-94f5-702721426938": {
+            "vertices": []
+          },
+          "7506ff90-1e6b-460e-b051-d537621501e5": {
+            "vertices": []
+          },
+          "9553e948-61a5-40ee-b040-6b2018a49b96": {
+            "vertices": []
+          },
+          "f1a7d9f7-2efc-4d08-8f03-e68c541047bd": {
+            "vertices": []
+          },
+          "33bb0702-415b-4d2c-bcfc-a95320108d62": {
+            "vertices": []
+          },
+          "8cdc2814-6436-46c1-9a3b-cc9313ca6716": {
+            "vertices": []
+          },
+          "4b195a9c-c264-40f4-8ff6-d3af1f06dcea": {
+            "vertices": []
+          },
+          "8d60605c-8742-4bd1-9999-2d4eac13d48c": {
+            "vertices": []
+          },
+          "d3559bcb-cebb-458c-8b42-21eb369fa336": {
+            "vertices": []
+          }
+        },
+        "notes": {},
+        "pan": {
+          "x": 366,
+          "y": 112
+        },
+        "zoom": 1
+      }
+    }
+  }
+}

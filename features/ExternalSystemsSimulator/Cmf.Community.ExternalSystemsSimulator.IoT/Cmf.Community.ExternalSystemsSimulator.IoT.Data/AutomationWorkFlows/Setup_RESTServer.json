@@ -1,0 +1,399 @@
+{
+  "tasks": [
+    {
+      "id": "task_2851",
+      "reference": {
+        "name": "driverEvent",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "driver": "RESTServer",
+      "settings": {
+        "autoEnable": true,
+        "event": "OnInitialize",
+        "autoSetup": true,
+        "___cmf___description": "OnInitialize"
+      }
+    },
+    {
+      "id": "task_2852",
+      "reference": {
+        "name": "equipmentConfig",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "driver": "RESTServer",
+      "settings": {
+        "_inputs": [
+          {
+            "name": "address",
+            "label": "Address",
+            "defaultValue": "0.0.0.0",
+            "parameter": {
+              "$type": "Cmf.Foundation.BusinessObjects.AutomationProtocolParameter, Cmf.Foundation.BusinessObjects",
+              "Name": "address"
+            },
+            "dataType": "String",
+            "automationDataType": 0,
+            "referenceType": 0,
+            "description": "Address (Ip) to listen to. Leave empty for all network addresses (0.0.0.0)",
+            "settingKey": "name"
+          },
+          {
+            "name": "port",
+            "label": "Port",
+            "defaultValue": 8080,
+            "parameter": {
+              "$type": "Cmf.Foundation.BusinessObjects.AutomationProtocolParameter, Cmf.Foundation.BusinessObjects",
+              "Name": "port"
+            },
+            "dataType": "Integer",
+            "automationDataType": 5,
+            "referenceType": 0,
+            "description": "Port number the server will be listening. Defaults to 80",
+            "settingKey": "name"
+          },
+          {
+            "name": "protocol",
+            "label": "Protocol",
+            "defaultValue": "HTTP",
+            "parameter": {
+              "$type": "Cmf.Foundation.BusinessObjects.AutomationProtocolParameter, Cmf.Foundation.BusinessObjects",
+              "Name": "protocol"
+            },
+            "dataType": "Enum",
+            "automationDataType": 0,
+            "referenceType": 1,
+            "description": "The protocol used for exchanging data",
+            "valueReferenceType": 6,
+            "settings": {
+              "enumValues": [
+                "HTTP",
+                "HTTPS"
+              ]
+            },
+            "settingKey": "name"
+          },
+          {
+            "name": "certificateAuthority",
+            "label": "Certificate Authority",
+            "parameter": {
+              "$type": "Cmf.Foundation.BusinessObjects.AutomationProtocolParameter, Cmf.Foundation.BusinessObjects",
+              "Name": "certificateAuthority"
+            },
+            "dataType": "String",
+            "automationDataType": 11,
+            "referenceType": 0,
+            "description": "Certificate Authority - can be either a path to a file or the contents of the file in plain text. Format should be 'pem'. The certificateAuthority property is used to define a set of trusted Certificate Authority (CA) certificates that an application or system uses to verify the authenticity of SSL/TLS certificates presented by servers during secure communication. It serves as a trust anchor, allowing the application to establish the legitimacy of certificates in the trust chain presented by the server.",
+            "settingKey": "name"
+          },
+          {
+            "name": "certificate",
+            "label": "Certificate",
+            "parameter": {
+              "$type": "Cmf.Foundation.BusinessObjects.AutomationProtocolParameter, Cmf.Foundation.BusinessObjects",
+              "Name": "certificate"
+            },
+            "dataType": "String",
+            "automationDataType": 11,
+            "referenceType": 0,
+            "description": "Own server certificate - can be either a path to a file or the contents of the file in plain text. Format should be 'pem'.",
+            "settingKey": "name"
+          },
+          {
+            "name": "key",
+            "label": "key",
+            "parameter": {
+              "$type": "Cmf.Foundation.BusinessObjects.AutomationProtocolParameter, Cmf.Foundation.BusinessObjects",
+              "Name": "key"
+            },
+            "dataType": "String",
+            "automationDataType": 11,
+            "referenceType": 0,
+            "description": "Own server private key - can be either a path to a file or the contents of the file in plain text. Format should be 'pem'.",
+            "settingKey": "name"
+          }
+        ],
+        "connectingTimeout": 30000,
+        "setupTimeout": 10000,
+        "intervalBeforeReconnect": 5000,
+        "heartbeatInterval": 60000,
+        "___cmf___name": "Equipment Configuration"
+      }
+    },
+    {
+      "id": "task_2853",
+      "reference": {
+        "name": "driverCommand",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "driver": "RESTServer",
+      "settings": {
+        "command": "Connect",
+        "___cmf___description": "Connect"
+      }
+    },
+    {
+      "id": "task_1492",
+      "reference": {
+        "name": "driverCommand",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "driver": "RESTServer",
+      "settings": {
+        "command": "SetupFailure",
+        "___cmf___description": "SetupFailure",
+        "___cmf___name": "Driver Command"
+      }
+    },
+    {
+      "id": "task_11366",
+      "reference": {
+        "name": "workflow",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "inputs": [
+          {
+            "name": "subject",
+            "valueType": {
+              "friendlyName": "Subject",
+              "name": "String",
+              "type": 4,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            },
+            "defaultValue": "subject",
+            "settingKey": "name"
+          },
+          {
+            "name": "data",
+            "valueType": {
+              "friendlyName": "Data",
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            },
+            "defaultValue": "data",
+            "settingKey": "name"
+          },
+          {
+            "name": "IsRequest",
+            "valueType": {
+              "friendlyName": "IsRequest",
+              "name": "Boolean",
+              "type": 3,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            },
+            "defaultValue": "IsRequest",
+            "settingKey": "name"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "reply",
+            "valueType": {
+              "friendlyName": "Reply",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            },
+            "defaultValue": "reply",
+            "settingKey": "name"
+          },
+          {
+            "name": "IsRequestOut",
+            "valueType": {
+              "friendlyName": "IsRequestOut",
+              "name": "Boolean",
+              "type": 3,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            },
+            "defaultValue": "IsRequestOut",
+            "settingKey": "name"
+          }
+        ],
+        "automationWorkflow": {
+          "displayName": "CleanConfig_SubWorkflow",
+          "isShared": false,
+          "name": null
+        },
+        "retries": 30,
+        "contextsExpirationInMilliseconds": 60000,
+        "executionExpirationInMilliseconds": 1200000,
+        "executeWhenAllInputsDefined": false,
+        "___cmf___name": "Call SubWorkflow",
+        "___cmf___description": "CleanConfig_SubWorkflow"
+      }
+    }
+  ],
+  "converters": [
+    {
+      "id": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks#anyToConstant",
+      "reference": {
+        "name": "anyToConstant",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      }
+    }
+  ],
+  "links": [
+    {
+      "id": "task_2852_success-task_2853_activate",
+      "sourceId": "task_2852",
+      "targetId": "task_2853",
+      "inputName": "activate",
+      "outputName": "success"
+    },
+    {
+      "id": "a86c4ac9-ed6a-4023-b96f-ac103335a7c4",
+      "sourceId": "task_2852",
+      "targetId": "task_1492",
+      "inputName": "activate",
+      "outputName": "error"
+    },
+    {
+      "id": "a901fd84-1164-40b9-a8c0-33387ad995e5",
+      "sourceId": "task_2851",
+      "targetId": "task_1492",
+      "inputName": "activate",
+      "outputName": "error"
+    },
+    {
+      "id": "dc379f54-d8ba-486e-8606-93034b7dab77",
+      "sourceId": "task_2851",
+      "targetId": "task_2852",
+      "inputName": "activate",
+      "outputName": "success"
+    },
+    {
+      "id": "fc28fad9-4ad6-4e70-ae20-8ddfbd99a9ac",
+      "sourceId": "task_2852",
+      "targetId": "task_11366",
+      "inputName": "activate",
+      "outputName": "success"
+    },
+    {
+      "id": "8f9afdbe-f7ff-4db6-91d2-ca648258e816",
+      "sourceId": "task_2852",
+      "targetId": "task_11366",
+      "inputName": "subjectIn",
+      "outputName": "success",
+      "converters": [
+        {
+          "id": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks#anyToConstant",
+          "params": {
+            "type": "String",
+            "value": "ExternalSystemsSimulator.Clear"
+          }
+        }
+      ]
+    }
+  ],
+  "$id": "1",
+  "layout": {
+    "general": {
+      "color": null,
+      "notes": []
+    },
+    "drawers": {
+      "DIAGRAM": {
+        "tasks": {
+          "task_1492": {
+            "collapsed": false,
+            "position": {
+              "x": 2685,
+              "y": 1031
+            },
+            "outdated": false
+          },
+          "task_2853": {
+            "collapsed": false,
+            "position": {
+              "x": 2684,
+              "y": 856
+            },
+            "outdated": false
+          },
+          "task_2852": {
+            "collapsed": false,
+            "position": {
+              "x": 1943,
+              "y": 213
+            },
+            "outdated": false
+          },
+          "task_2851": {
+            "collapsed": false,
+            "position": {
+              "x": 945,
+              "y": 859
+            },
+            "outdated": false
+          },
+          "task_11366": {
+            "collapsed": false,
+            "position": {
+              "x": 2687,
+              "y": 492
+            },
+            "outdated": false
+          }
+        },
+        "links": {
+          "task_2852_success-task_2853_activate": {
+            "vertices": []
+          },
+          "a86c4ac9-ed6a-4023-b96f-ac103335a7c4": {
+            "vertices": []
+          },
+          "a901fd84-1164-40b9-a8c0-33387ad995e5": {
+            "vertices": []
+          },
+          "dc379f54-d8ba-486e-8606-93034b7dab77": {
+            "vertices": []
+          },
+          "fc28fad9-4ad6-4e70-ae20-8ddfbd99a9ac": {
+            "vertices": []
+          },
+          "8f9afdbe-f7ff-4db6-91d2-ca648258e816": {
+            "vertices": []
+          }
+        },
+        "notes": {},
+        "pan": {
+          "x": 1545.142822265625,
+          "y": 442.8571472167969
+        },
+        "zoom": 0.99
+      }
+    }
+  }
+}

@@ -1,0 +1,201 @@
+{
+  "tasks": [
+    {
+      "id": "task_578",
+      "reference": {
+        "name": "equipmentEvent",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "_outputs": [],
+        "_autoActivate": true,
+        "_workingMode": "AlwaysActive",
+        "___cmf___name": "On Equipment Event",
+        "___cmf___description": "All Events",
+        "_acceptAllEvents": true,
+        "_events": []
+      },
+      "driver": "RESTServer"
+    },
+    {
+      "id": "task_663",
+      "reference": {
+        "name": "workflow",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "inputs": [
+          {
+            "name": "RequestId",
+            "valueType": {
+              "name": "String",
+              "type": 4,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null,
+              "friendlyName": "RequestId"
+            },
+            "defaultValue": "RequestId",
+            "settingKey": "name"
+          },
+          {
+            "name": "EventRawData",
+            "valueType": {
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null,
+              "friendlyName": ""
+            },
+            "defaultValue": "EventRawData",
+            "settingKey": "name"
+          }
+        ],
+        "outputs": [],
+        "automationWorkflow": {
+          "displayName": "MainWorkflow",
+          "isShared": false,
+          "name": null
+        },
+        "retries": 30,
+        "contextsExpirationInMilliseconds": 60000,
+        "executionExpirationInMilliseconds": 1200000,
+        "executeWhenAllInputsDefined": false,
+        "___cmf___name": "Call SubWorkflow"
+      }
+    }
+  ],
+  "converters": [
+    {
+      "id": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks#objectProperty",
+      "reference": {
+        "name": "objectProperty",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      }
+    },
+    {
+      "id": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks#getArrayValue",
+      "reference": {
+        "name": "getArrayValue",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      }
+    }
+  ],
+  "links": [
+    {
+      "id": "5f3f3e22-b4c3-4675-90f9-2ad53a117488",
+      "sourceId": "task_578",
+      "targetId": "task_663",
+      "inputName": "activate",
+      "outputName": "success"
+    },
+    {
+      "id": "3a82c685-e399-4d40-95e9-3f92191ab4bf",
+      "sourceId": "task_578",
+      "targetId": "task_663",
+      "inputName": "activate",
+      "outputName": "error"
+    },
+    {
+      "id": "7419802d-6468-4cde-82e5-93aad4134383",
+      "sourceId": "task_578",
+      "targetId": "task_663",
+      "inputName": "EventRawDataIn",
+      "outputName": "eventRawData"
+    },
+    {
+      "id": "ac693188-3c9d-41e6-810d-617d509f655f",
+      "sourceId": "task_578",
+      "targetId": "task_663",
+      "inputName": "RequestIdIn",
+      "outputName": "eventRawData",
+      "converters": [
+        {
+          "id": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks#objectProperty",
+          "params": {
+            "path": "values",
+            "type": "Object",
+            "defaultValue": "[]"
+          }
+        },
+        {
+          "id": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks#getArrayValue",
+          "params": {
+            "position": "First"
+          }
+        },
+        {
+          "id": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks#objectProperty",
+          "params": {
+            "path": "value",
+            "type": "String",
+            "defaultValue": "\"\""
+          }
+        }
+      ]
+    }
+  ],
+  "layout": {
+    "general": {
+      "color": null,
+      "notes": []
+    },
+    "drawers": {
+      "DIAGRAM": {
+        "tasks": {
+          "task_578": {
+            "collapsed": false,
+            "position": {
+              "x": 174,
+              "y": 401
+            },
+            "outdated": false
+          },
+          "task_663": {
+            "collapsed": false,
+            "position": {
+              "x": 716,
+              "y": 464
+            },
+            "outdated": false
+          }
+        },
+        "links": {
+          "5f3f3e22-b4c3-4675-90f9-2ad53a117488": {
+            "vertices": []
+          },
+          "3a82c685-e399-4d40-95e9-3f92191ab4bf": {
+            "vertices": []
+          },
+          "7419802d-6468-4cde-82e5-93aad4134383": {
+            "vertices": []
+          },
+          "ac693188-3c9d-41e6-810d-617d509f655f": {
+            "vertices": []
+          }
+        },
+        "notes": {},
+        "zoom": 1,
+        "pan": {
+          "x": 6.285714149475098,
+          "y": 222.85714721679688
+        }
+      }
+    }
+  }
+}

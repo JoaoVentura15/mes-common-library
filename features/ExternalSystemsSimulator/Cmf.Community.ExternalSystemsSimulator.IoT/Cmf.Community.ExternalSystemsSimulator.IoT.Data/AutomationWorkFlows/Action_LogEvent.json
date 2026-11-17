@@ -1,0 +1,853 @@
+{
+  "tasks": [
+    {
+      "id": "task_1981",
+      "reference": {
+        "name": "subWorkflowStart",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "outputs": [
+          {
+            "name": "Action",
+            "valueType": {
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null,
+              "friendlyName": ""
+            },
+            "defaultValue": null
+          }
+        ],
+        "___cmf___name": "SubWorkflow Start"
+      }
+    },
+    {
+      "id": "task_2009",
+      "reference": {
+        "name": "subWorkflowEnd",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "inputs": [
+          {
+            "name": "Action",
+            "friendlyName": "Action",
+            "valueType": {
+              "friendlyName": "Action",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "task_2023",
+      "reference": {
+        "name": "codeExecution",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "inputs": [
+          {
+            "name": "Action",
+            "friendlyName": "Action",
+            "valueType": {
+              "friendlyName": "Action",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "name": "ActionOut",
+            "friendlyName": "Action",
+            "valueType": {
+              "friendlyName": "Action",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          },
+          {
+            "name": "Object",
+            "friendlyName": "Object",
+            "valueType": {
+              "friendlyName": "Object",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          },
+          {
+            "name": "LogObjectEventParameters",
+            "friendlyName": "LogObjectEventParameters",
+            "valueType": {
+              "friendlyName": "LogObjectEventParameters",
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          },
+          {
+            "name": "IgnoreLastServiceId",
+            "friendlyName": "IgnoreLastServiceId",
+            "valueType": {
+              "friendlyName": "IgnoreLastServiceId",
+              "name": "Boolean",
+              "type": 3,
+              "collectionType": 0,
+              "referenceType": null,
+              "referenceTypeName": null,
+              "referenceTypeId": null
+            }
+          }
+        ],
+        "contextExpirationInMilliseconds": 10000,
+        "executionExpirationInMilliseconds": 0,
+        "tsCode": [
+          "import { Framework } from 'framework';",
+          "",
+          "export default class {",
+          "",
+          "    /** Allows accessing external functions */",
+          "    private framework: Framework;",
+          "",
+          "    constructor(framework: Framework) {",
+          "        this.framework = framework;",
+          "    }",
+          "",
+          "    /*",
+          "     * Entry point of the class (IMPORTANT: don't change the signature of this method)",
+          "     * Should return an object containing the values for each output to emit",
+          "     * If necessary, use the parameter \"outputs\" to emit data while running the code.",
+          "     */",
+          "    public async main(inputs: any, outputs: any): Promise<any> {",
+          "        // Add code here",
+          "        var action = inputs.Action as Action;",
+          "",
+          "        if(action.ActionType !== \"LogEvent\"){",
+          "            throw new Error (\"Invalid action ->\" + JSON.stringify(action));",
+          "        }",
+          "",
+          "        let parameters = action.ActionParameter as LogEventParameter;",
+          "",
+          "        if(!parameters){",
+          "            throw new Error(\"Missing or invalid parameters. Got -> \" + JSON.stringify(parameters));",
+          "        }",
+          "",
+          "        var entity = await this.LoadObject(parameters.EntityType, parameters.EntityId, parameters.EntityName);",
+          "        var stateTransition = await this.GetStateTransition(entity, parameters.ToState, entity.CurrentMainState.CurrentState)",
+          "",
+          "        return { ",
+          "            Object: entity,",
+          "            LogObjectEventParameters: { \"TransitionName\": stateTransition, \"StateModel\": entity.CurrentMainState.StateModel },",
+          "            IgnoreLastServiceId : parameters.IgnoreLastServiceId",
+          "        };",
+          "",
+          "        // emit output during execution: outputs.output1.emit(\"something\");",
+          "        // return example: return { output1: inputs.input1, output2: \"Hello World\" };",
+          "    }",
+          "",
+          "    ",
+          "    private async GetStateTransition(entity: any, toState: string, currentState: string): Promise<string> {",
+          "",
+          "        var sm = new this.framework.LBOS.Cmf.Foundation.BusinessOrchestration.StateModelsManagement.InputObjects.GetPossibleTransitionsForStateInput();",
+          "",
+          "        sm.StateModel = entity.CurrentMainState.StateModel;",
+          "        sm.StateModelState = entity.CurrentMainState.CurrentState;",
+          "",
+          "        var possibleTransitions = new this.framework.LBOS.Cmf.Foundation.BusinessObjects.StateModelTransitionCollection;",
+          "        possibleTransitions = (await this.framework.system.call(sm)).StateModelTransitions;",
+          "",
+          "        for (let transition of possibleTransitions) {",
+          "           if(transition?.ToState?.Name === toState){",
+          "                return transition?.Name;",
+          "           }",
+          "        }",
+          "",
+          "        if (toState == undefined && currentState === entity.CurrentMainState.CurrentState.Name){",
+          "            return possibleTransitions[0]?.Name;",
+          "        }",
+          "",
+          "        if(toState){",
+          "            throw new Error(`No transition found to ${toState} for the batch ${entity.Name} current state ${entity.CurrentMainState.CurrentState.Name}`);        ",
+          "        }",
+          "        throw new Error(`Event does not match current batch state expected: ${currentState} got ${entity.CurrentMainState.CurrentState.Name}`);",
+          "    }",
+          "",
+          "    private async LoadObject(entityType: string, EntityId? : string, EntityName? : string): Promise<any>{",
+          "               ",
+          "        if(EntityId && entityType){",
+          "            let getObjectByIdInput = new this.framework.LBOS.Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.GetObjectByIdInput;",
+          "            getObjectByIdInput.Id = EntityId;",
+          "            getObjectByIdInput.LevelsToLoad = 1;",
+          "            getObjectByIdInput.Type = entityType;",
+          "            const getObjectByIdResult = await this.framework.system.call(getObjectByIdInput);",
+          "            ",
+          "            if(getObjectByIdResult.Instance){",
+          "                return getObjectByIdResult.Instance;",
+          "            }",
+          "        }",
+          "",
+          "        if(EntityName && entityType){",
+          "            let getObjectByNameInput = new this.framework.LBOS.Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.GetObjectByNameInput;",
+          "            getObjectByNameInput.Name = EntityName;",
+          "            getObjectByNameInput.LevelsToLoad = 1;",
+          "            getObjectByNameInput.Type = entityType;",
+          "            const getObjectByNameResult = await this.framework.system.call(getObjectByNameInput);",
+          "",
+          "            if(getObjectByNameResult.Instance){",
+          "                return getObjectByNameResult.Instance;",
+          "            }",
+          "        }",
+          "",
+          "        throw new Error(\"Unable to get entity -> EntityType: \"+ entityType +\" | EntityId: \" + EntityId + \" | EntityName: \"+ EntityName);",
+          "    }",
+          "}",
+          "//Model for AutomationEvent ExtendedData",
+          "class CustomExtendedData {",
+          "    DefaultActions: Action[];",
+          "    DefaultBody: string;",
+          "    DefaultStatusCode : number",
+          "}",
+          "",
+          "//Model for ActionParameter for action of type LogEvent",
+          "class LogEventParameter {",
+          "    EntityType : string;",
+          "    EntityId: string | undefined;",
+          "    EntityName: string | undefined;",
+          "    ToState : string;",
+          "    IgnoreLastServiceId = false;",
+          "}",
+          "",
+          "//Model for CustomCode ",
+          "class CustomCodeParameters {",
+          "    ParameterNames: string[];",
+          "    Parameters: any[];",
+          "    Function: string;",
+          "}",
+          "",
+          "//Generic data model",
+          "class EndpointConfig{",
+          "    Id: string|undefined;",
+          "    StatusCode : number|undefined;",
+          "    BodyToSend: any;",
+          "    ActionsToExecute: Action[] | undefined;",
+          "",
+          "    constructor(init?: Partial<EndpointConfig>) {",
+          "        Object.assign(this, init);",
+          "        if(!this.Id){",
+          "            this.Id = crypto.randomUUID();",
+          "        }",
+          "    }",
+          "",
+          "    static GetNew(statusCodeToSet: number, bodyToSet: any): EndpointConfig {",
+          "        return new EndpointConfig({",
+          "            Id: crypto.randomUUID(),",
+          "            StatusCode: statusCodeToSet,",
+          "            BodyToSend: bodyToSet,",
+          "        });",
+          "    }",
+          "}",
+          "",
+          "class Action {",
+          "    Id: string|undefined;",
+          "    ActionType: string;",
+          "    ActionState: ActionStates;",
+          "    ActionParameter: any;",
+          "    DependsOn: string[] | undefined;",
+          "",
+          "     constructor(init?: Partial<Action>) {",
+          "        if(!init || !init.ActionType ||!init.ActionParameter){",
+          "            throw new Error(\"Invalid input. Received: \" + JSON.stringify(init));",
+          "        }",
+          "        this.Id = init.Id ?? crypto.randomUUID();",
+          "        this.ActionType = init.ActionType;",
+          "        this.ActionState = init.ActionState ?? ActionStates.Created;",
+          "        this.ActionParameter = init.ActionParameter;",
+          "    }",
+          "}",
+          "",
+          "class EndpointStatistic {",
+          "    RequestId : string | undefined;",
+          "    EndpointConfig: EndpointConfig|undefined;",
+          "    ReceivedBody: any;",
+          "    ReplySent: any;",
+          "    StatusCodeSent: number|undefined;",
+          "    Error: any",
+          "}",
+          "",
+          "enum ActionStates {",
+          "    \"Created\",",
+          "    \"Requested\",",
+          "    \"Processed\",",
+          "    \"Failed\"",
+          "}",
+          ""
+        ],
+        "jsCodeBase64": "InVzZSBzdHJpY3QiOwpPYmplY3QuZGVmaW5lUHJvcGVydHkoZXhwb3J0cywgIl9fZXNNb2R1bGUiLCB7IHZhbHVlOiB0cnVlIH0pOwpjbGFzcyBkZWZhdWx0XzEgewogICAgY29uc3RydWN0b3IoZnJhbWV3b3JrKSB7CiAgICAgICAgdGhpcy5mcmFtZXdvcmsgPSBmcmFtZXdvcms7CiAgICB9CiAgICAvKgogICAgICogRW50cnkgcG9pbnQgb2YgdGhlIGNsYXNzIChJTVBPUlRBTlQ6IGRvbid0IGNoYW5nZSB0aGUgc2lnbmF0dXJlIG9mIHRoaXMgbWV0aG9kKQogICAgICogU2hvdWxkIHJldHVybiBhbiBvYmplY3QgY29udGFpbmluZyB0aGUgdmFsdWVzIGZvciBlYWNoIG91dHB1dCB0byBlbWl0CiAgICAgKiBJZiBuZWNlc3NhcnksIHVzZSB0aGUgcGFyYW1ldGVyICJvdXRwdXRzIiB0byBlbWl0IGRhdGEgd2hpbGUgcnVubmluZyB0aGUgY29kZS4KICAgICAqLwogICAgYXN5bmMgbWFpbihpbnB1dHMsIG91dHB1dHMpIHsKICAgICAgICAvLyBBZGQgY29kZSBoZXJlCiAgICAgICAgdmFyIGFjdGlvbiA9IGlucHV0cy5BY3Rpb247CiAgICAgICAgaWYgKGFjdGlvbi5BY3Rpb25UeXBlICE9PSAiTG9nRXZlbnQiKSB7CiAgICAgICAgICAgIHRocm93IG5ldyBFcnJvcigiSW52YWxpZCBhY3Rpb24gLT4iICsgSlNPTi5zdHJpbmdpZnkoYWN0aW9uKSk7CiAgICAgICAgfQogICAgICAgIGxldCBwYXJhbWV0ZXJzID0gYWN0aW9uLkFjdGlvblBhcmFtZXRlcjsKICAgICAgICBpZiAoIXBhcmFtZXRlcnMpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IEVycm9yKCJNaXNzaW5nIG9yIGludmFsaWQgcGFyYW1ldGVycy4gR290IC0+ICIgKyBKU09OLnN0cmluZ2lmeShwYXJhbWV0ZXJzKSk7CiAgICAgICAgfQogICAgICAgIHZhciBlbnRpdHkgPSBhd2FpdCB0aGlzLkxvYWRPYmplY3QocGFyYW1ldGVycy5FbnRpdHlUeXBlLCBwYXJhbWV0ZXJzLkVudGl0eUlkLCBwYXJhbWV0ZXJzLkVudGl0eU5hbWUpOwogICAgICAgIHZhciBzdGF0ZVRyYW5zaXRpb24gPSBhd2FpdCB0aGlzLkdldFN0YXRlVHJhbnNpdGlvbihlbnRpdHksIHBhcmFtZXRlcnMuVG9TdGF0ZSwgZW50aXR5LkN1cnJlbnRNYWluU3RhdGUuQ3VycmVudFN0YXRlKTsKICAgICAgICByZXR1cm4gewogICAgICAgICAgICBPYmplY3Q6IGVudGl0eSwKICAgICAgICAgICAgTG9nT2JqZWN0RXZlbnRQYXJhbWV0ZXJzOiB7ICJUcmFuc2l0aW9uTmFtZSI6IHN0YXRlVHJhbnNpdGlvbiwgIlN0YXRlTW9kZWwiOiBlbnRpdHkuQ3VycmVudE1haW5TdGF0ZS5TdGF0ZU1vZGVsIH0sCiAgICAgICAgICAgIElnbm9yZUxhc3RTZXJ2aWNlSWQ6IHBhcmFtZXRlcnMuSWdub3JlTGFzdFNlcnZpY2VJZAogICAgICAgIH07CiAgICAgICAgLy8gZW1pdCBvdXRwdXQgZHVyaW5nIGV4ZWN1dGlvbjogb3V0cHV0cy5vdXRwdXQxLmVtaXQoInNvbWV0aGluZyIpOwogICAgICAgIC8vIHJldHVybiBleGFtcGxlOiByZXR1cm4geyBvdXRwdXQxOiBpbnB1dHMuaW5wdXQxLCBvdXRwdXQyOiAiSGVsbG8gV29ybGQiIH07CiAgICB9CiAgICBhc3luYyBHZXRTdGF0ZVRyYW5zaXRpb24oZW50aXR5LCB0b1N0YXRlLCBjdXJyZW50U3RhdGUpIHsKICAgICAgICB2YXIgX2EsIF9iOwogICAgICAgIHZhciBzbSA9IG5ldyB0aGlzLmZyYW1ld29yay5MQk9TLkNtZi5Gb3VuZGF0aW9uLkJ1c2luZXNzT3JjaGVzdHJhdGlvbi5TdGF0ZU1vZGVsc01hbmFnZW1lbnQuSW5wdXRPYmplY3RzLkdldFBvc3NpYmxlVHJhbnNpdGlvbnNGb3JTdGF0ZUlucHV0KCk7CiAgICAgICAgc20uU3RhdGVNb2RlbCA9IGVudGl0eS5DdXJyZW50TWFpblN0YXRlLlN0YXRlTW9kZWw7CiAgICAgICAgc20uU3RhdGVNb2RlbFN0YXRlID0gZW50aXR5LkN1cnJlbnRNYWluU3RhdGUuQ3VycmVudFN0YXRlOwogICAgICAgIHZhciBwb3NzaWJsZVRyYW5zaXRpb25zID0gbmV3IHRoaXMuZnJhbWV3b3JrLkxCT1MuQ21mLkZvdW5kYXRpb24uQnVzaW5lc3NPYmplY3RzLlN0YXRlTW9kZWxUcmFuc2l0aW9uQ29sbGVjdGlvbjsKICAgICAgICBwb3NzaWJsZVRyYW5zaXRpb25zID0gKGF3YWl0IHRoaXMuZnJhbWV3b3JrLnN5c3RlbS5jYWxsKHNtKSkuU3RhdGVNb2RlbFRyYW5zaXRpb25zOwogICAgICAgIGZvciAobGV0IHRyYW5zaXRpb24gb2YgcG9zc2libGVUcmFuc2l0aW9ucykgewogICAgICAgICAgICBpZiAoKChfYSA9IHRyYW5zaXRpb24gPT09IG51bGwgfHwgdHJhbnNpdGlvbiA9PT0gdm9pZCAwID8gdm9pZCAwIDogdHJhbnNpdGlvbi5Ub1N0YXRlKSA9PT0gbnVsbCB8fCBfYSA9PT0gdm9pZCAwID8gdm9pZCAwIDogX2EuTmFtZSkgPT09IHRvU3RhdGUpIHsKICAgICAgICAgICAgICAgIHJldHVybiB0cmFuc2l0aW9uID09PSBudWxsIHx8IHRyYW5zaXRpb24gPT09IHZvaWQgMCA/IHZvaWQgMCA6IHRyYW5zaXRpb24uTmFtZTsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgICAgICBpZiAodG9TdGF0ZSA9PSB1bmRlZmluZWQgJiYgY3VycmVudFN0YXRlID09PSBlbnRpdHkuQ3VycmVudE1haW5TdGF0ZS5DdXJyZW50U3RhdGUuTmFtZSkgewogICAgICAgICAgICByZXR1cm4gKF9iID0gcG9zc2libGVUcmFuc2l0aW9uc1swXSkgPT09IG51bGwgfHwgX2IgPT09IHZvaWQgMCA/IHZvaWQgMCA6IF9iLk5hbWU7CiAgICAgICAgfQogICAgICAgIGlmICh0b1N0YXRlKSB7CiAgICAgICAgICAgIHRocm93IG5ldyBFcnJvcihgTm8gdHJhbnNpdGlvbiBmb3VuZCB0byAke3RvU3RhdGV9IGZvciB0aGUgYmF0Y2ggJHtlbnRpdHkuTmFtZX0gY3VycmVudCBzdGF0ZSAke2VudGl0eS5DdXJyZW50TWFpblN0YXRlLkN1cnJlbnRTdGF0ZS5OYW1lfWApOwogICAgICAgIH0KICAgICAgICB0aHJvdyBuZXcgRXJyb3IoYEV2ZW50IGRvZXMgbm90IG1hdGNoIGN1cnJlbnQgYmF0Y2ggc3RhdGUgZXhwZWN0ZWQ6ICR7Y3VycmVudFN0YXRlfSBnb3QgJHtlbnRpdHkuQ3VycmVudE1haW5TdGF0ZS5DdXJyZW50U3RhdGUuTmFtZX1gKTsKICAgIH0KICAgIGFzeW5jIExvYWRPYmplY3QoZW50aXR5VHlwZSwgRW50aXR5SWQsIEVudGl0eU5hbWUpIHsKICAgICAgICBpZiAoRW50aXR5SWQgJiYgZW50aXR5VHlwZSkgewogICAgICAgICAgICBsZXQgZ2V0T2JqZWN0QnlJZElucHV0ID0gbmV3IHRoaXMuZnJhbWV3b3JrLkxCT1MuQ21mLkZvdW5kYXRpb24uQnVzaW5lc3NPcmNoZXN0cmF0aW9uLkdlbmVyaWNTZXJ2aWNlTWFuYWdlbWVudC5JbnB1dE9iamVjdHMuR2V0T2JqZWN0QnlJZElucHV0OwogICAgICAgICAgICBnZXRPYmplY3RCeUlkSW5wdXQuSWQgPSBFbnRpdHlJZDsKICAgICAgICAgICAgZ2V0T2JqZWN0QnlJZElucHV0LkxldmVsc1RvTG9hZCA9IDE7CiAgICAgICAgICAgIGdldE9iamVjdEJ5SWRJbnB1dC5UeXBlID0gZW50aXR5VHlwZTsKICAgICAgICAgICAgY29uc3QgZ2V0T2JqZWN0QnlJZFJlc3VsdCA9IGF3YWl0IHRoaXMuZnJhbWV3b3JrLnN5c3RlbS5jYWxsKGdldE9iamVjdEJ5SWRJbnB1dCk7CiAgICAgICAgICAgIGlmIChnZXRPYmplY3RCeUlkUmVzdWx0Lkluc3RhbmNlKSB7CiAgICAgICAgICAgICAgICByZXR1cm4gZ2V0T2JqZWN0QnlJZFJlc3VsdC5JbnN0YW5jZTsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgICAgICBpZiAoRW50aXR5TmFtZSAmJiBlbnRpdHlUeXBlKSB7CiAgICAgICAgICAgIGxldCBnZXRPYmplY3RCeU5hbWVJbnB1dCA9IG5ldyB0aGlzLmZyYW1ld29yay5MQk9TLkNtZi5Gb3VuZGF0aW9uLkJ1c2luZXNzT3JjaGVzdHJhdGlvbi5HZW5lcmljU2VydmljZU1hbmFnZW1lbnQuSW5wdXRPYmplY3RzLkdldE9iamVjdEJ5TmFtZUlucHV0OwogICAgICAgICAgICBnZXRPYmplY3RCeU5hbWVJbnB1dC5OYW1lID0gRW50aXR5TmFtZTsKICAgICAgICAgICAgZ2V0T2JqZWN0QnlOYW1lSW5wdXQuTGV2ZWxzVG9Mb2FkID0gMTsKICAgICAgICAgICAgZ2V0T2JqZWN0QnlOYW1lSW5wdXQuVHlwZSA9IGVudGl0eVR5cGU7CiAgICAgICAgICAgIGNvbnN0IGdldE9iamVjdEJ5TmFtZVJlc3VsdCA9IGF3YWl0IHRoaXMuZnJhbWV3b3JrLnN5c3RlbS5jYWxsKGdldE9iamVjdEJ5TmFtZUlucHV0KTsKICAgICAgICAgICAgaWYgKGdldE9iamVjdEJ5TmFtZVJlc3VsdC5JbnN0YW5jZSkgewogICAgICAgICAgICAgICAgcmV0dXJuIGdldE9iamVjdEJ5TmFtZVJlc3VsdC5JbnN0YW5jZTsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgICAgICB0aHJvdyBuZXcgRXJyb3IoIlVuYWJsZSB0byBnZXQgZW50aXR5IC0+IEVudGl0eVR5cGU6ICIgKyBlbnRpdHlUeXBlICsgIiB8IEVudGl0eUlkOiAiICsgRW50aXR5SWQgKyAiIHwgRW50aXR5TmFtZTogIiArIEVudGl0eU5hbWUpOwogICAgfQp9CmV4cG9ydHMuZGVmYXVsdCA9IGRlZmF1bHRfMTsKLy9Nb2RlbCBmb3IgQXV0b21hdGlvbkV2ZW50IEV4dGVuZGVkRGF0YQpjbGFzcyBDdXN0b21FeHRlbmRlZERhdGEgewp9Ci8vTW9kZWwgZm9yIEFjdGlvblBhcmFtZXRlciBmb3IgYWN0aW9uIG9mIHR5cGUgTG9nRXZlbnQKY2xhc3MgTG9nRXZlbnRQYXJhbWV0ZXIgewogICAgY29uc3RydWN0b3IoKSB7CiAgICAgICAgdGhpcy5JZ25vcmVMYXN0U2VydmljZUlkID0gZmFsc2U7CiAgICB9Cn0KLy9Nb2RlbCBmb3IgQ3VzdG9tQ29kZSAKY2xhc3MgQ3VzdG9tQ29kZVBhcmFtZXRlcnMgewp9Ci8vR2VuZXJpYyBkYXRhIG1vZGVsCmNsYXNzIEVuZHBvaW50Q29uZmlnIHsKICAgIGNvbnN0cnVjdG9yKGluaXQpIHsKICAgICAgICBPYmplY3QuYXNzaWduKHRoaXMsIGluaXQpOwogICAgICAgIGlmICghdGhpcy5JZCkgewogICAgICAgICAgICB0aGlzLklkID0gY3J5cHRvLnJhbmRvbVVVSUQoKTsKICAgICAgICB9CiAgICB9CiAgICBzdGF0aWMgR2V0TmV3KHN0YXR1c0NvZGVUb1NldCwgYm9keVRvU2V0KSB7CiAgICAgICAgcmV0dXJuIG5ldyBFbmRwb2ludENvbmZpZyh7CiAgICAgICAgICAgIElkOiBjcnlwdG8ucmFuZG9tVVVJRCgpLAogICAgICAgICAgICBTdGF0dXNDb2RlOiBzdGF0dXNDb2RlVG9TZXQsCiAgICAgICAgICAgIEJvZHlUb1NlbmQ6IGJvZHlUb1NldCwKICAgICAgICB9KTsKICAgIH0KfQpjbGFzcyBBY3Rpb24gewogICAgY29uc3RydWN0b3IoaW5pdCkgewogICAgICAgIHZhciBfYSwgX2I7CiAgICAgICAgaWYgKCFpbml0IHx8ICFpbml0LkFjdGlvblR5cGUgfHwgIWluaXQuQWN0aW9uUGFyYW1ldGVyKSB7CiAgICAgICAgICAgIHRocm93IG5ldyBFcnJvcigiSW52YWxpZCBpbnB1dC4gUmVjZWl2ZWQ6ICIgKyBKU09OLnN0cmluZ2lmeShpbml0KSk7CiAgICAgICAgfQogICAgICAgIHRoaXMuSWQgPSAoX2EgPSBpbml0LklkKSAhPT0gbnVsbCAmJiBfYSAhPT0gdm9pZCAwID8gX2EgOiBjcnlwdG8ucmFuZG9tVVVJRCgpOwogICAgICAgIHRoaXMuQWN0aW9uVHlwZSA9IGluaXQuQWN0aW9uVHlwZTsKICAgICAgICB0aGlzLkFjdGlvblN0YXRlID0gKF9iID0gaW5pdC5BY3Rpb25TdGF0ZSkgIT09IG51bGwgJiYgX2IgIT09IHZvaWQgMCA/IF9iIDogQWN0aW9uU3RhdGVzLkNyZWF0ZWQ7CiAgICAgICAgdGhpcy5BY3Rpb25QYXJhbWV0ZXIgPSBpbml0LkFjdGlvblBhcmFtZXRlcjsKICAgIH0KfQpjbGFzcyBFbmRwb2ludFN0YXRpc3RpYyB7Cn0KdmFyIEFjdGlvblN0YXRlczsKKGZ1bmN0aW9uIChBY3Rpb25TdGF0ZXMpIHsKICAgIEFjdGlvblN0YXRlc1tBY3Rpb25TdGF0ZXNbIkNyZWF0ZWQiXSA9IDBdID0gIkNyZWF0ZWQiOwogICAgQWN0aW9uU3RhdGVzW0FjdGlvblN0YXRlc1siUmVxdWVzdGVkIl0gPSAxXSA9ICJSZXF1ZXN0ZWQiOwogICAgQWN0aW9uU3RhdGVzW0FjdGlvblN0YXRlc1siUHJvY2Vzc2VkIl0gPSAyXSA9ICJQcm9jZXNzZWQiOwogICAgQWN0aW9uU3RhdGVzW0FjdGlvblN0YXRlc1siRmFpbGVkIl0gPSAzXSA9ICJGYWlsZWQiOwp9KShBY3Rpb25TdGF0ZXMgfHwgKEFjdGlvblN0YXRlcyA9IHt9KSk7Cg==",
+        "___cmf___name": "Code",
+        "___cmf___description": ""
+      }
+    },
+    {
+      "id": "task_2242",
+      "reference": {
+        "name": "executeServiceCall",
+        "package": {
+          "name": "@criticalmanufacturing/connect-iot-controller-engine-core-tasks",
+          "version": "11.3.6"
+        }
+      },
+      "settings": {
+        "_inputs": [
+          {
+            "name": "Object",
+            "friendlyName": "Object",
+            "collectionType": "None",
+            "valueType": {
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": 0,
+              "referenceTypeName": null
+            },
+            "settingKey": "name"
+          },
+          {
+            "name": "LogObjectEventParameters",
+            "friendlyName": "LogObjectEventParameters",
+            "collectionType": "None",
+            "valueType": {
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": 0,
+              "referenceTypeName": null
+            },
+            "settingKey": "name"
+          },
+          {
+            "name": "IgnoreLastServiceId",
+            "friendlyName": "IgnoreLastServiceId",
+            "collectionType": "None",
+            "valueType": {
+              "name": "Boolean",
+              "type": 3,
+              "collectionType": 0,
+              "referenceType": 0,
+              "referenceTypeName": null
+            },
+            "settingKey": "name"
+          },
+          {
+            "name": "OperationTarget",
+            "friendlyName": "OperationTarget",
+            "collectionType": "None",
+            "valueType": {
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": 6,
+              "referenceTypeName": "Cmf.Foundation.BusinessObjects.EntityTypeSource"
+            },
+            "settingKey": "name"
+          },
+          {
+            "name": "NumberOfRetries",
+            "friendlyName": "NumberOfRetries",
+            "collectionType": "None",
+            "valueType": {
+              "name": "Integer",
+              "type": 5,
+              "collectionType": 0,
+              "referenceType": 0,
+              "referenceTypeName": null
+            },
+            "settingKey": "name"
+          },
+          {
+            "name": "OperationAttributes",
+            "friendlyName": "OperationAttributes",
+            "collectionType": "None",
+            "valueType": {
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": 0,
+              "referenceTypeName": null
+            },
+            "settingKey": "name"
+          },
+          {
+            "name": "PageNumber",
+            "friendlyName": "PageNumber",
+            "collectionType": "None",
+            "valueType": {
+              "name": "Integer",
+              "type": 5,
+              "collectionType": 0,
+              "referenceType": 0,
+              "referenceTypeName": null
+            },
+            "settingKey": "name"
+          },
+          {
+            "name": "PageSize",
+            "friendlyName": "PageSize",
+            "collectionType": "None",
+            "valueType": {
+              "name": "Integer",
+              "type": 5,
+              "collectionType": 0,
+              "referenceType": 0,
+              "referenceTypeName": null
+            },
+            "settingKey": "name"
+          },
+          {
+            "name": "ServiceComments",
+            "friendlyName": "ServiceComments",
+            "collectionType": "None",
+            "valueType": {
+              "name": "String",
+              "type": 4,
+              "collectionType": 0,
+              "referenceType": 0,
+              "referenceTypeName": null
+            },
+            "settingKey": "name"
+          },
+          {
+            "name": "ExtraParameters",
+            "friendlyName": "ExtraParameters",
+            "collectionType": "Map",
+            "valueType": {
+              "name": "Object",
+              "type": 10,
+              "collectionType": 2,
+              "referenceType": 0,
+              "referenceTypeName": null
+            },
+            "settingKey": "name"
+          }
+        ],
+        "_outputs": [
+          {
+            "name": "output$Object",
+            "friendlyName": "Object",
+            "collectionType": "None",
+            "valueType": {
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": 0,
+              "referenceTypeName": null
+            },
+            "defaultValue": "output$Object",
+            "settingKey": "name"
+          },
+          {
+            "name": "output$Message",
+            "friendlyName": "Message",
+            "collectionType": "None",
+            "valueType": {
+              "name": "String",
+              "type": 4,
+              "collectionType": 0,
+              "referenceType": 0,
+              "referenceTypeName": null
+            },
+            "defaultValue": "output$Message",
+            "settingKey": "name"
+          },
+          {
+            "name": "output$FeedbackMessages",
+            "friendlyName": "FeedbackMessages",
+            "collectionType": "None",
+            "valueType": {
+              "name": "Object",
+              "type": 10,
+              "collectionType": 0,
+              "referenceType": 0,
+              "referenceTypeName": null
+            },
+            "defaultValue": "output$FeedbackMessages",
+            "settingKey": "name"
+          },
+          {
+            "name": "output$TotalRows",
+            "friendlyName": "TotalRows",
+            "collectionType": "None",
+            "valueType": {
+              "name": "Integer",
+              "type": 5,
+              "collectionType": 0,
+              "referenceType": 0,
+              "referenceTypeName": null
+            },
+            "defaultValue": "output$TotalRows",
+            "settingKey": "name"
+          }
+        ],
+        "retries": 30,
+        "sleepBetweenRetries": 1000,
+        "_serviceContractName": "GenericService",
+        "_serviceCallName": "LogObjectEvent",
+        "_serviceCall": {
+          "Description": "LogObjectEvent",
+          "Input": {
+            "Name": "LogObjectEventInput",
+            "FullNamespace": "Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.LogObjectEventInput",
+            "Properties": [
+              {
+                "Name": "Object",
+                "ReferenceType": "None",
+                "ReferenceTypeName": null,
+                "ScalarType": null,
+                "CollectionType": "None",
+                "FullNamespace": null
+              },
+              {
+                "Name": "LogObjectEventParameters",
+                "ReferenceType": "None",
+                "ReferenceTypeName": null,
+                "ScalarType": null,
+                "CollectionType": "None",
+                "FullNamespace": "Cmf.Foundation.BusinessOrchestration.LogObjectEventParameters"
+              },
+              {
+                "Name": "IgnoreLastServiceId",
+                "ReferenceType": "None",
+                "ReferenceTypeName": null,
+                "ScalarType": "Bit",
+                "CollectionType": "None",
+                "FullNamespace": null
+              },
+              {
+                "Name": "OperationTarget",
+                "ReferenceType": "Enum",
+                "ReferenceTypeName": "Cmf.Foundation.BusinessObjects.EntityTypeSource",
+                "ScalarType": null,
+                "CollectionType": "None",
+                "FullNamespace": "Cmf.Foundation.BusinessObjects.EntityTypeSource"
+              },
+              {
+                "Name": "NumberOfRetries",
+                "ReferenceType": "None",
+                "ReferenceTypeName": null,
+                "ScalarType": "Int",
+                "CollectionType": "None",
+                "FullNamespace": null
+              },
+              {
+                "Name": "OperationAttributes",
+                "ReferenceType": "None",
+                "ReferenceTypeName": null,
+                "ScalarType": null,
+                "CollectionType": "None",
+                "FullNamespace": "Cmf.Foundation.BusinessObjects.OperationAttributeCollection"
+              },
+              {
+                "Name": "PageNumber",
+                "ReferenceType": "None",
+                "ReferenceTypeName": null,
+                "ScalarType": "Int",
+                "CollectionType": "None",
+                "FullNamespace": null
+              },
+              {
+                "Name": "PageSize",
+                "ReferenceType": "None",
+                "ReferenceTypeName": null,
+                "ScalarType": "Int",
+                "CollectionType": "None",
+                "FullNamespace": null
+              },
+              {
+                "Name": "ServiceComments",
+                "ReferenceType": "None",
+                "ReferenceTypeName": null,
+                "ScalarType": "NVarChar",
+                "CollectionType": "None",
+                "FullNamespace": null
+              },
+              {
+                "Name": "ExtraParameters",
+                "ReferenceType": "None",
+                "ReferenceTypeName": null,
+                "ScalarType": null,
+                "CollectionType": "Map",
+                "FullNamespace": "string,System.Object"
+              }
+            ]
+          },
+          "Output": {
+            "Name": "LogObjectEventOutput",
+            "FullNamespace": "Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.OutputObjects.LogObjectEventOutput",
+            "Properties": [
+              {
+                "Name": "Object",
+                "ReferenceType": "None",
+                "ReferenceTypeName": null,
+                "ScalarType": null,
+                "CollectionType": "None",
+                "FullNamespace": null
+              },
+              {
+                "Name": "Message",
+                "ReferenceType": "None",
+                "ReferenceTypeName": null,
+                "ScalarType": "NVarChar",
+                "CollectionType": "None",
+                "FullNamespace": null
+              },
+              {
+                "Name": "FeedbackMessages",
+                "ReferenceType": "None",
+                "ReferenceTypeName": null,
+                "ScalarType": null,
+                "CollectionType": "None",
+                "FullNamespace": "Cmf.Foundation.BusinessOrchestration.FeedbackMessage"
+              },
+              {
+                "Name": "TotalRows",
+                "ReferenceType": "None",
+                "ReferenceTypeName": null,
+                "ScalarType": "Int",
+                "CollectionType": "None",
+                "FullNamespace": null
+              }
+            ]
+          },
+          "Area": "GenericService"
+        },
+        "_serviceCallAdditionalInfo": {
+          "_CMFInternal_URLSuffix": "api/GenericService/LogObjectEvent",
+          "_CMFInternal_FullNamespace": "Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.LogObjectEventInput",
+          "_CMFInternal_HTTPMethod": "POST",
+          "_type": "Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.LogObjectEventInput, Cmf.Foundation.BusinessOrchestration"
+        },
+        "___cmf___name": "Execute Service Call",
+        "___cmf___color": "#8080ff"
+      }
+    }
+  ],
+  "converters": [],
+  "links": [
+    {
+      "id": "cc3082cd-a4bc-40f0-bdc0-15efdb7d2312",
+      "sourceId": "task_1981",
+      "targetId": "task_2009",
+      "inputName": "Action",
+      "outputName": "ActionOut"
+    },
+    {
+      "id": "ac4a7b1f-6386-4913-a64c-b264d8b02f0c",
+      "sourceId": "task_1981",
+      "targetId": "task_2023",
+      "inputName": "ActionIn",
+      "outputName": "ActionOut"
+    },
+    {
+      "id": "2e45e6ef-0b2d-4c1b-aee9-b7b82437f0ae",
+      "sourceId": "task_1981",
+      "targetId": "task_2023",
+      "inputName": "activate",
+      "outputName": "activateOut"
+    },
+    {
+      "id": "e3c8d0b7-ebf3-4cc0-b47d-8e9ff5c00ec8",
+      "sourceId": "task_1981",
+      "targetId": "task_2023",
+      "inputName": "ActionIn",
+      "outputName": "ActionOut"
+    },
+    {
+      "id": "830478b3-f7c3-4fce-b57e-9b49f954bcb8",
+      "sourceId": "task_2023",
+      "targetId": "task_2242",
+      "inputName": "activate",
+      "outputName": "success"
+    },
+    {
+      "id": "cfc51fd8-333f-4fa1-975e-10819c517c86",
+      "sourceId": "task_2023",
+      "targetId": "task_2242",
+      "inputName": "Object",
+      "outputName": "ObjectOut"
+    },
+    {
+      "id": "62fbc8c9-78c5-4e79-b354-d28a9823a2fd",
+      "sourceId": "task_2023",
+      "targetId": "task_2242",
+      "inputName": "LogObjectEventParameters",
+      "outputName": "LogObjectEventParametersOut"
+    },
+    {
+      "id": "5d33ec8b-be11-4270-9537-506ea65b52c7",
+      "sourceId": "task_2242",
+      "targetId": "task_2009",
+      "inputName": "success",
+      "outputName": "success"
+    },
+    {
+      "id": "31289505-0278-4019-98db-f968945649e9",
+      "sourceId": "task_2023",
+      "targetId": "task_2242",
+      "inputName": "LogObjectEventParameters",
+      "outputName": "LogObjectEventParametersOut"
+    },
+    {
+      "id": "cb53bf7d-dda1-4582-a1f0-bae864a02593",
+      "sourceId": "task_2023",
+      "targetId": "task_2242",
+      "inputName": "Object",
+      "outputName": "ObjectOut"
+    },
+    {
+      "id": "4b88f9f6-aae8-4330-9716-bcb8009b1fbb",
+      "sourceId": "task_2023",
+      "targetId": "task_2009",
+      "inputName": "Action",
+      "outputName": "ActionOutOut"
+    },
+    {
+      "id": "84ae14f5-09fa-4586-93ce-3d906ae1a177",
+      "sourceId": "task_2023",
+      "targetId": "task_2242",
+      "inputName": "IgnoreLastServiceId",
+      "outputName": "IgnoreLastServiceIdOut"
+    },
+    {
+      "id": "fee5593d-155c-4513-8c60-477c13e25123",
+      "sourceId": "task_2242",
+      "targetId": "task_2009",
+      "inputName": "error",
+      "outputName": "error"
+    }
+  ],
+  "layout": {
+    "general": {
+      "color": null,
+      "notes": []
+    },
+    "drawers": {
+      "DIAGRAM": {
+        "tasks": {
+          "task_2009": {
+            "collapsed": false,
+            "position": {
+              "x": 2762,
+              "y": 186
+            },
+            "outdated": false
+          },
+          "task_1981": {
+            "collapsed": false,
+            "position": {
+              "x": 214,
+              "y": 186
+            },
+            "outdated": false
+          },
+          "task_2242": {
+            "collapsed": false,
+            "position": {
+              "x": 1673,
+              "y": 350
+            },
+            "outdated": false
+          },
+          "task_2023": {
+            "collapsed": false,
+            "position": {
+              "x": 876,
+              "y": 273
+            },
+            "outdated": false
+          }
+        },
+        "links": {
+          "cc3082cd-a4bc-40f0-bdc0-15efdb7d2312": {
+            "vertices": []
+          },
+          "ac4a7b1f-6386-4913-a64c-b264d8b02f0c": {
+            "vertices": []
+          },
+          "2e45e6ef-0b2d-4c1b-aee9-b7b82437f0ae": {
+            "vertices": []
+          },
+          "e3c8d0b7-ebf3-4cc0-b47d-8e9ff5c00ec8": {
+            "vertices": []
+          },
+          "830478b3-f7c3-4fce-b57e-9b49f954bcb8": {
+            "vertices": []
+          },
+          "cfc51fd8-333f-4fa1-975e-10819c517c86": {
+            "vertices": []
+          },
+          "62fbc8c9-78c5-4e79-b354-d28a9823a2fd": {
+            "vertices": []
+          },
+          "5d33ec8b-be11-4270-9537-506ea65b52c7": {
+            "vertices": []
+          },
+          "31289505-0278-4019-98db-f968945649e9": {
+            "vertices": []
+          },
+          "cb53bf7d-dda1-4582-a1f0-bae864a02593": {
+            "vertices": []
+          },
+          "4b88f9f6-aae8-4330-9716-bcb8009b1fbb": {
+            "vertices": []
+          },
+          "84ae14f5-09fa-4586-93ce-3d906ae1a177": {
+            "vertices": []
+          },
+          "fee5593d-155c-4513-8c60-477c13e25123": {
+            "vertices": []
+          }
+        },
+        "notes": {},
+        "pan": {
+          "x": 560.4443704085627,
+          "y": 177.21642464436354
+        },
+        "zoom": 1
+      }
+    }
+  }
+}
