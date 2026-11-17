@@ -123,7 +123,7 @@
             "Description": "TemplateEvent",
             "DeviceEventId": "/api/TemplateEvent/",
             "IsEnabled": "Yes",
-            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": [],\n\t\"DocumentName\" : \"Template\"\n}",
+            "ExtendedData": "{\n\t\"requestMethod\": \"POST\",\n\t\"automaticReply\": false,\n\t\"automaticReplyStatusCode\": \"200\",\n\t\"timeout\": \"60000\",\n\t\"DefaultBody\":   {},\n\t\"DefaultStatusCode\": 200,\n\t\"ActionsToExecute\": [],\n\t\"DocumentName\" : \"ExternalSystemsSimulatorTemplate\"\n}",
             "EntityPicture": "",
             "IsTemplate": "No"
         }
