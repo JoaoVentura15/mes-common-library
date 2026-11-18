@@ -9,7 +9,7 @@ namespace audit.Objects.PipelineRuns
     /// Reads pipeline runs, timelines, approvals, changes, tests, pull requests and agent jobs from
     /// Azure DevOps and turns them into PostTelemetry events.
     /// </summary>
-    public class PipelineRunsCollector
+    public partial class PipelineRunsCollector
     {
         private readonly IAzureDevOpsRestClient ado;
         private readonly PipelineRunsSettings s;
@@ -98,7 +98,7 @@ namespace audit.Objects.PipelineRuns
                 if (iterations != null) AddRange(MapSprints(iterations.Value, s));
                 var repos = repositories.Count > 0
                     ? repositories
-                    : s.RefreshOpenPullRequests
+                    : (s.RefreshOpenPullRequests || s.Parts.HasFlag(PipelineRunsParts.Policies))
                         ? (await ado.ListRepositoriesAsync(s.Project)).Select(repo => (Str(repo, "name"), Str(repo, "id"))).Where(repo => repo.Item2.Length > 0).Distinct().ToList()
                         : builds.Where(b => Str(b, "repository.type").Equals("TfsGit", StringComparison.OrdinalIgnoreCase))
                             .Select(b => (Str(b, "repository.name"), Str(b, "repository.id"))).Where(repo => repo.Item2.Length > 0).Distinct().ToList();
@@ -405,7 +405,10 @@ namespace audit.Objects.PipelineRuns
         private async Task CollectBuildAsync(JsonElement b, int? parent)
         {
             var id = (int)Long(b, "id");
+            if (!collectedBuilds.TryAdd(id, true)) return;
             var timeline = await ado.GetTimelineAsync(s.Project, id);
+            var logErrors = s.StepErrors && (s.Parts.HasFlag(PipelineRunsParts.Failures) || (s.LogErrors && s.Parts.HasFlag(PipelineRunsParts.Steps)))
+                ? await ReadFailureLogsAsync(id, timeline) : new Dictionary<string, FailureEvidence>();
 
             int? failed = null; // stays null when the build has no test run (or tests are skipped), so FailedTests is NULL rather than 0
             if (s.Parts.HasFlag(PipelineRunsParts.Tests) && testsAvailable)
@@ -440,7 +443,11 @@ namespace audit.Objects.PipelineRuns
 
             if (s.Parts.HasFlag(PipelineRunsParts.Steps))
             {
-                AddRange(MapTimeline(b, timeline, s));
+                AddRange(MapTimeline(b, timeline, s, logErrors));
+            }
+            if (s.Parts.HasFlag(PipelineRunsParts.Failures) && s.StepErrors)
+            {
+                AddRange(MapFailureEvidence(b, timeline, logErrors, s, parent));
             }
 
             if (s.Parts.HasFlag(PipelineRunsParts.Approvals) && approvalsAvailable)
@@ -473,7 +480,7 @@ namespace audit.Objects.PipelineRuns
         {
             var recent = (await ado.ListPullRequestsAsync(s.Project, repositoryId, s.Since, "created"))
                 .Concat(await ado.ListPullRequestsAsync(s.Project, repositoryId, s.Since, "closed"));
-            var prs = (s.RefreshOpenPullRequests ? recent.Concat(await ado.ListActivePullRequestsAsync(s.Project, repositoryId)) : recent)
+            var prs = ((s.RefreshOpenPullRequests || s.Parts.HasFlag(PipelineRunsParts.Policies)) ? recent.Concat(await ado.ListActivePullRequestsAsync(s.Project, repositoryId)) : recent)
                 .GroupBy(p => Long(p, "pullRequestId")).Select(g => g.First()).ToList();
 
             var inWindow = prs.Count;
@@ -505,6 +512,7 @@ namespace audit.Objects.PipelineRuns
                 var threads = await threadsTask;
                 var iterations = await iterationsTask;
                 Add(MapPullRequest(pr, linked, s, threads, iterations));
+                if (s.Parts.HasFlag(PipelineRunsParts.Policies)) await CollectPolicySnapshotAsync(pr);
                 foreach (var item in linked)
                 {
                     var id = (int)Long(item, "id");
