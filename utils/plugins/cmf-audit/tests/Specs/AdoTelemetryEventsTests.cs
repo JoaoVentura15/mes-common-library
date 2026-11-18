@@ -165,7 +165,7 @@ namespace specs
         [Fact]
         public void EveryEventHasKeysStartingWithOrganizationAndProject_AndUniqueColumnNames()
         {
-            Assert.Equal(16, AdoTelemetryEvents.Schemas.Count);
+            Assert.Equal(18, AdoTelemetryEvents.Schemas.Count);
             Assert.All(AdoTelemetryEvents.Schemas, s =>
             {
                 var keys = s.Columns.Where(c => c.KeyOrder > 0).OrderBy(c => c.KeyOrder).Select(c => c.Name).ToList();
