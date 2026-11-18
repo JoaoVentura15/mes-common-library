@@ -47,6 +47,8 @@ namespace audit.Objects.PipelineRuns
         public string? sprintFromIterationPath { get; set; }
         public bool workItemHistory { get; set; }
         public bool stepErrors { get; set; } = true;
+        public bool logErrors { get; set; }
+        public int logMaxLines { get; set; } = 50000;
         public string? doneStates { get; set; }
         public string? branchVersions { get; set; }
         public int resolvedAfterHours { get; set; } = 24;
@@ -95,6 +97,8 @@ namespace audit.Objects.PipelineRuns
         PullRequestFiles = 512,
         /// <summary>Current state, team, estimate and Feature/Epic of every open or recently changed work item of the scope types (User Story and Bug by default), to forecast the remaining scope of an Epic. Not part of All: its event must be deployed first.</summary>
         WorkItemScope = 1024,
+        Failures = 2048,
+        Policies = 4096,
         All = Runs | Steps | Tests | Changes | PullRequests | Approvals | AgentJobs,
     }
 
@@ -126,6 +130,8 @@ namespace audit.Objects.PipelineRuns
         public bool WorkItemHistory { get; init; }
         /// <summary>Send the error code and the scrubbed first error line of failed steps (ErrorCode tag, ErrorMessage). On by default; --stepErrors false turns it off.</summary>
         public bool StepErrors { get; init; } = true;
+        public bool LogErrors { get; init; }
+        public int LogMaxLines { get; init; } = 50000;
         public HashSet<string> DoneStates { get; init; } = new(new[] { "Resolved", "Closed" }, StringComparer.OrdinalIgnoreCase);
         public Dictionary<string, string> BranchVersions { get; init; } = new(StringComparer.OrdinalIgnoreCase);
         public int ResolvedAfterHours { get; init; } = 24;
@@ -205,6 +211,10 @@ namespace audit.Objects.PipelineRuns
                 since = DateTime.Parse(o.since, null, System.Globalization.DateTimeStyles.AdjustToUniversal | System.Globalization.DateTimeStyles.AssumeUniversal);
             }
 
+            var parts = ParseParts(o.include);
+            if (!o.stepErrors && parts.HasFlag(PipelineRunsParts.Failures))
+                throw new ArgumentException("--include failures requires --stepErrors true");
+
             return new PipelineRunsSettings
             {
                 OrganizationUrl = url,
@@ -218,7 +228,7 @@ namespace audit.Objects.PipelineRuns
                 Pools = SplitList(o.pools),
                 Identity = ParseIdentity(o.identity),
                 LinuxAgent = new Regex(string.IsNullOrWhiteSpace(o.linuxAgentPattern) ? "(runner|linux|ubuntu)" : o.linuxAgentPattern, RegexOptions.IgnoreCase),
-                Parts = ParseParts(o.include),
+                Parts = parts,
                 StrictCollection = o.strictCollection,
                 RefreshOpenPullRequests = o.refreshOpenPullRequests,
                 RefreshChangedWorkItems = o.refreshChangedWorkItems,
@@ -227,6 +237,8 @@ namespace audit.Objects.PipelineRuns
                 SprintFromIterationPath = PathPattern(o.sprintFromIterationPath),
                 WorkItemHistory = o.workItemHistory,
                 StepErrors = o.stepErrors,
+                LogErrors = o.logErrors,
+                LogMaxLines = o.logMaxLines is >= 1 and <= 200000 ? o.logMaxLines : throw new ArgumentException("--logMaxLines must be between 1 and 200000"),
                 DoneStates = new HashSet<string>(SplitList(o.doneStates ?? "Resolved,Closed"), StringComparer.OrdinalIgnoreCase),
                 BranchVersions = ParseRoles(o.branchVersions),
                 ResolvedAfterHours = Math.Max(1, o.resolvedAfterHours),
@@ -339,17 +351,17 @@ namespace audit.Objects.PipelineRuns
         public static PipelineRunsParts ParseParts(string? value)
         {
             var items = SplitList(value);
-            if (items.Count == 0 || items.Any(i => i.Equals("all", StringComparison.OrdinalIgnoreCase)))
-            {
-                return PipelineRunsParts.All;
-            }
+            if (items.Count == 0) return PipelineRunsParts.All;
             var parts = PipelineRunsParts.None;
             foreach (var i in items)
             {
                 parts |= i.ToLowerInvariant() switch
                 {
+                    "all" => PipelineRunsParts.All,
                     "runs" => PipelineRunsParts.Runs,
                     "steps" => PipelineRunsParts.Steps,
+                    "failures" => PipelineRunsParts.Failures | PipelineRunsParts.Steps,
+                    "policies" => PipelineRunsParts.Policies | PipelineRunsParts.PullRequests,
                     "tests" => PipelineRunsParts.Tests,
                     "changes" => PipelineRunsParts.Changes,
                     "prs" or "pullrequests" => PipelineRunsParts.PullRequests,
@@ -359,7 +371,7 @@ namespace audit.Objects.PipelineRuns
                     "tags" or "releasetags" => PipelineRunsParts.ReleaseTags,
                     "prfiles" or "pullrequestfiles" => PipelineRunsParts.PullRequestFiles,
                     "scope" or "workitemscope" => PipelineRunsParts.WorkItemScope,
-                    _ => throw new ArgumentException($"Unknown --include value '{i}'. Use runs, steps, tests, changes, prs, approvals, jobs, schedule, tags, prfiles, scope or all"),
+                    _ => throw new ArgumentException($"Unknown --include value '{i}'. Use runs, steps, tests, changes, prs, approvals, jobs, schedule, tags, prfiles, scope, failures, policies or all"),
                 };
             }
             // schedule and tags alone read only the release Features and tags, no runs
