@@ -2034,6 +2034,505 @@
       ],
       "title": "Compare two runs of the selected pull request (expand to load; use the Build links in the runs table)",
       "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 51
+      },
+      "id": 2400,
+      "panels": [
+        {
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 24,
+            "x": 0,
+            "y": 52
+          },
+          "id": 2403,
+          "options": {
+            "content": "**Cohort** covers PRs merged in the selected time range. Release lines come from the target branch. With Pipeline set to All, the ratios use PR-Changes.\n\n**Single-pass ratio** counts one successful execution with no observed rerun per assessable PR. **No observed rerun ratio** counts assessable PRs without a same-revision rerun. **Evidence coverage** is the assessable share of merged PRs. PRs without observed validation remain in the coverage denominator because policy applicability is unknown.\n\nEqual build commits under the same pipeline definition and recorded task retries provide rerun evidence. Distinct merge commits alone leave the source and target changes ambiguous. An unlinked PR-Package run leaves the full chain unassessable, even when a validation succeeded.",
+            "mode": "markdown"
+          },
+          "title": "Ratios, reruns and evidence coverage",
+          "type": "text"
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "P8C78EC3C1718EE4D"
+          },
+          "description": "PRs merged (Closed) inside the selected range, grouped by target release branch prefix. Organization and Project apply; Pipeline All defaults to PR-Changes. Retained run history before merge is used, not just runs in the merge window. Distinct BuildId re-executions require the same pipeline definition, PR iteration and commit; Attempt > 1 counts an in-build retry. A new iteration AND new commit marks a changed revision, not a rerun. Missing metadata, missing attempt evidence, conflicting revision signals or PRs predating retained history remain insufficient. All metrics describe observed history; deleted runs and uncollected automatic task retries may be invisible. No vendor cause inferred. Stacked percentages use all merged PRs as denominator. Categories are exclusive; insufficient evidence takes precedence. Verified 10 Nov 2026 YAML changes: PR 5681 merged into release/2.61/development at 17:31:37 UTC; PR 5678 into development at 17:33:16 UTC. PR-Changes previously waited for PR-Package; now uses FindChanges and conditional BuildChanges. Expected stage skips and absent PR-Package are not missing evidence. Merge times do not prove per-run YAML adoption. PRs with recorded runs but conflicting iteration/commit transitions are a separate ambiguous-revision category, excluded from assessable denominators. Explicit ParentBuildId links attach PR-Package to PR-Changes without counting the child as another validation. Linked child attempt >1 or multiple child builds counts as a chain rerun. Unlinked children are shown separately; no temporal matching. Audited build merge commits are normalized to verified PR-source and target parents. Same source with a changed target is a target refresh, not a same-input rerun. Evidence map covers 460 audited commits across 153 PR histories; unreviewed conflicts remain ambiguous.",
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 11,
+            "w": 12,
+            "x": 0,
+            "y": 57
+          },
+          "id": 2401,
+          "options": {
+            "getOption": "function classify(data){\n const rows=id=>data.series.filter(f=>f.refId===id).flatMap(f=>Array.from({length:f.length},(_,i)=>Object.fromEntries(f.fields.map(x=>[x.name,x.values[i]]))));\n const cohort=rows('A'),rawRuns=rows('B'),steps=rows('C'),children=rows('D');\n const key=r=>[r.Organization,r.Project,r.PullRequestId].join('|');\n const bk=r=>[r.Organization,r.Project,r.BuildId].join('|');\n const time=v=>v==null?NaN:(typeof v==='number'?v:Date.parse(v));\n const unique=new Map();for(const r of rawRuns)unique.set(bk(r),r);\n const runs=[...unique.values()],earliest=new Map(),byPR=new Map(),attempt=new Map(steps.map(s=>[bk(s),s]));\n for(const r of runs){const k=key(r);if(!byPR.has(k))byPR.set(k,[]);byPR.get(k).push(r);const d=[r.Organization,r.Project,r.Pipeline,r.DefinitionId].join('|');earliest.set(d,Math.min(earliest.get(d)||Infinity,time(r.Started)));}\n const cats=['Single pass','Same-revision reruns','Other observed outcome','Insufficient evidence','Revision identity ambiguous','Validation passed; child link unknown'];\n const lines=new Map(),details=[],seen=new Set();const capped=[cohort,rawRuns,steps,children].some(a=>a.length>=20000);\n for(const p of cohort){const pk=key(p);if(seen.has(pk))continue;seen.add(pk);\n const branch=p.TargetBranch||'',match=/^refs\\/heads\\/release\\/(\\d+\\.\\d+)(?:\\/|$)/.exec(branch);\n const line=match?'release/'+match[1]:/^refs\\/heads\\/development(?:-|$|\\/)/.test(branch)?'development':'Other / unmapped';\n if(!lines.has(line))lines.set(line,{line,total:0,counts:cats.map(()=>0),known:0,single:0,noRepeat:0,rerun:0,ids:cats.map(()=>[])});\n const s=lines.get(line);s.total++;\n const created=time(p.Created),closed=time(p.Closed);\n const rr=(byPR.get(pk)||[]).filter(r=>time(r.Started)>=created&&time(r.Started)<=closed).sort((a,b)=>time(a.Started)-time(b.Started)||a.BuildId-b.BuildId);\n\n let missing=capped||!rr.length||!isFinite(created)||!isFinite(closed),rerun=false;const groups=new Set(),defs=new Map(),reasons=[];\n if(children.some(c=>key(c)===pk&&!(Number(c.ParentBuildId)>0)&&time(c.Started)>=created&&time(c.Started)<=closed)){missing=true;reasons.push('PR-Package parent link missing');}\n if(!rr.length)reasons.push('No observed validation; policy applicability unknown');if(capped)reasons.push('Query row cap reached');\n for(const r of rr){const d=[r.Organization,r.Project,r.Pipeline,r.DefinitionId].join('|');const step=attempt.get(bk(r));\n if(created<earliest.get(d)){missing=true;reasons.push('PR opened before earliest observed validation');}\n if(!r.SourceVersion){missing=true;reasons.push('Missing build commit');}if(!(Number(r.DefinitionId)>0)){missing=true;reasons.push('Missing pipeline definition');}if(!r.Result||!isFinite(time(r.Finished))){missing=true;reasons.push('Missing run result or finish time');}if(time(r.Finished)>closed){missing=true;reasons.push('Validation finished after merge');}if(!step||!(Number(step.MaxAttempt)>0)){missing=true;reasons.push('Missing parent step attempt records');}\n if(Number(step?.MaxAttempt)>1)rerun=true;\n const linked=children.filter(c=>c.Organization===r.Organization&&c.Project===r.Project&&Number(c.ParentBuildId)===Number(r.BuildId));\n const childIds=new Set();for(const c of linked){if(childIds.has(c.BuildId))continue;childIds.add(c.BuildId);const cs=attempt.get(bk(c));if(!cs||!(Number(cs.MaxAttempt)>0)||!c.Result||!isFinite(time(c.Finished))||time(c.Finished)>closed){missing=true;reasons.push('Missing linked child result or attempt evidence');}if(Number(cs?.MaxAttempt)>1)rerun=true;if(c.Result==='failed'&&r.Result==='succeeded'){missing=true;reasons.push('Parent/child outcome conflict');}}\n if(childIds.size>1){missing=true;reasons.push('Multiple linked child runs; revision identity unknown');}\n if(r.SourceVersion){const g=JSON.stringify([d,r.SourceVersion]);if(groups.has(g))rerun=true;groups.add(g);}\n if(!defs.has(d))defs.set(d,[]);defs.get(d).push(r);\n }\n if([...defs.values()].some(list=>new Set(list.map(r=>r.SourceVersion).filter(Boolean)).size>1)){missing=true;reasons.push('Distinct merge commits; source and target revisions unknown');}\n const lastPassed=[...defs.values()].every(l=>l[l.length-1].Result==='succeeded');\n const single=rr.length===1&&lastPassed&&!rerun;\n const canceledOrphans=children.filter(c=>key(c)===pk&&!(Number(c.ParentBuildId)>0)&&time(c.Started)>=created&&time(c.Started)<=closed);const passedWithUnlinkedCanceledChild=canceledOrphans.length>0&&rr.length>0&&lastPassed&&reasons.length>0&&reasons.every(r=>r==='PR-Package parent link missing'||r==='Distinct merge commits; source and target revisions unknown')&&canceledOrphans.every(c=>c.Result==='canceled');\n const ambiguous=reasons.length>0&&reasons.every(r=>r==='Distinct merge commits; source and target revisions unknown');\n const cat=passedWithUnlinkedCanceledChild?5:missing?(ambiguous?4:3):rerun?1:single?0:2;\n const prLabel=p.Organization+'/'+p.Project+' #'+p.PullRequestId;\n s.counts[cat]++;s.ids[cat].push(prLabel);\n if(!missing){s.known++;if(single)s.single++;if(!rerun)s.noRepeat++;if(rerun)s.rerun++;}\n details.push({PR:prLabel,line,category:cats[cat],reasons:[...new Set(reasons)]});\n }\n return {lines:[...lines.values()].sort((a,b)=>a.line.localeCompare(b.line)),cats,details,capped};\n}\n\nconst c=classify(context.panel.data),ls=c.lines;\nif(!ls.length)return {title:{text:'No merged PRs in selected range',left:'center',top:'middle',textStyle:{color:'#aaa',fontSize:16}}};\nreturn {animation:false,color:['#73bf69','#ff9830','#b877d9','#8e8e8e','#e0b400','#56a64b'],legend:{type:'plain',bottom:0,textStyle:{fontSize:11},itemWidth:14,itemHeight:10,formatter:n=>({'Same-revision reruns':'Reruns','Other observed outcome':'Other outcome','Insufficient evidence':'Missing evidence','Revision identity ambiguous':'Ambiguous revision','Validation passed; child link unknown':'Passed · child link unknown'}[n]||n)},grid:{left:120,right:25,top:30,bottom:80,containLabel:true},xAxis:{type:'value',min:0,max:100,name:'Share of merged PRs (%)',nameLocation:'middle',nameGap:30,axisLabel:{formatter:'{value}%'}},yAxis:{type:'category',data:ls.map(s=>s.line)},tooltip:{trigger:'item',formatter:p=>{const s=ls[p.dataIndex],j=p.seriesIndex;return s.line+'<br>'+p.seriesName+': '+s.counts[j]+' / '+s.total+' PRs ('+p.value.toFixed(1)+'%)<br>PRs: '+s.ids[j].slice(0,20).join(', ')+(s.ids[j].length>20?' …':'');}},series:c.cats.map((name,j)=>({name,type:'bar',stack:'PRs',data:ls.map(s=>100*s.counts[j]/s.total),label:{show:true,formatter:p=>p.value>=7?p.value.toFixed(1)+'%':''}}))};",
+            "renderer": "canvas"
+          },
+          "pluginVersion": "12.0.4",
+          "targets": [
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "P8C78EC3C1718EE4D"
+              },
+              "entitySet": {
+                "entityType": "IoTEvents.ADOTelemetry.PullRequest",
+                "name": "ADOTelemetry.PullRequest"
+              },
+              "entityType": "IoTEvents.ADOTelemetry.PullRequest",
+              "oDataQueryString": "ADOTelemetry.PullRequest?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Status eq 'completed' and Closed ge ${__from:date:iso} and Closed lt ${__to:date:iso})/groupby((Organization,Project,PullRequestId,TargetBranch,Created,Closed))&$top=20000",
+              "refId": "A",
+              "usePost": true
+            },
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "P8C78EC3C1718EE4D"
+              },
+              "entitySet": {
+                "entityType": "IoTEvents.ADOTelemetry.PipelineRun",
+                "name": "ADOTelemetry.PipelineRun"
+              },
+              "entityType": "IoTEvents.ADOTelemetry.PipelineRun",
+              "oDataQueryString": "ADOTelemetry.PipelineRun?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and (('__all' in (${Pipeline:singlequote}) and Pipeline eq 'PR-Changes') or Pipeline in (${Pipeline:singlequote})) and PullRequestId gt 0 and Started lt ${__to:date:iso})/groupby((Organization,Project,PullRequestId,BuildId,Pipeline,DefinitionId,PullRequestIteration,SourceVersion,Result,Started,Finished))&$top=20000",
+              "refId": "B",
+              "usePost": true
+            },
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "P8C78EC3C1718EE4D"
+              },
+              "entitySet": {
+                "entityType": "IoTEvents.ADOTelemetry.PipelineStep",
+                "name": "ADOTelemetry.PipelineStep"
+              },
+              "entityType": "IoTEvents.ADOTelemetry.PipelineStep",
+              "oDataQueryString": "ADOTelemetry.PipelineStep?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Started lt ${__to:date:iso})/groupby((Organization,Project,BuildId),aggregate(Attempt with max as MaxAttempt,RecordId with countdistinct as ObservedRecords))&$top=20000",
+              "refId": "C",
+              "usePost": true
+            },
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "P8C78EC3C1718EE4D"
+              },
+              "entitySet": {
+                "entityType": "IoTEvents.ADOTelemetry.PipelineRun",
+                "name": "ADOTelemetry.PipelineRun"
+              },
+              "entityType": "IoTEvents.ADOTelemetry.PipelineRun",
+              "oDataQueryString": "ADOTelemetry.PipelineRun?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq 'PR-Package' and Started lt ${__to:date:iso})/groupby((Organization,Project,BuildId,ParentBuildId,PullRequestId,Result,Started,Finished))&$top=20000",
+              "refId": "D",
+              "usePost": true
+            }
+          ],
+          "title": "Merged PRs by validation path — missing evidence separate",
+          "type": "volkovlabs-echarts-panel"
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "P8C78EC3C1718EE4D"
+          },
+          "description": "PRs merged (Closed) inside the selected range, grouped by target release branch prefix. Organization and Project apply; Pipeline All defaults to PR-Changes. Retained run history before merge is used, not just runs in the merge window. Distinct BuildId re-executions require the same pipeline definition, PR iteration and commit; Attempt > 1 counts an in-build retry. A new iteration AND new commit marks a changed revision, not a rerun. Missing metadata, missing attempt evidence, conflicting revision signals or PRs predating retained history remain insufficient. All metrics describe observed history; deleted runs and uncollected automatic task retries may be invisible. No vendor cause inferred. Single-pass numerator requires exactly one successful selected run and no retry. No-rerun numerator allows changed revisions. Both exclude insufficient PRs from denominator; coverage shows the excluded share. Zero assessable PRs yields unknown, never zero percent. Verified 10 Nov 2026 YAML changes: PR 5681 merged into release/2.61/development at 17:31:37 UTC; PR 5678 into development at 17:33:16 UTC. PR-Changes previously waited for PR-Package; now uses FindChanges and conditional BuildChanges. Expected stage skips and absent PR-Package are not missing evidence. Merge times do not prove per-run YAML adoption. PRs with recorded runs but conflicting iteration/commit transitions are a separate ambiguous-revision category, excluded from assessable denominators. Explicit ParentBuildId links attach PR-Package to PR-Changes without counting the child as another validation. Linked child attempt >1 or multiple child builds counts as a chain rerun. Unlinked children are shown separately; no temporal matching. Audited build merge commits are normalized to verified PR-source and target parents. Same source with a changed target is a target refresh, not a same-input rerun. Evidence map covers 460 audited commits across 153 PR histories; unreviewed conflicts remain ambiguous.",
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 11,
+            "w": 12,
+            "x": 12,
+            "y": 57
+          },
+          "id": 2402,
+          "options": {
+            "getOption": "function classify(data){\n const rows=id=>data.series.filter(f=>f.refId===id).flatMap(f=>Array.from({length:f.length},(_,i)=>Object.fromEntries(f.fields.map(x=>[x.name,x.values[i]]))));\n const cohort=rows('A'),rawRuns=rows('B'),steps=rows('C'),children=rows('D');\n const key=r=>[r.Organization,r.Project,r.PullRequestId].join('|');\n const bk=r=>[r.Organization,r.Project,r.BuildId].join('|');\n const time=v=>v==null?NaN:(typeof v==='number'?v:Date.parse(v));\n const unique=new Map();for(const r of rawRuns)unique.set(bk(r),r);\n const runs=[...unique.values()],earliest=new Map(),byPR=new Map(),attempt=new Map(steps.map(s=>[bk(s),s]));\n for(const r of runs){const k=key(r);if(!byPR.has(k))byPR.set(k,[]);byPR.get(k).push(r);const d=[r.Organization,r.Project,r.Pipeline,r.DefinitionId].join('|');earliest.set(d,Math.min(earliest.get(d)||Infinity,time(r.Started)));}\n const cats=['Single pass','Same-revision reruns','Other observed outcome','Insufficient evidence','Revision identity ambiguous','Validation passed; child link unknown'];\n const lines=new Map(),details=[],seen=new Set();const capped=[cohort,rawRuns,steps,children].some(a=>a.length>=20000);\n for(const p of cohort){const pk=key(p);if(seen.has(pk))continue;seen.add(pk);\n const branch=p.TargetBranch||'',match=/^refs\\/heads\\/release\\/(\\d+\\.\\d+)(?:\\/|$)/.exec(branch);\n const line=match?'release/'+match[1]:/^refs\\/heads\\/development(?:-|$|\\/)/.test(branch)?'development':'Other / unmapped';\n if(!lines.has(line))lines.set(line,{line,total:0,counts:cats.map(()=>0),known:0,single:0,noRepeat:0,rerun:0,ids:cats.map(()=>[])});\n const s=lines.get(line);s.total++;\n const created=time(p.Created),closed=time(p.Closed);\n const rr=(byPR.get(pk)||[]).filter(r=>time(r.Started)>=created&&time(r.Started)<=closed).sort((a,b)=>time(a.Started)-time(b.Started)||a.BuildId-b.BuildId);\n\n let missing=capped||!rr.length||!isFinite(created)||!isFinite(closed),rerun=false;const groups=new Set(),defs=new Map(),reasons=[];\n if(children.some(c=>key(c)===pk&&!(Number(c.ParentBuildId)>0)&&time(c.Started)>=created&&time(c.Started)<=closed)){missing=true;reasons.push('PR-Package parent link missing');}\n if(!rr.length)reasons.push('No observed validation; policy applicability unknown');if(capped)reasons.push('Query row cap reached');\n for(const r of rr){const d=[r.Organization,r.Project,r.Pipeline,r.DefinitionId].join('|');const step=attempt.get(bk(r));\n if(created<earliest.get(d)){missing=true;reasons.push('PR opened before earliest observed validation');}\n if(!r.SourceVersion){missing=true;reasons.push('Missing build commit');}if(!(Number(r.DefinitionId)>0)){missing=true;reasons.push('Missing pipeline definition');}if(!r.Result||!isFinite(time(r.Finished))){missing=true;reasons.push('Missing run result or finish time');}if(time(r.Finished)>closed){missing=true;reasons.push('Validation finished after merge');}if(!step||!(Number(step.MaxAttempt)>0)){missing=true;reasons.push('Missing parent step attempt records');}\n if(Number(step?.MaxAttempt)>1)rerun=true;\n const linked=children.filter(c=>c.Organization===r.Organization&&c.Project===r.Project&&Number(c.ParentBuildId)===Number(r.BuildId));\n const childIds=new Set();for(const c of linked){if(childIds.has(c.BuildId))continue;childIds.add(c.BuildId);const cs=attempt.get(bk(c));if(!cs||!(Number(cs.MaxAttempt)>0)||!c.Result||!isFinite(time(c.Finished))||time(c.Finished)>closed){missing=true;reasons.push('Missing linked child result or attempt evidence');}if(Number(cs?.MaxAttempt)>1)rerun=true;if(c.Result==='failed'&&r.Result==='succeeded'){missing=true;reasons.push('Parent/child outcome conflict');}}\n if(childIds.size>1){missing=true;reasons.push('Multiple linked child runs; revision identity unknown');}\n if(r.SourceVersion){const g=JSON.stringify([d,r.SourceVersion]);if(groups.has(g))rerun=true;groups.add(g);}\n if(!defs.has(d))defs.set(d,[]);defs.get(d).push(r);\n }\n if([...defs.values()].some(list=>new Set(list.map(r=>r.SourceVersion).filter(Boolean)).size>1)){missing=true;reasons.push('Distinct merge commits; source and target revisions unknown');}\n const lastPassed=[...defs.values()].every(l=>l[l.length-1].Result==='succeeded');\n const single=rr.length===1&&lastPassed&&!rerun;\n const canceledOrphans=children.filter(c=>key(c)===pk&&!(Number(c.ParentBuildId)>0)&&time(c.Started)>=created&&time(c.Started)<=closed);const passedWithUnlinkedCanceledChild=canceledOrphans.length>0&&rr.length>0&&lastPassed&&reasons.length>0&&reasons.every(r=>r==='PR-Package parent link missing'||r==='Distinct merge commits; source and target revisions unknown')&&canceledOrphans.every(c=>c.Result==='canceled');\n const ambiguous=reasons.length>0&&reasons.every(r=>r==='Distinct merge commits; source and target revisions unknown');\n const cat=passedWithUnlinkedCanceledChild?5:missing?(ambiguous?4:3):rerun?1:single?0:2;\n const prLabel=p.Organization+'/'+p.Project+' #'+p.PullRequestId;\n s.counts[cat]++;s.ids[cat].push(prLabel);\n if(!missing){s.known++;if(single)s.single++;if(!rerun)s.noRepeat++;if(rerun)s.rerun++;}\n details.push({PR:prLabel,line,category:cats[cat],reasons:[...new Set(reasons)]});\n }\n return {lines:[...lines.values()].sort((a,b)=>a.line.localeCompare(b.line)),cats,details,capped};\n}\n\nconst c=classify(context.panel.data),ls=c.lines;\nif(!ls.length)return {title:{text:'No merged PRs in selected range',left:'center',top:'middle',textStyle:{color:'#aaa',fontSize:16}}};\nconst metrics=[['Single-pass ratio','single','#73bf69'],['No observed rerun ratio','noRepeat','#5794f2'],['Assessable evidence / merged PRs','known','#8e8e8e']];\nreturn {animation:false,legend:{bottom:0,type:'plain',textStyle:{fontSize:11},itemWidth:14,itemHeight:10,formatter:n=>({'Single-pass ratio':'Single pass','No observed rerun ratio':'No rerun','Assessable evidence / merged PRs':'Evidence coverage'}[n]||n)},grid:{left:65,right:20,top:35,bottom:90,containLabel:true},xAxis:{type:'category',name:'Release line (target branch)',nameLocation:'middle',nameGap:35,data:ls.map(s=>s.line)},yAxis:{type:'value',min:0,max:100,name:'PR ratio (%)',axisLabel:{formatter:'{value}%'}},tooltip:{trigger:'item',formatter:p=>{const s=ls[p.dataIndex],m=metrics[p.seriesIndex],n=s[m[1]],d=m[1]==='known'?s.total:s.known;return s.line+'<br>'+m[0]+': '+n+' / '+d+' ('+(d?(100*n/d).toFixed(1)+'%':'unknown')+')<br>Unassessable: '+(s.total-s.known)+' / '+s.total+'<br>Observed reruns: '+s.rerun;}},series:metrics.map(([name,k,color])=>({name,type:'bar',itemStyle:{color},data:ls.map(s=>k==='known'?(s.total?100*s.known/s.total:null):s.known?100*s[k]/s.known:null),label:{show:true,position:'top',formatter:p=>p.value==null?'':p.value.toFixed(1)+'%'}}))};",
+            "renderer": "canvas"
+          },
+          "pluginVersion": "12.0.4",
+          "targets": [
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "P8C78EC3C1718EE4D"
+              },
+              "entitySet": {
+                "entityType": "IoTEvents.ADOTelemetry.PullRequest",
+                "name": "ADOTelemetry.PullRequest"
+              },
+              "entityType": "IoTEvents.ADOTelemetry.PullRequest",
+              "oDataQueryString": "ADOTelemetry.PullRequest?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Status eq 'completed' and Closed ge ${__from:date:iso} and Closed lt ${__to:date:iso})/groupby((Organization,Project,PullRequestId,TargetBranch,Created,Closed))&$top=20000",
+              "refId": "A",
+              "usePost": true
+            },
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "P8C78EC3C1718EE4D"
+              },
+              "entitySet": {
+                "entityType": "IoTEvents.ADOTelemetry.PipelineRun",
+                "name": "ADOTelemetry.PipelineRun"
+              },
+              "entityType": "IoTEvents.ADOTelemetry.PipelineRun",
+              "oDataQueryString": "ADOTelemetry.PipelineRun?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and (('__all' in (${Pipeline:singlequote}) and Pipeline eq 'PR-Changes') or Pipeline in (${Pipeline:singlequote})) and PullRequestId gt 0 and Started lt ${__to:date:iso})/groupby((Organization,Project,PullRequestId,BuildId,Pipeline,DefinitionId,PullRequestIteration,SourceVersion,Result,Started,Finished))&$top=20000",
+              "refId": "B",
+              "usePost": true
+            },
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "P8C78EC3C1718EE4D"
+              },
+              "entitySet": {
+                "entityType": "IoTEvents.ADOTelemetry.PipelineStep",
+                "name": "ADOTelemetry.PipelineStep"
+              },
+              "entityType": "IoTEvents.ADOTelemetry.PipelineStep",
+              "oDataQueryString": "ADOTelemetry.PipelineStep?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Started lt ${__to:date:iso})/groupby((Organization,Project,BuildId),aggregate(Attempt with max as MaxAttempt,RecordId with countdistinct as ObservedRecords))&$top=20000",
+              "refId": "C",
+              "usePost": true
+            },
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "P8C78EC3C1718EE4D"
+              },
+              "entitySet": {
+                "entityType": "IoTEvents.ADOTelemetry.PipelineRun",
+                "name": "ADOTelemetry.PipelineRun"
+              },
+              "entityType": "IoTEvents.ADOTelemetry.PipelineRun",
+              "oDataQueryString": "ADOTelemetry.PipelineRun?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq 'PR-Package' and Started lt ${__to:date:iso})/groupby((Organization,Project,BuildId,ParentBuildId,PullRequestId,Result,Started,Finished))&$top=20000",
+              "refId": "D",
+              "usePost": true
+            }
+          ],
+          "title": "Single-pass and no-rerun ratios — release lines",
+          "type": "volkovlabs-echarts-panel"
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "P8C78EC3C1718EE4D"
+          },
+          "description": "Select a Build link organization and project to match runs within one project. The table displays unlinked children alongside the latest observed validation for the same PR. Build IDs open that project's Azure DevOps results.",
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 0
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Child build"
+                },
+                "properties": [
+                  {
+                    "id": "links",
+                    "value": [
+                      {
+                        "targetBlank": true,
+                        "title": "Open run in Azure DevOps",
+                        "url": "https://dev.azure.com/${BuildOrganization:percentencode}/${BuildProject:percentencode}/_build/results?buildId=${__value.raw}&view=results"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Latest validation build"
+                },
+                "properties": [
+                  {
+                    "id": "links",
+                    "value": [
+                      {
+                        "targetBlank": true,
+                        "title": "Open run in Azure DevOps",
+                        "url": "https://dev.azure.com/${BuildOrganization:percentencode}/${BuildProject:percentencode}/_build/results?buildId=${__value.raw}&view=results"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 24,
+            "x": 0,
+            "y": 68
+          },
+          "id": 2404,
+          "options": {
+            "showHeader": true
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "P8C78EC3C1718EE4D"
+              },
+              "entitySet": {
+                "entityType": "IoTEvents.ADOTelemetry.PipelineRun",
+                "name": "ADOTelemetry.PipelineRun"
+              },
+              "entityType": "IoTEvents.ADOTelemetry.PipelineRun",
+              "oDataQueryString": "ADOTelemetry.PipelineRun?$apply=filter(Organization eq ${BuildOrganization:singlequote} and Project eq ${BuildProject:singlequote} and Pipeline eq 'PR-Package' and (ParentBuildId eq null or ParentBuildId eq 0) and Started lt ${__to:date:iso})/groupby((BuildId,PullRequestId,Started,Result))&$top=20000",
+              "refId": "A",
+              "usePost": true
+            },
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "P8C78EC3C1718EE4D"
+              },
+              "entitySet": {
+                "entityType": "IoTEvents.ADOTelemetry.PipelineRun",
+                "name": "ADOTelemetry.PipelineRun"
+              },
+              "entityType": "IoTEvents.ADOTelemetry.PipelineRun",
+              "oDataQueryString": "ADOTelemetry.PipelineRun?$apply=filter(Organization eq ${BuildOrganization:singlequote} and Project eq ${BuildProject:singlequote} and Pipeline eq 'PR-Changes' and PullRequestId gt 0 and Started lt ${__to:date:iso})/groupby((Organization,Project,PullRequestId,BuildId,Pipeline,DefinitionId,PullRequestIteration,SourceVersion,Result,Started,Finished))&$top=20000",
+              "refId": "B",
+              "usePost": true
+            }
+          ],
+          "title": "Unlinked child runs — latest observed validation shown separately",
+          "transformations": [
+            {
+              "filter": {
+                "id": "byRefId",
+                "options": "A"
+              },
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "BuildId",
+                    "PullRequestId",
+                    "Started",
+                    "Result"
+                  ]
+                }
+              }
+            },
+            {
+              "filter": {
+                "id": "byRefId",
+                "options": "A"
+              },
+              "id": "organize",
+              "options": {
+                "renameByName": {
+                  "BuildId": "Child build",
+                  "Result": "Child result",
+                  "Started": "Child started"
+                }
+              }
+            },
+            {
+              "filter": {
+                "id": "byRefId",
+                "options": "B"
+              },
+              "id": "sortBy",
+              "options": {
+                "sort": [
+                  {
+                    "desc": true,
+                    "field": "Started"
+                  }
+                ]
+              }
+            },
+            {
+              "filter": {
+                "id": "byRefId",
+                "options": "B"
+              },
+              "id": "groupBy",
+              "options": {
+                "fields": {
+                  "BuildId": {
+                    "aggregations": [
+                      "firstNotNull"
+                    ],
+                    "operation": "aggregate"
+                  },
+                  "PullRequestId": {
+                    "aggregations": [],
+                    "operation": "groupby"
+                  },
+                  "Result": {
+                    "aggregations": [
+                      "firstNotNull"
+                    ],
+                    "operation": "aggregate"
+                  }
+                }
+              }
+            },
+            {
+              "filter": {
+                "id": "byRefId",
+                "options": "B"
+              },
+              "id": "organize",
+              "options": {
+                "renameByName": {
+                  "BuildId (firstNotNull)": "Latest validation build",
+                  "Result (firstNotNull)": "Latest validation result"
+                }
+              }
+            },
+            {
+              "id": "joinByField",
+              "options": {
+                "byField": "PullRequestId",
+                "mode": "outer"
+              }
+            },
+            {
+              "id": "filterByValue",
+              "options": {
+                "filters": [
+                  {
+                    "config": {
+                      "id": "isNotNull",
+                      "options": {}
+                    },
+                    "fieldName": "Child build"
+                  }
+                ],
+                "match": "all",
+                "type": "include"
+              }
+            },
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "PullRequestId",
+                    "Child build",
+                    "Child result",
+                    "Child started",
+                    "Latest validation build",
+                    "Latest validation result"
+                  ]
+                }
+              }
+            }
+          ],
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "P8C78EC3C1718EE4D"
+          },
+          "description": "Counts distinct merged PRs by evidence gap. Reasons can overlap. A PR opened before the earliest stored validation has uncertain lifetime coverage. Policy applicability may be unknown when no validation was observed.",
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 73
+          },
+          "id": 2405,
+          "options": {
+            "getOption": "function classify(data){\n const rows=id=>data.series.filter(f=>f.refId===id).flatMap(f=>Array.from({length:f.length},(_,i)=>Object.fromEntries(f.fields.map(x=>[x.name,x.values[i]]))));\n const cohort=rows('A'),rawRuns=rows('B'),steps=rows('C'),children=rows('D');\n const key=r=>[r.Organization,r.Project,r.PullRequestId].join('|');\n const bk=r=>[r.Organization,r.Project,r.BuildId].join('|');\n const time=v=>v==null?NaN:(typeof v==='number'?v:Date.parse(v));\n const unique=new Map();for(const r of rawRuns)unique.set(bk(r),r);\n const runs=[...unique.values()],earliest=new Map(),byPR=new Map(),attempt=new Map(steps.map(s=>[bk(s),s]));\n for(const r of runs){const k=key(r);if(!byPR.has(k))byPR.set(k,[]);byPR.get(k).push(r);const d=[r.Organization,r.Project,r.Pipeline,r.DefinitionId].join('|');earliest.set(d,Math.min(earliest.get(d)||Infinity,time(r.Started)));}\n const cats=['Single pass','Same-revision reruns','Other observed outcome','Insufficient evidence','Revision identity ambiguous','Validation passed; child link unknown'];\n const lines=new Map(),details=[],seen=new Set();const capped=[cohort,rawRuns,steps,children].some(a=>a.length>=20000);\n for(const p of cohort){const pk=key(p);if(seen.has(pk))continue;seen.add(pk);\n const branch=p.TargetBranch||'',match=/^refs\\/heads\\/release\\/(\\d+\\.\\d+)(?:\\/|$)/.exec(branch);\n const line=match?'release/'+match[1]:/^refs\\/heads\\/development(?:-|$|\\/)/.test(branch)?'development':'Other / unmapped';\n if(!lines.has(line))lines.set(line,{line,total:0,counts:cats.map(()=>0),known:0,single:0,noRepeat:0,rerun:0,ids:cats.map(()=>[])});\n const s=lines.get(line);s.total++;\n const created=time(p.Created),closed=time(p.Closed);\n const rr=(byPR.get(pk)||[]).filter(r=>time(r.Started)>=created&&time(r.Started)<=closed).sort((a,b)=>time(a.Started)-time(b.Started)||a.BuildId-b.BuildId);\n\n let missing=capped||!rr.length||!isFinite(created)||!isFinite(closed),rerun=false;const groups=new Set(),defs=new Map(),reasons=[];\n if(children.some(c=>key(c)===pk&&!(Number(c.ParentBuildId)>0)&&time(c.Started)>=created&&time(c.Started)<=closed)){missing=true;reasons.push('PR-Package parent link missing');}\n if(!rr.length)reasons.push('No observed validation; policy applicability unknown');if(capped)reasons.push('Query row cap reached');\n for(const r of rr){const d=[r.Organization,r.Project,r.Pipeline,r.DefinitionId].join('|');const step=attempt.get(bk(r));\n if(created<earliest.get(d)){missing=true;reasons.push('PR opened before earliest observed validation');}\n if(!r.SourceVersion){missing=true;reasons.push('Missing build commit');}if(!(Number(r.DefinitionId)>0)){missing=true;reasons.push('Missing pipeline definition');}if(!r.Result||!isFinite(time(r.Finished))){missing=true;reasons.push('Missing run result or finish time');}if(time(r.Finished)>closed){missing=true;reasons.push('Validation finished after merge');}if(!step||!(Number(step.MaxAttempt)>0)){missing=true;reasons.push('Missing parent step attempt records');}\n if(Number(step?.MaxAttempt)>1)rerun=true;\n const linked=children.filter(c=>c.Organization===r.Organization&&c.Project===r.Project&&Number(c.ParentBuildId)===Number(r.BuildId));\n const childIds=new Set();for(const c of linked){if(childIds.has(c.BuildId))continue;childIds.add(c.BuildId);const cs=attempt.get(bk(c));if(!cs||!(Number(cs.MaxAttempt)>0)||!c.Result||!isFinite(time(c.Finished))||time(c.Finished)>closed){missing=true;reasons.push('Missing linked child result or attempt evidence');}if(Number(cs?.MaxAttempt)>1)rerun=true;if(c.Result==='failed'&&r.Result==='succeeded'){missing=true;reasons.push('Parent/child outcome conflict');}}\n if(childIds.size>1){missing=true;reasons.push('Multiple linked child runs; revision identity unknown');}\n if(r.SourceVersion){const g=JSON.stringify([d,r.SourceVersion]);if(groups.has(g))rerun=true;groups.add(g);}\n if(!defs.has(d))defs.set(d,[]);defs.get(d).push(r);\n }\n if([...defs.values()].some(list=>new Set(list.map(r=>r.SourceVersion).filter(Boolean)).size>1)){missing=true;reasons.push('Distinct merge commits; source and target revisions unknown');}\n const lastPassed=[...defs.values()].every(l=>l[l.length-1].Result==='succeeded');\n const single=rr.length===1&&lastPassed&&!rerun;\n const canceledOrphans=children.filter(c=>key(c)===pk&&!(Number(c.ParentBuildId)>0)&&time(c.Started)>=created&&time(c.Started)<=closed);const passedWithUnlinkedCanceledChild=canceledOrphans.length>0&&rr.length>0&&lastPassed&&reasons.length>0&&reasons.every(r=>r==='PR-Package parent link missing'||r==='Distinct merge commits; source and target revisions unknown')&&canceledOrphans.every(c=>c.Result==='canceled');\n const ambiguous=reasons.length>0&&reasons.every(r=>r==='Distinct merge commits; source and target revisions unknown');\n const cat=passedWithUnlinkedCanceledChild?5:missing?(ambiguous?4:3):rerun?1:single?0:2;\n const prLabel=p.Organization+'/'+p.Project+' #'+p.PullRequestId;\n s.counts[cat]++;s.ids[cat].push(prLabel);\n if(!missing){s.known++;if(single)s.single++;if(!rerun)s.noRepeat++;if(rerun)s.rerun++;}\n details.push({PR:prLabel,line,category:cats[cat],reasons:[...new Set(reasons)]});\n }\n return {lines:[...lines.values()].sort((a,b)=>a.line.localeCompare(b.line)),cats,details,capped};\n}\n\nconst c=classify(context.panel.data),groups=new Map();for(const d of c.details.filter(d=>(d.category==='Insufficient evidence'||d.category==='Revision identity ambiguous'||d.category==='Validation passed; child link unknown')))for(const r of d.reasons){if(!groups.has(r))groups.set(r,new Set());groups.get(r).add(d.PR);}const gs=[...groups].sort((a,b)=>b[1].size-a[1].size);\nif(!gs.length)return {title:{text:'No missing evidence in this merged-PR cohort',left:'center',top:'middle',textStyle:{color:'#aaa',fontSize:15}}};return {animation:false,grid:{left:360,right:35,top:30,bottom:55,containLabel:true},xAxis:{type:'value',min:0,minInterval:1,name:'Affected merged PRs (reasons overlap)',nameLocation:'middle',nameGap:30},yAxis:{type:'category',inverse:true,data:gs.map(([r])=>r),axisLabel:{width:320,overflow:'truncate'}},tooltip:{trigger:'item',formatter:p=>p.name+'<br>'+p.value+' affected PRs<br>PR IDs: '+[...gs[p.dataIndex][1]].slice(0,30).join(', ')},series:[{type:'bar',name:'Affected PRs',itemStyle:{color:'#8e8e8e'},data:gs.map(([,s])=>s.size),label:{show:true,position:'right'}}]};",
+            "renderer": "canvas"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "P8C78EC3C1718EE4D"
+              },
+              "entitySet": {
+                "entityType": "IoTEvents.ADOTelemetry.PullRequest",
+                "name": "ADOTelemetry.PullRequest"
+              },
+              "entityType": "IoTEvents.ADOTelemetry.PullRequest",
+              "oDataQueryString": "ADOTelemetry.PullRequest?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Status eq 'completed' and Closed ge ${__from:date:iso} and Closed lt ${__to:date:iso})/groupby((Organization,Project,PullRequestId,TargetBranch,Created,Closed))&$top=20000",
+              "refId": "A",
+              "usePost": true
+            },
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "P8C78EC3C1718EE4D"
+              },
+              "entitySet": {
+                "entityType": "IoTEvents.ADOTelemetry.PipelineRun",
+                "name": "ADOTelemetry.PipelineRun"
+              },
+              "entityType": "IoTEvents.ADOTelemetry.PipelineRun",
+              "oDataQueryString": "ADOTelemetry.PipelineRun?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and (('__all' in (${Pipeline:singlequote}) and Pipeline eq 'PR-Changes') or Pipeline in (${Pipeline:singlequote})) and PullRequestId gt 0 and Started lt ${__to:date:iso})/groupby((Organization,Project,PullRequestId,BuildId,Pipeline,DefinitionId,PullRequestIteration,SourceVersion,Result,Started,Finished))&$top=20000",
+              "refId": "B",
+              "usePost": true
+            },
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "P8C78EC3C1718EE4D"
+              },
+              "entitySet": {
+                "entityType": "IoTEvents.ADOTelemetry.PipelineStep",
+                "name": "ADOTelemetry.PipelineStep"
+              },
+              "entityType": "IoTEvents.ADOTelemetry.PipelineStep",
+              "oDataQueryString": "ADOTelemetry.PipelineStep?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Started lt ${__to:date:iso})/groupby((Organization,Project,BuildId),aggregate(Attempt with max as MaxAttempt,RecordId with countdistinct as ObservedRecords))&$top=20000",
+              "refId": "C",
+              "usePost": true
+            },
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "P8C78EC3C1718EE4D"
+              },
+              "entitySet": {
+                "entityType": "IoTEvents.ADOTelemetry.PipelineRun",
+                "name": "ADOTelemetry.PipelineRun"
+              },
+              "entityType": "IoTEvents.ADOTelemetry.PipelineRun",
+              "oDataQueryString": "ADOTelemetry.PipelineRun?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq 'PR-Package' and Started lt ${__to:date:iso})/groupby((Organization,Project,BuildId,ParentBuildId,PullRequestId,Result,Started,Finished))&$top=20000",
+              "refId": "D",
+              "usePost": true
+            }
+          ],
+          "title": "What is missing? — merged PR evidence gaps",
+          "type": "volkovlabs-echarts-panel"
+        }
+      ],
+      "title": "Merged PR validation efficiency by release line",
+      "type": "row"
     }
   ],
   "preload": false,
@@ -2248,6 +2747,52 @@
           "usePost": true
         },
         "refresh": 2,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": false,
+        "label": "Build link organization",
+        "multi": false,
+        "name": "BuildOrganization",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=groupby((Organization))&$select=Organization&$orderby=Organization",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": false,
+        "label": "Build link project",
+        "multi": false,
+        "name": "BuildProject",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(Organization eq ${BuildOrganization:singlequote})/groupby((Project))&$select=Project&$orderby=Project",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
         "type": "query"
       }
     ]
