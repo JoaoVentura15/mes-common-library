@@ -20,12 +20,15 @@ namespace audit.Objects.PipelineRuns
         // Ordered: most specific first, so later rules never see the pieces an earlier rule already replaced.
         private static readonly (Regex Pattern, string Replacement)[] Rules =
         {
+            // Quoted/JSON/CLI secrets may contain whitespace. Remove values before generic rules.
+            (new Regex(@"(?i)[""']?\b(?:password|passwd|pwd|pat|token|secret|api[-_]?key|_authToken|authorization|connectionstring|connection[-_]string)\b[""']?\s*[=:]\s*(?:""[^""]*""|'[^']*')", Opt, Timeout), "<redacted>"),
+            (new Regex(@"(?i)(?:--?(?:password|passwd|pwd|pat|token|secret|api[-_]?key|connection[-_]string))\s+(?:""[^""]*""|'[^']*'|[^\s]+)", Opt, Timeout), "<redacted>"),
             // URLs (feeds, repositories, internal services)
             (new Regex(@"\b[a-z][a-z0-9+.\-]{1,15}://[^\s""'<>)\]]+", Opt | RegexOptions.IgnoreCase, Timeout), "<url>"),
             // secrets with a known shape
             (new Regex(@"\b(?:ghp|gho|ghs|ghu|github_pat|glpat|xox[abprs]|AKIA|ASIA|AIza|sk)[-_A-Za-z0-9]{12,}|\beyJ[A-Za-z0-9_\-]{8,}\.[A-Za-z0-9_\-.]+", Opt, Timeout), "<secret>"),
             // key=value secrets (connection strings, query strings, headers)
-            (new Regex(@"(?i)\b(pass(?:word)?|pwd|pat|token|secret|api[-_]?key|account[-_]?key|access[-_]?key|sig|sas|authorization)\b\s*[=:]\s*(?:Bearer\s+|Basic\s+)?[^\s;,&""'<>]{4,}", Opt, Timeout), "$1=<redacted>"),
+            (new Regex(@"(?i)\b(pass(?:word)?|pwd|pat|token|_authToken|secret|api[-_]?key|account[-_]?key|access[-_]?key|sig|sas|authorization)\b\s*[=:]\s*(?:Bearer\s+|Basic\s+)?[^\s;,&""'<>]{4,}", Opt, Timeout), "$1=<redacted>"),
             // bearer / basic credentials sent as header values
             (new Regex(@"(?i)\b(?:bearer|basic)\s+[A-Za-z0-9+/=._\-]{8,}", Opt, Timeout), "<redacted>"),
             // people: "canceled by Jane Doe", "queued by ..." (name runs to the end of the sentence)
