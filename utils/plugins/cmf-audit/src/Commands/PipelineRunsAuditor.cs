@@ -95,7 +95,7 @@ namespace Cmf.Cli.Plugin.Audit.Commands
 
             cmd.AddOption(new Option<string>(
                 aliases: new[] { "--include" },
-                description: "What to collect: runs, steps, tests, changes, prs, approvals, jobs, schedule, tags, prfiles, scope or all (all includes none of schedule, tags, prfiles and scope; use --include schedule,tags alone for only the release Feature date history and the version tags, or --include scope alone for only the work item scope)",
+                description: "What to collect: runs, steps, tests, changes, prs, approvals, jobs, schedule, tags, prfiles, scope, failures, policies or all (all excludes schedule, tags, prfiles, scope, failures and policies; use --include schedule,tags alone for only the release Feature date history and the version tags, or --include scope alone for only the work item scope)",
                 getDefaultValue: () => "all"));
 
             cmd.AddOption(new Option<int>(
@@ -108,7 +108,7 @@ namespace Cmf.Cli.Plugin.Audit.Commands
             cmd.AddOption(new Option<bool>("--refreshOpenPullRequests", "Refresh all open pull requests, including those created before the lookback window"));
             cmd.AddOption(new Option<bool>("--refreshChangedWorkItems", "Also refresh the pull requests of any age that are linked to work items changed since the lookback window starts"));
             cmd.AddOption(new Option<int>("--batchDelayMs", () => 1000, "Pause between PostMultipleIoTEvents calls in milliseconds; 0 posts back to back (Kafka accepts the events and the housekeeper writes them to ClickHouse afterwards)"));
-            cmd.AddOption(new Option<bool>("--typedEvents", "Also post the typed IoT events of the \"ADOTelemetry\" folder (PipelineRun, PipelineStep, Approval, RunChange, TestRun, TestFailure, PullRequest, PullRequestWorkItem, WorkItemFlow, WorkItemHistory, WorkItemScope, ReleaseSchedule, ReleaseTag, PullRequestFiles, Sprint, AgentJob), one ReplacingMergeTree table each. Their event definitions must be deployed first (see --writeEventDefinitions)"));
+            cmd.AddOption(new Option<bool>("--typedEvents", "Also post the typed IoT events of the \"ADOTelemetry\" folder (PipelineRun, PipelineStep, Approval, RunChange, TestRun, TestFailure, PullRequest, PullRequestWorkItem, WorkItemFlow, WorkItemHistory, WorkItemScope, ReleaseSchedule, ReleaseTag, PullRequestFiles, Sprint, AgentJob, optional PipelineFailure/PullRequestPolicy), one ReplacingMergeTree table each. Their event definitions must be deployed first (see --writeEventDefinitions)"));
             cmd.AddOption(new Option<bool>("--telemetryEvents", () => true, "Post the generic PostTelemetry events; false posts only the typed events (with --typedEvents)"));
             cmd.AddOption(new Option<string>("--writeEventDefinitions", "Write the typed event definitions (MasterData JSON and one MES export XML per event, importable from the IoT Event Definition list) to this folder and exit; nothing is collected or posted"));
             cmd.AddOption(new Option<string>("--mesVersion", () => AdoTelemetryEvents.DefaultMesVersion, "MES version of the tenant (for example 11.2.3), used for the assembly versions of the exported event definition XML"));
@@ -117,6 +117,8 @@ namespace Cmf.Cli.Plugin.Audit.Commands
             cmd.AddOption(new Option<string>("--sprintFromIterationPath", "Regex with one capture group extracting the sprint from System.IterationPath"));
             cmd.AddOption(new Option<bool>("--workItemHistory", "Read work item revisions to measure state transitions and sprint carry-over"));
             cmd.AddOption(new Option<bool>("--stepErrors", () => true, "Send the error code and the first error line of failed steps, with URLs, paths, accounts, hosts, IPs, e-mails, secrets and ids scrubbed (max 300 chars); false sends neither"));
+            cmd.AddOption(new Option<bool>("--logErrors", () => false, "Read failed tasks' own logs for a redacted specific error; requires --stepErrors. No full logs are posted or saved."));
+            cmd.AddOption(new Option<int>("--logMaxLines", () => 50000, "Maximum lines scanned per failed task (1..200000). Truncated/unavailable evidence is marked; strict collection fails on incomplete log reads."));
             cmd.AddOption(new Option<string>("--doneStates", () => "Resolved,Closed", "Comma-separated work item states considered done"));
             cmd.AddOption(new Option<string>("--branchVersions", "Branch=VersionPrefix pairs, e.g. main=1.6,release/1.3=1.3. Also names the branch (Line) of each release version; without an entry x.y.0 = development and x.y.z = release/x.y"));
             cmd.AddOption(new Option<string>("--releaseTitle", () => PipelineRunsSettings.DefaultReleaseTitle, "Regex with one capture group (the version) matching the title of a release Feature, for --include schedule"));

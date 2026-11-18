@@ -24,7 +24,8 @@ public class ResolveAdoTelemetryFolder : DeeDevBase
         {
             "PipelineRun", "PipelineStep", "Approval", "RunChange", "TestRun", "TestFailure",
             "PullRequest", "PullRequestWorkItem", "WorkItemFlow", "WorkItemHistory", "WorkItemScope",
-            "ReleaseSchedule", "ReleaseTag", "PullRequestFiles", "Sprint", "AgentJob"
+            "ReleaseSchedule", "ReleaseTag", "PullRequestFiles", "Sprint", "AgentJob",
+            "PipelineFailure", "PullRequestPolicy"
         };
 
         foreach (IIoTEventDefinition definition in (IIoTEventDefinitionCollection)Input["IoTEventDefinitionCollection"])
