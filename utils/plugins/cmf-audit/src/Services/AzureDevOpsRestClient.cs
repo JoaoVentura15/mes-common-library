@@ -13,6 +13,10 @@ namespace audit.Services
     {
         Task<List<JsonElement>> ListBuildsAsync(string project, DateTime since, string? repositoryId);
         Task<JsonElement?> GetTimelineAsync(string project, int buildId);
+        Task<IReadOnlyList<string>?> GetBuildLogLinesAsync(string project, int buildId, int logId, int startLine, int endLine) => throw new NotSupportedException();
+        Task<JsonElement?> GetBuildAsync(string project, int buildId) => Task.FromResult<JsonElement?>(null);
+        Task<string?> GetProjectIdAsync(string project) => Task.FromResult<string?>(null);
+        Task<List<JsonElement>> GetPullRequestPoliciesAsync(string project, string projectId, int pullRequestId) => throw new NotSupportedException();
         Task<List<JsonElement>> GetBuildChangesAsync(string project, int buildId);
         Task<List<JsonElement>> GetTestRunsAsync(string project, string buildUri);
         Task<List<JsonElement>> GetFailedTestResultsAsync(string project, int testRunId);
@@ -133,6 +137,92 @@ namespace audit.Services
         {
             var (body, _) = await GetAsync($"{orgUrl}{Q(project)}/_apis/build/builds/{buildId}/timeline?api-version={ApiVersion}");
             return body.ValueKind == JsonValueKind.Object ? body : null;
+        }
+
+        /// <summary>Reads only the trusted build/log route, never a URL supplied by a log. Pages are bounded to 2 MiB of text.</summary>
+        public async Task<IReadOnlyList<string>?> GetBuildLogLinesAsync(string project, int buildId, int logId, int startLine, int endLine)
+        {
+            if (buildId <= 0 || logId <= 0 || startLine < 0 || endLine < startLine || endLine - startLine >= 2000)
+                throw new ArgumentOutOfRangeException(nameof(startLine));
+            var url = $"{orgUrl}{Q(project)}/_apis/build/builds/{buildId}/logs/{logId}?startLine={startLine}&endLine={endLine}&api-version={ApiVersion}";
+            for (var attempt = 1; ; attempt++)
+            {
+                using var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
+                using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+                if ((response.StatusCode == (HttpStatusCode)429 || (int)response.StatusCode >= 500) && attempt < 4)
+                {
+                    await Task.Delay(response.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(5 * attempt));
+                    continue;
+                }
+                if (response.StatusCode == HttpStatusCode.NotFound) return null;
+                if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden or HttpStatusCode.NonAuthoritativeInformation)
+                    throw new UnauthorizedAccessException("Azure DevOps denied access to a build log; check Build: Read.");
+                response.EnsureSuccessStatusCode();
+                if (response.Content.Headers.ContentType?.MediaType is "text/html" or "application/zip")
+                    throw new InvalidDataException("Unexpected build log response format.");
+                using var timeout = new CancellationTokenSource(http.Timeout);
+                using var reader = new StreamReader(await response.Content.ReadAsStreamAsync(timeout.Token));
+                var buffer = new char[8192];
+                var text = new StringBuilder();
+                int read;
+                while ((read = await reader.ReadAsync(buffer.AsMemory(), timeout.Token)) > 0)
+                {
+                    if (text.Length + read > 2 * 1024 * 1024) throw new InvalidDataException("Build log page exceeds the safe text limit.");
+                    text.Append(buffer, 0, read);
+                }
+                var content = text.ToString();
+                if (content.TrimStart().StartsWith("<html", StringComparison.OrdinalIgnoreCase) || content.TrimStart().StartsWith("<!DOCTYPE html", StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidDataException("Unexpected login page instead of a build log.");
+                if (response.Content.Headers.ContentType?.MediaType == "application/json")
+                {
+                    using var doc = JsonDocument.Parse(content);
+                    if (doc.RootElement.ValueKind == JsonValueKind.String) content = doc.RootElement.GetString() ?? "";
+                    else
+                    {
+                        var array = doc.RootElement.ValueKind == JsonValueKind.Array ? doc.RootElement
+                            : doc.RootElement.ValueKind == JsonValueKind.Object && doc.RootElement.TryGetProperty("value", out var value) ? value : default;
+                        if (array.ValueKind != JsonValueKind.Array || array.EnumerateArray().Any(v => v.ValueKind != JsonValueKind.String))
+                            throw new InvalidDataException("Unexpected JSON build log response.");
+                        return array.EnumerateArray().Select(v => v.GetString() ?? "").ToList();
+                    }
+                }
+                if (content.Length == 0) return Array.Empty<string>();
+                var lines = content.Replace("\r\n", "\n").Split('\n').ToList();
+                if (lines[^1].Length == 0) lines.RemoveAt(lines.Count - 1);
+                return lines;
+            }
+        }
+
+        public async Task<JsonElement?> GetBuildAsync(string project, int buildId)
+        {
+            var (body, _) = await GetAsync($"{orgUrl}{Q(project)}/_apis/build/builds/{buildId}?api-version={ApiVersion}");
+            return body.ValueKind == JsonValueKind.Object ? body : null;
+        }
+
+        public async Task<string?> GetProjectIdAsync(string project)
+        {
+            var (body, _) = await GetAsync($"{orgUrl}_apis/projects/{Q(project)}?api-version={ApiVersion}", requireFound: true);
+            return body.ValueKind == JsonValueKind.Object && body.TryGetProperty("id", out var id) ? id.GetString() : null;
+        }
+
+        // https://learn.microsoft.com/rest/api/azure/devops/policy/evaluations/list
+        public async Task<List<JsonElement>> GetPullRequestPoliciesAsync(string project, string projectId, int pullRequestId)
+        {
+            if (!Guid.TryParse(projectId, out _) || pullRequestId <= 0) throw new ArgumentException("A project GUID and PR id are required.");
+            var artifact = $"vstfs:///CodeReview/CodeReviewId/{projectId}/{pullRequestId}";
+            var all = new List<JsonElement>();
+            const int top = 100;
+            for (var skip = 0; ; skip += top)
+            {
+                var (body, _) = await GetAsync($"{orgUrl}{Q(project)}/_apis/policy/evaluations?artifactId={Q(artifact)}&includeNotApplicable=true&$top={top}&$skip={skip}&api-version=7.1-preview.1", requireFound: true);
+                if (body.ValueKind != JsonValueKind.Object || !body.TryGetProperty("value", out var entries) || entries.ValueKind != JsonValueKind.Array)
+                    throw new InvalidDataException("Policy response was incomplete.");
+                var page = Values(body);
+                if (skip >= 10000) throw new InvalidDataException("Policy pagination exceeded the safety bound.");
+                all.AddRange(page);
+                if (page.Count < top) return all;
+            }
         }
 
         public async Task<List<JsonElement>> GetBuildChangesAsync(string project, int buildId)
