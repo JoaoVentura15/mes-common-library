@@ -35,7 +35,7 @@ namespace audit.Objects.PipelineRuns
     /// ORDER BY = the key columns (IsIndexed, by IndexOrder), no version column (the last post wins), no partition on this tenant.
     /// Keys never change between posts and EventTime is derived from the entity, so re-posting history replaces rows instead of adding them.
     /// </summary>
-    public static class AdoTelemetryEvents
+    public static partial class AdoTelemetryEvents
     {
         public const string Folder = "ADOTelemetry";
 
@@ -536,9 +536,9 @@ namespace audit.Objects.PipelineRuns
             },
         };
 
-        public static readonly IReadOnlyList<EventSchema> Schemas = new[]
+        public static IReadOnlyList<EventSchema> Schemas => new[]
         {
-            PipelineRun, PipelineStep, Approval, RunChange, TestRun, TestFailure, PullRequest, PullRequestWorkItem, WorkItemFlow, WorkItemHistory, WorkItemScope, ReleaseSchedule, ReleaseTag, PullRequestFiles, Sprint, AgentJob,
+            PipelineRun, PipelineStep, Approval, RunChange, TestRun, TestFailure, PullRequest, PullRequestWorkItem, WorkItemFlow, WorkItemHistory, WorkItemScope, ReleaseSchedule, ReleaseTag, PullRequestFiles, Sprint, AgentJob, PipelineFailure, PullRequestPolicy,
         };
 
         /// <summary>Converts the collector events of the supported areas; other areas are left to PostTelemetry.</summary>
@@ -552,10 +552,11 @@ namespace audit.Objects.PipelineRuns
                 if (PipelineRun.EntityTime(e) is { } t && TagOf(e, "BuildId") is { } id) runTime[id] = t;
             }
 
+            var schemas = Schemas;
             var result = new List<TypedEvent>();
             foreach (var e in list)
             {
-                var schema = Schemas.FirstOrDefault(s => s.Areas.Contains(e.Area?.Name ?? ""));
+                var schema = schemas.FirstOrDefault(s => s.Areas.Contains(e.Area?.Name ?? ""));
                 if (schema == null) continue;
                 var time = schema.EntityTime(e)
                     ?? (TagOf(e, "BuildId") is { } id && runTime.TryGetValue(id, out var rt) ? rt : DateTime.UtcNow.Date);
