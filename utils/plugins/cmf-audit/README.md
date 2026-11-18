@@ -113,9 +113,28 @@ never done. Deploy the `WorkItemScope` event definition first using the `Cmf.Aud
 The event definitions ship as MasterData in the `Cmf.Audit.Data` package, which creates the IoT event definitions folder before import.
 The typed datasets (`Dataset-ADO*Typed.xml`) ship in the `Cmf.Audit.ExportedObjects` package, `ExportedObjects/2.0.0`, next to the objects of version 1.0.0. Eight dashboards ship in the
 `Cmf.Audit.Grafana` package, `2.0.0/dashboards/ADO Data`: Pipeline hot spots, PR flow hot spots, Team progress, Sprint handoff,
-Agents and tests, Pipeline investigation, Package release flow and Epic forecast. They read the typed datasets
+Agents and tests, Pipeline investigation, Package release flow and Epic forecast. Most panels use the typed datasets
 (`UserDefined.ADOTelemetry.*Typed`) over the CM Data Platform OData datasource, with multi-select filters and Grafana's time
-range. Replace the datasource UID in them if it differs from yours.
+range. Replace the datasource UIDs if they differ in your deployment.
+
+The Pipeline investigation dashboard also reads the raw `PullRequest`, `PipelineRun` and `PipelineStep` events
+for the validation-efficiency section. Configure the IoT Events OData datasource and install Grafana Business
+Charts (`volkovlabs-echarts-panel`) for the charts. Use **Build link organization** and **Build link project**
+to scope the unlinked-child table to one Azure DevOps project. Both build ID columns open the results page
+in that project. PRs with missing child links stay outside the full-chain rerun ratios.
+
+### Failure evidence and PR policies
+
+Install `PipelineFailure` and `PullRequestPolicy` from `Cmf.Audit.Data` before collecting those events.
+The corresponding exported datasets are `ADOPipelineFailuresTyped` and `ADOBlockedPullRequestsTyped`.
+Add `failures` and `policies` to `--include` and post with `--typedEvents`. In the generated pipeline,
+`CollectorArguments` replaces the default include list when you supply `--include`. To keep default
+collection and add both parts, pass `--include runs,steps,tests,changes,prs,approvals,tags,failures,policies`.
+
+Failure collection uses failed timeline tasks and requires step errors to be enabled. Pass `--logErrors true`
+to scan the failed tasks' logs as well. The collector posts bounded, redacted excerpts and records incomplete
+reads. With `--strictCollection`, an incomplete requested log scan fails collection. The ADO identity
+needs read access to the builds and, when you enable policies, to pull request policy evaluations.
 
 The Epic forecast dashboard (Monte Carlo forecast of an epic or a set of milestones, per team) works for any number of projects. It reads `ADOEpicForecastTyped`, `ADORemainingWorkTyped`, `ADOReleasesTyped` and, for its filters, `ADOScopeDimensionsTyped`. Pick the Organization and Project (several allowed; each project keeps its own rows, so ids and milestone names of different projects never mix), then the scope: milestones (several allowed), features (several allowed) or an epic id, a target date and the history to learn from. A story that has no Feature is grouped under its Epic (listed as `Epic: ... (no feature)`), or under `(standalone)` when it has no parent either, so it can still be forecast; the table "Open items in scope without a Feature" lists them so their links can be fixed in Azure DevOps.
 
