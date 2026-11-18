@@ -11,7 +11,7 @@ namespace audit.Objects.PipelineRuns
     /// Area = record type, Resource = record id, Flow = pipeline, Step = stage, step or test run.
     /// Times go into Parameter Timestamps as Unix seconds, like the other cmf-audit events.
     /// </summary>
-    public static class PipelineRunsMapper
+    public static partial class PipelineRunsMapper
     {
         public const string AreaRun = "PipelineRun";
         public const string AreaStage = "PipelineStage";
@@ -277,7 +277,7 @@ namespace audit.Objects.PipelineRuns
         }
 
         /// <summary>PipelineStage events (stages) and PipelineStep events (jobs, tasks, checkpoints).</summary>
-        public static List<PostTelemetry> MapTimeline(JsonElement build, JsonElement? timeline, PipelineRunsSettings s)
+        public static List<PostTelemetry> MapTimeline(JsonElement build, JsonElement? timeline, PipelineRunsSettings s, IReadOnlyDictionary<string, FailureEvidence>? logErrors = null)
         {
             var records = Records(timeline).ToList();
             var byId = records.Where(r => Str(r, "id").Length > 0).GroupBy(r => Str(r, "id")).ToDictionary(g => g.Key, g => g.First());
@@ -322,9 +322,10 @@ namespace audit.Objects.PipelineRuns
                 Number(t, "Duration", "Duration", Seconds(started, finished), "s", started, finished);
                 if (Long(r, "errorCount") > 0) Number(t, "Count", "Errors", Long(r, "errorCount"), "");
                 if (Long(r, "warningCount") > 0) Number(t, "Count", "Warnings", Long(r, "warningCount"), "");
-                if (s.StepErrors && Long(r, "errorCount") > 0)
+                if (s.StepErrors && (Long(r, "errorCount") > 0 || logErrors?.ContainsKey(Str(r, "id")) == true))
                 {
-                    var (code, message) = FirstError(r);
+                    var (code, message) = logErrors != null && logErrors.TryGetValue(Str(r, "id"), out var evidence)
+                        ? (evidence.Code, evidence.Message) : FirstError(r);
                     Tag(t, "ErrorCode", code);
                     Text(t, "ErrorMessage", message);
                 }
