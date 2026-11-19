@@ -651,7 +651,7 @@ namespace audit.Objects.PipelineRuns
                 var stateChanged = state != previousState;
                 var pathChanged = path != previousPath;
                 var changedAt = FieldDate(revision, "System.ChangedDate");
-                if (first || stateChanged || pathChanged)
+                if (settings.AllWorkItemHistory || first || stateChanged || pathChanged)
                 {
                     var t = NewEvent(settings, "", AreaWorkItemHistory, $"{Str(item, "id")}:{Long(revision, "rev")}");
                     Tag(t, "WorkItemId", Str(item, "id"));
@@ -659,7 +659,7 @@ namespace audit.Objects.PipelineRuns
                     Tag(t, "WorkItemType", Field(revision, "System.WorkItemType") is { Length: > 0 } type ? type : Field(item, "System.WorkItemType"));
                     Tag(t, "State", state);
                     Tag(t, "PreviousState", previousState);
-                    Tag(t, "ChangeKind", first ? "Created" : stateChanged && pathChanged ? "StateAndIteration" : stateChanged ? "State" : "Iteration");
+                    Tag(t, "ChangeKind", first ? "Created" : stateChanged && pathChanged ? "StateAndIteration" : stateChanged ? "State" : pathChanged ? "Iteration" : "Updated");
                     Tag(t, "AreaPath", Field(revision, "System.AreaPath"));
                     Tag(t, "IterationPath", path);
                     Tag(t, "PreviousIterationPath", previousPath);
@@ -669,7 +669,7 @@ namespace audit.Objects.PipelineRuns
                     if (settings.Identity != IdentityMode.None && Get(revision, "fields") is JsonElement fields && fields.TryGetProperty("System.ChangedBy", out var person) && person.ValueKind == JsonValueKind.Object)
                         Tag(t, "ChangedBy", Str(person, settings.Identity == IdentityMode.Name ? "displayName" : "id"));
                     Moment(t, "ChangedAt", changedAt);
-                    Interval(t, "InPreviousState", previousChanged, changedAt);
+                    if (first || stateChanged || pathChanged) Interval(t, "InPreviousState", previousChanged, changedAt);
                     events.Add(t);
                 }
                 if (stateChanged || first) previousChanged = changedAt;
