@@ -46,6 +46,7 @@ namespace audit.Objects.PipelineRuns
         public string? teamFromIterationPath { get; set; }
         public string? sprintFromIterationPath { get; set; }
         public bool workItemHistory { get; set; }
+        public bool allWorkItemHistory { get; set; }
         public bool stepErrors { get; set; } = true;
         public bool logErrors { get; set; }
         public int logMaxLines { get; set; } = 50000;
@@ -128,6 +129,7 @@ namespace audit.Objects.PipelineRuns
         public Regex? TeamFromIterationPath { get; init; }
         public Regex? SprintFromIterationPath { get; init; }
         public bool WorkItemHistory { get; init; }
+        public bool AllWorkItemHistory { get; init; }
         /// <summary>Send the error code and the scrubbed first error line of failed steps (ErrorCode tag, ErrorMessage). On by default; --stepErrors false turns it off.</summary>
         public bool StepErrors { get; init; } = true;
         public bool LogErrors { get; init; }
@@ -235,7 +237,8 @@ namespace audit.Objects.PipelineRuns
                 WorkItemFields = ParseRoles(o.workItemFields),
                 TeamFromIterationPath = PathPattern(o.teamFromIterationPath),
                 SprintFromIterationPath = PathPattern(o.sprintFromIterationPath),
-                WorkItemHistory = o.workItemHistory,
+                WorkItemHistory = o.workItemHistory || o.allWorkItemHistory,
+                AllWorkItemHistory = o.allWorkItemHistory,
                 StepErrors = o.stepErrors,
                 LogErrors = o.logErrors,
                 LogMaxLines = o.logMaxLines is >= 1 and <= 200000 ? o.logMaxLines : throw new ArgumentException("--logMaxLines must be between 1 and 200000"),
