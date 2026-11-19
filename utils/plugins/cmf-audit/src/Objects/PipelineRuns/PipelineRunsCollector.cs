@@ -41,6 +41,7 @@ namespace audit.Objects.PipelineRuns
 
         public async Task<List<PostTelemetry>> CollectAsync()
         {
+            if (s.AllWorkItemHistory) await CollectAllWorkItemHistoryAsync();
             if ((s.Parts & ~PipelineRunsSettings.MetadataParts) == PipelineRunsParts.None)
             {
                 if (s.Parts.HasFlag(PipelineRunsParts.ReleaseSchedule)) await CollectReleaseScheduleAsync();
@@ -185,7 +186,6 @@ namespace audit.Objects.PipelineRuns
             var wiql = $"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @project AND [System.WorkItemType] IN ({string.Join(", ", s.ScopeTypes.Select(Quote))}) " +
                        $"AND ([System.ChangedDate] >= '{s.Since:yyyy-MM-dd}' OR [System.State] NOT IN ({string.Join(", ", settled)})) ORDER BY [System.Id]";
             var ids = await ado.QueryWorkItemIdsAsync(s.Project, wiql);
-            if (ids.Count >= 20000) WarnOrThrow("Work item scope: WIQL answers at most 20000 ids and this query reached it; narrow it with --since or --scopeTypes");
             Log.Information($"Work item scope: reading {ids.Count} {string.Join("/", s.ScopeTypes)} work item(s) open or changed since {s.Since:yyyy-MM-dd}");
 
             var all = new Dictionary<int, JsonElement>();
@@ -556,7 +556,6 @@ namespace audit.Objects.PipelineRuns
             var result = new Dictionary<string, HashSet<int>>(StringComparer.OrdinalIgnoreCase);
             var wiql = $"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @project AND [System.ChangedDate] >= '{s.Since:yyyy-MM-dd}' ORDER BY [System.Id]";
             var ids = await ado.QueryWorkItemIdsAsync(s.Project, wiql);
-            if (ids.Count >= 20000) WarnOrThrow("Changed work items: WIQL answers at most 20000 ids and this query reached it; narrow it with --since");
             Log.Information($"Changed work items: reading the links of {ids.Count} work item(s) changed since {s.Since:yyyy-MM-dd}");
             var linked = new List<(int Id, List<(string Repository, int PullRequest)> PullRequests)>();
             foreach (var item in await ado.GetWorkItemRelationsAsync(s.Project, ids))
