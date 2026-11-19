@@ -1,5 +1,15 @@
 # cmf-audit
 
+## Complete project work-item history
+
+Add `--allWorkItemHistory` to `pipeline-runs` to backfill every accessible work item's revision history in the selected team project, including user stories without pull requests and closed or removed items. This implies `--workItemHistory` and ignores `--since`, repository filters and scope types for history collection. Pipeline and PR collection still use their configured date range.
+
+Every revision is emitted using the existing `WorkItemHistory` schema. Revisions that leave state and iteration unchanged use `ChangeKind=Updated` and do not duplicate state-duration measurements. This retains the schema's state, iteration, area, reason, actor and timestamp fields; it does not archive arbitrary field snapshots, attachments, comments or deleted work items. No new event definition columns or data sets are required.
+
+Work-item queries use ascending ID pages of at most 10,000 and continue to an empty page, including beyond 20,000 items. Repeated pages and malformed responses are rejected. Revision requests use 200-row pages; full-history collection rejects missing, duplicate or mismatched revisions and empty histories before posting. Use `--strictCollection` for the remaining collections. Full history is rebuilt whenever this flag is supplied; revisions and generated events are held in memory, so large projects need adequate memory.
+
+For example, append `--allWorkItemHistory --strictCollection` to an existing `pipeline-runs` command with `--typedEvents --postEvent`. Keep the organization's existing tenant, field mappings, repository and pool configuration. For incremental pipeline collection, retain a recent `--since`; the full work-item history remains independent of that lookback.
+
 Plugin used to audit CM CLI based projects. This repo is split in two parts:
 
 - **Root** (`package.json`) — the build/release orchestrator. Not published; it drives `dotnet publish` for every platform and wraps the `npm/` package's version bump/publish scripts.
