@@ -1079,6 +1079,36 @@ namespace specs
             Assert.Contains(events, item => item.Area.Name == AreaPullRequest && item.Resource.Name == "51");
         }
 
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task FullHistoryIncludesItemsWithoutPrsAndRejectsRevisionGaps(bool revisionGap)
+        {
+            var ado = new FakeAdo { QueryIds = { 6005 } };
+            ado.Revisions[6005] = new()
+            {
+                J("""{"id":6005,"rev":1,"fields":{"System.WorkItemType":"User Story","System.State":"New","System.ChangedDate":"2020-01-01T00:00:00Z"}}"""),
+                J("""{"id":6005,"rev":2,"fields":{"System.WorkItemType":"User Story","System.State":"New","System.Title":"Edited title","System.ChangedDate":"2020-01-02T00:00:00Z"}}""")
+            };
+            var settings = PipelineRunsSettings.From(new PipelineRunsOptions
+            {
+                azureDevOpsUrl = "https://dev.azure.com/example/", teamProject = "Contoso",
+                include = "scope", since = "2026-11-01", allWorkItemHistory = true
+            }, DateTime.UtcNow);
+            if (revisionGap)
+            {
+                ado.Revisions[6005].RemoveAt(0);
+                await Assert.ThrowsAsync<InvalidDataException>(() => new PipelineRunsCollector(ado, settings).CollectAsync());
+                return;
+            }
+            var events = await new PipelineRunsCollector(ado, settings).CollectAsync();
+            var history = events.Where(e => TagOf(e, "WorkItemId") == "6005" && TagOf(e, "Rev") != null).ToList();
+            Assert.Equal(2, history.Count);
+            Assert.Contains(history, e => TagOf(e, "ChangeKind") == "Updated");
+            Assert.Equal(1, ado.HistoryCalls);
+            Assert.True(settings.WorkItemHistory);
+        }
+
         private class FakeAdo : IAzureDevOpsRestClient
         {
             public List<JsonElement> Builds { get; } = new();

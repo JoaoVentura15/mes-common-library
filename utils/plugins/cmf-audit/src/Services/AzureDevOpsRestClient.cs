@@ -366,17 +366,37 @@ namespace audit.Services
             const int top = 200;
             for (var skip = 0; ; skip += top)
             {
-                var (body, _) = await GetAsync($"{orgUrl}{Q(project)}/_apis/wit/workitems/{workItemId}/revisions?$top={top}&$skip={skip}&api-version={ApiVersion}");
+                var (body, _) = await GetAsync($"{orgUrl}{Q(project)}/_apis/wit/workitems/{workItemId}/revisions?$top={top}&$skip={skip}&api-version={ApiVersion}", requireFound: true);
                 var page = Values(body);
                 all.AddRange(page);
                 if (page.Count < top) return all;
             }
         }
 
-        /// <summary>Ids returned by a WIQL query (read-only POST; WIQL answers at most 20000 ids).</summary>
+        /// <summary>Enumerates flat work-item queries in ID order with bounded pages, avoiding WIQL's 20000-result limit.</summary>
         public async Task<List<int>> QueryWorkItemIdsAsync(string project, string wiql)
         {
-            var url = $"{orgUrl}{Q(project)}/_apis/wit/wiql?api-version={ApiVersion}";
+            var match = System.Text.RegularExpressions.Regex.Match(wiql,
+                @"\A\s*SELECT\s+\[System\.Id\]\s+FROM\s+WorkItems\s+WHERE\s+(.+?)(?:\s+ORDER\s+BY\s+.+)?\s*\z",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
+            if (!match.Success) throw new ArgumentException("Expected a flat SELECT [System.Id] FROM WorkItems WHERE query", nameof(wiql));
+            var all = new List<int>();
+            var cursor = 0;
+            while (true)
+            {
+                var query = $"SELECT [System.Id] FROM WorkItems WHERE ({match.Groups[1].Value}) AND [System.Id] > {cursor} ORDER BY [System.Id] ASC";
+                var page = await QueryWorkItemIdPageAsync(project, query);
+                if (page.Count == 0) return all;
+                if (page.Any(id => id <= cursor) || page.Distinct().Count() != page.Count)
+                    throw new InvalidDataException("WIQL paging did not advance or returned duplicate IDs; refusing incomplete results");
+                all.AddRange(page.OrderBy(id => id));
+                cursor = page.Max();
+            }
+        }
+
+        private async Task<List<int>> QueryWorkItemIdPageAsync(string project, string wiql)
+        {
+            var url = $"{orgUrl}{Q(project)}/_apis/wit/wiql?$top=10000&api-version={ApiVersion}";
             for (var attempt = 1; ; attempt++)
             {
                 using var content = new StringContent(JsonSerializer.Serialize(new { query = wiql }), Encoding.UTF8, "application/json");
@@ -392,9 +412,9 @@ namespace audit.Services
                 }
                 response.EnsureSuccessStatusCode();
                 using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-                return doc.RootElement.TryGetProperty("workItems", out var items) && items.ValueKind == JsonValueKind.Array
-                    ? items.EnumerateArray().Where(i => i.TryGetProperty("id", out _)).Select(i => i.GetProperty("id").GetInt32()).ToList()
-                    : new List<int>();
+                if (!doc.RootElement.TryGetProperty("workItems", out var items) || items.ValueKind != JsonValueKind.Array)
+                    throw new InvalidDataException("WIQL did not return a flat workItems array; refusing incomplete results");
+                return items.EnumerateArray().Select(i => i.GetProperty("id").GetInt32()).ToList();
             }
         }
 
