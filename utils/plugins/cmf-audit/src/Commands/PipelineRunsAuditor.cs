@@ -116,6 +116,7 @@ namespace Cmf.Cli.Plugin.Audit.Commands
             cmd.AddOption(new Option<string>("--teamFromIterationPath", "Regex with one capture group extracting the team from System.IterationPath"));
             cmd.AddOption(new Option<string>("--sprintFromIterationPath", "Regex with one capture group extracting the sprint from System.IterationPath"));
             cmd.AddOption(new Option<bool>("--workItemHistory", "Read work item revisions to measure state transitions and sprint carry-over"));
+            cmd.AddOption(new Option<bool>("--allWorkItemHistory", "Read every accessible project work item's complete revision history, including items without PRs and closed/removed items; ignores --since and repository filters for this history and implies --workItemHistory"));
             cmd.AddOption(new Option<bool>("--stepErrors", () => true, "Send the error code and the first error line of failed steps, with URLs, paths, accounts, hosts, IPs, e-mails, secrets and ids scrubbed (max 300 chars); false sends neither"));
             cmd.AddOption(new Option<bool>("--logErrors", () => false, "Read failed tasks' own logs for a redacted specific error; requires --stepErrors. No full logs are posted or saved."));
             cmd.AddOption(new Option<int>("--logMaxLines", () => 50000, "Maximum lines scanned per failed task (1..200000). Truncated/unavailable evidence is marked; strict collection fails on incomplete log reads."));
