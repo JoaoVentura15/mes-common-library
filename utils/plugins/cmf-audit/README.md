@@ -38,6 +38,8 @@ A previous execution without `--checkpointDirectory` cannot be recovered from th
 
 Upload progress retains the original batch number, batch total and event range when using checkpoints. Generic and typed uploads each have their own totals. For five events in batches of two, retrying after the first batch was acknowledged reports batch 1/3 as previously acknowledged and skipped, then posts batch 2/3 (events 3-4 of 5) and batch 3/3 (event 5 of 5). Failure messages use the same overall positions. Existing checkpoints remain compatible. An already running process keeps its original log messages until the next invocation.
 
+A dual-stream checkpoint can be resumed with `--typedEvents --telemetryEvents false --resume` to stop further generic PostTelemetry uploads while reusing the saved extraction and typed batch acknowledgements. Every other collection and destination option must match. The manifest is preserved, and already queued generic events remain in Kafka. This requires the existing checkpoint files; a deleted checkpoint cannot be resumed. If both uploads already finished, allow ingestion to drain instead of uploading again.
+
 ## Prerequisites
 
 - **.NET SDK 8.0.x**.
