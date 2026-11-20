@@ -28,6 +28,7 @@ namespace audit.Objects.PipelineRuns
         {
             this.ado = ado;
             this.s = settings;
+            policyObservedAt = settings.CollectedAt;
             this.parallelism = Math.Max(1, parallelism);
         }
 
@@ -620,7 +621,6 @@ namespace audit.Objects.PipelineRuns
             {
                 Log.Information($"Agent jobs: reading pool {Str(pool, "name")} ({++poolNumber}/{wanted.Count})");
                 var requests = await ado.ListJobRequestsAsync((int)Long(pool, "id"));
-                if (requests.Count >= 2000) WarnOrThrow($"Agent jobs in pool {Str(pool, "name")} may be truncated at 2000 requests.");
                 var jobs = requests
                     .Where(j => Date(j, "finishTime") is DateTime f && f >= s.Since).ToList();
                 AddRange(jobs.Select(j => MapAgentJob(j, Str(pool, "name"), s)));
