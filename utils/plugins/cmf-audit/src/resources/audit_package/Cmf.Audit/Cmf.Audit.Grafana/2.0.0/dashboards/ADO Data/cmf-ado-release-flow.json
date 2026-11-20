@@ -1,0 +1,5105 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Package/environment delivery flow. Release means CD approval and retention, not a proven production deployment. Merge-to-retention is not commit-to-production DORA lead time. Approval-stage non-release is not production change failure rate. Production deployment and incident/recovery events are required for production DORA metrics.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [
+    {
+      "asDropdown": true,
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "ado"
+      ],
+      "title": "ADO dashboards",
+      "type": "dashboards"
+    }
+  ],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "panels": [],
+      "title": "Summary (merged PRs and CD runs in the selected range)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Median time from PR merge to the end of the first CD run that contained it and passed its approval stages (released clean or with failures). Per PR and environment.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#4f8ff7",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 1,
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "median"
+          ],
+          "fields": "/^MergeToRelease$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOChangeLeadTimeTyped",
+            "name": "ADOTelemetry.ADOChangeLeadTimeTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOChangeLeadTimeTyped",
+          "oDataQueryString": "ADOTelemetry.ADOChangeLeadTimeTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and IsReleased eq 1)/groupby((PullRequestId,Environment,MergeToRelease))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Merge → release (median)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Median time from merge until a CD run that contained the PR started (whatever its outcome).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#2ec4c4",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 1,
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 1
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "median"
+          ],
+          "fields": "/^MergeToFirstCD$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOChangeLeadTimeTyped",
+            "name": "ADOTelemetry.ADOChangeLeadTimeTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOChangeLeadTimeTyped",
+          "oDataQueryString": "ADOTelemetry.ADOChangeLeadTimeTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((PullRequestId,Environment,MergeToFirstCD))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Merge → first CD run (median)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Share of PR × environment pairs merged in the range that already reached a released CD run.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#3fb68b",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 0,
+          "noValue": "No data",
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 1
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^ReleasedShare$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOChangeLeadTimeTyped",
+            "name": "ADOTelemetry.ADOChangeLeadTimeTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOChangeLeadTimeTyped",
+          "oDataQueryString": "ADOTelemetry.ADOChangeLeadTimeTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((Organization),aggregate(IsReleased with average as ReleasedShare))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Merged PRs released",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Mean number of CD runs (same environment) between merge and release, for released PRs. 1 = released by the first CD run that contained it.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#f2a33a",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 1,
+          "noValue": "No data",
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 1
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "/^CDAttempts$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOChangeLeadTimeTyped",
+            "name": "ADOTelemetry.ADOChangeLeadTimeTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOChangeLeadTimeTyped",
+          "oDataQueryString": "ADOTelemetry.ADOChangeLeadTimeTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and IsReleased eq 1)/groupby((PullRequestId,Environment,CDAttempts))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "CD attempts per release",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "CD runs in the range whose approval stages all succeeded (deployment frequency).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#3fb68b",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 0,
+          "noValue": "No data",
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 1
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^Releases$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and Role eq 'CD' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and (ReleaseOutcome eq 'ReleasedClean' or ReleaseOutcome eq 'ReleasedWithFailures'))/groupby((Organization),aggregate(BuildId with countdistinct as Releases))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Releases",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "CD attempts classified NotReleased divided by CD attempts with a recorded release outcome. This is a pre-release approval/retention measure, not DORA change failure rate. Production deployment failures requiring intervention and recovery events are not collected here.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {},
+          "decimals": 0,
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3fb68b"
+              },
+              {
+                "color": "#f2a33a",
+                "value": 0.15
+              },
+              {
+                "color": "#e5534b",
+                "value": 0.3
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 1
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^ChangeFailure$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and Role eq 'CD' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and ReleaseOutcome eq 'NotReleased')/groupby((Organization),aggregate(BuildId with countdistinct as NotReleased))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and Role eq 'CD' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and ReleaseOutcome ne null)/groupby((Organization),aggregate(BuildId with countdistinct as WithOutcome))&$top=20000",
+          "refId": "B",
+          "usePost": true
+        }
+      ],
+      "title": "Approval-stage non-release rate",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Organization",
+                "NotReleased",
+                "WithOutcome"
+              ]
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "ChangeFailure",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "NotReleased"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "WithOutcome"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 8,
+      "panels": [],
+      "title": "Where release lead time goes",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "For each CD environment: median wait from merge to the first CD run that contained the PR (teal) and from that run to release (blue). A long blue segment = PRs ride several failed CD attempts before one is released. Common environment prefixes are omitted from axis labels. Segment values are in tooltips; full environment names remain in the data.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "fillOpacity": 85,
+            "gradientMode": "none",
+            "lineWidth": 0,
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Merge → first CD run"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#2ec4c4",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "First CD run → release"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f8ff7",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 10,
+        "x": 0,
+        "y": 6
+      },
+      "id": 9,
+      "options": {
+        "barWidth": 0.8,
+        "groupWidth": 0.75,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "never",
+        "stacking": "normal",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "EnvironmentLabel",
+        "xTickLabelMaxLength": 28,
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOChangeLeadTimeTyped",
+            "name": "ADOTelemetry.ADOChangeLeadTimeTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOChangeLeadTimeTyped",
+          "oDataQueryString": "ADOTelemetry.ADOChangeLeadTimeTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((PullRequestId,Environment,MergeToFirstCD,MergeToRelease))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Lead time per environment (median)",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Environment",
+                "MergeToFirstCD",
+                "MergeToRelease"
+              ]
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "FirstCDToRelease",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "MergeToRelease"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "MergeToFirstCD"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Environment": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "FirstCDToRelease": {
+                "aggregations": [
+                  "median"
+                ],
+                "operation": "aggregate"
+              },
+              "MergeToFirstCD": {
+                "aggregations": [
+                  "median"
+                ],
+                "operation": "aggregate"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": false,
+                "field": "Environment"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "FirstCDToRelease (median)": "First CD run → release",
+              "MergeToFirstCD (median)": "Merge → first CD run"
+            }
+          }
+        },
+        {
+          "id": "extractFields",
+          "options": {
+            "format": "regexp",
+            "regExp": "/^(?<EnvironmentLabel>.+)$/",
+            "replace": false,
+            "source": "Environment"
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "PRs grouped by the Monday-based week they merged in: median merge → release (blue) and merge → first CD (teal) per PR × environment, plus how many PR × environment pairs are still not released (grey bars, right axis). Recent weeks always look faster: their slow PRs are not released yet, so read the line together with the grey bars.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "lineWidth": 2,
+            "pointSize": 6,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "spanNulls": true
+          },
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Merge → release"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f8ff7",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 3
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Merge → first CD"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#2ec4c4",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Not released yet"
+            },
+            "properties": [
+              {
+                "id": "custom.drawStyle",
+                "value": "bars"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 35
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 0
+              },
+              {
+                "id": "custom.showPoints",
+                "value": "never"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.scaleDistribution",
+                "value": {
+                  "type": "linear"
+                }
+              },
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#8e8e8e",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 14,
+        "x": 10,
+        "y": 6
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOChangeLeadTimeTyped",
+            "name": "ADOTelemetry.ADOChangeLeadTimeTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOChangeLeadTimeTyped",
+          "oDataQueryString": "ADOTelemetry.ADOChangeLeadTimeTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((PullRequestId,Environment,Merged,MergeToFirstCD,MergeToRelease,IsReleased))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Release lead time per week of merge",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "PullRequestId",
+                "Merged",
+                "MergeToFirstCD",
+                "MergeToRelease",
+                "IsReleased"
+              ]
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Pending",
+            "binary": {
+              "left": {
+                "fixed": "1"
+              },
+              "operator": "-",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "IsReleased"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week_0",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Merged"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week_1",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week_0"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week_2",
+            "mode": "unary",
+            "replaceFields": false,
+            "unary": {
+              "fieldName": "Week_1",
+              "operator": "floor"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week_3",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week_2"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week_3"
+                }
+              },
+              "operator": "+",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "MergeToFirstCD": {
+                "aggregations": [
+                  "median"
+                ],
+                "operation": "aggregate"
+              },
+              "MergeToRelease": {
+                "aggregations": [
+                  "median"
+                ],
+                "operation": "aggregate"
+              },
+              "Pending": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "Week": {
+                "aggregations": [],
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": false,
+                "field": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "dateFormat": "X",
+                "destinationType": "time",
+                "targetField": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "MergeToFirstCD (median)": "Merge → first CD",
+              "MergeToRelease (median)": "Merge → release",
+              "Pending (sum)": "Not released yet"
+            }
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
+      "id": 11,
+      "panels": [],
+      "title": "Recovery: how long are environments without a release?",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Each CD run, by start time, per environment, colored until the next run: green = released clean, orange = released with test failures, red = not released at the approval stage, grey = never reached an approval stage (failed earlier or cancelled). A long red/grey stretch is the time that environment went without a release.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#8e8e8e",
+            "mode": "fixed"
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 0
+          },
+          "mappings": [
+            {
+              "options": {
+                "": {
+                  "color": "#8e8e8e",
+                  "text": "No approval stage reached"
+                },
+                "NotReleased": {
+                  "color": "red",
+                  "text": "Not released"
+                },
+                "ReleasedClean": {
+                  "color": "green",
+                  "text": "Released clean"
+                },
+                "ReleasedWithFailures": {
+                  "color": "yellow",
+                  "text": "Released with failures"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "#8e8e8e",
+                  "text": "No approval stage reached"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "noValue": "No data"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Outcome"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "${__field.labels.Environment}"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 12,
+      "options": {
+        "alignValue": "left",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": false,
+        "rowHeight": 0.8,
+        "showValue": "never",
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and Role eq 'CD' and Environment ne null and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso})/groupby((BuildId,Environment,StartedAt,ReleaseOutcome,Result))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "CD outcome timeline per environment",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Environment",
+                "StartedAt",
+                "ReleaseOutcome"
+              ]
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": false,
+                "field": "StartedAt"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "ReleaseOutcome": "Outcome"
+            }
+          }
+        },
+        {
+          "id": "partitionByValues",
+          "options": {
+            "fields": [
+              "Environment"
+            ],
+            "keepFields": false,
+            "naming": {
+              "asLabels": true
+            }
+          }
+        }
+      ],
+      "type": "state-timeline"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 13,
+      "panels": [],
+      "title": "Which PRs started a test-failure streak?",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Data set ADOTestFailureSuspects: for each test failing in the range, the CD build where its failure streak started, and the PRs that were new in that build (in its change list but not in the previous run of the same pipeline and environment). Title, repository and merge date come from ADOPullRequests and are blank for PRs that data set does not hold. Candidates, not proven causes: when a build brings many new PRs (e.g. 36701) the list is long and the signal is weak.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": true
+          },
+          "decimals": 1,
+          "noValue": "No data"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PullRequestId"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "PR"
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "Open PR in Azure DevOps",
+                    "url": "https://dev.azure.com/${__data.fields.Organization}/${__data.fields.Project}/_git/${__data.fields.Repository}/pullrequest/${__value.raw}"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/^(Organization|Project)$/"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Team"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "match": "empty",
+                      "result": {
+                        "text": "(no team)"
+                      }
+                    },
+                    "type": "special"
+                  },
+                  {
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "(no team)"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tests that started failing"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#e5534b",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Longest streak (days)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "text"
+                    },
+                    {
+                      "color": "#f2a33a",
+                      "value": 3
+                    },
+                    {
+                      "color": "#e5534b",
+                      "value": 7
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Title"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 380
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tests that started failing"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Environment"
+            },
+            "properties": [
+              {
+                "id": "noValue",
+                "value": "—"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Title"
+            },
+            "properties": [
+              {
+                "id": "noValue",
+                "value": "(not in ADOPullRequests)"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 14,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOTestFailureSuspectsTyped",
+            "name": "ADOTelemetry.ADOTestFailureSuspectsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOTestFailureSuspectsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOTestFailureSuspectsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and LastFailed ge ${__from:date:seconds} and LastFailed lt ${__to:date:seconds})/groupby((Organization,Project,PullRequestId,Team,Environment,FailingSinceBuildId),aggregate(Test with countdistinct as Tests,LastFailed with max as LastFailed))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPullRequestsTyped",
+            "name": "ADOTelemetry.ADOPullRequestsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPullRequestsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPullRequestsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Status eq 'completed')/groupby((PullRequestId),aggregate(Repository with max as Repository,Title with max as Title,ClosedAt with max as Merged))&$top=50000",
+          "refId": "B",
+          "usePost": true
+        }
+      ],
+      "title": "PRs new in the build where tests started failing",
+      "transformations": [
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "A"
+          },
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Organization",
+                "Project",
+                "PullRequestId",
+                "Team",
+                "Environment",
+                "FailingSinceBuildId",
+                "Tests",
+                "LastFailed"
+              ]
+            }
+          }
+        },
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "B"
+          },
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "PullRequestId",
+                "Repository",
+                "Title",
+                "Merged"
+              ]
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "string",
+                "targetField": "PullRequestId"
+              }
+            ],
+            "fields": {}
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "PullRequestId",
+            "mode": "outerTabular"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "isNull",
+                  "options": {}
+                },
+                "fieldName": "Tests A"
+              }
+            ],
+            "match": "any",
+            "type": "exclude"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "Environment A": 5,
+              "FailingSinceBuildId A": 4,
+              "LastFailed A": 8,
+              "Merged B": 7,
+              "Organization A": 9,
+              "Project A": 10,
+              "PullRequestId": 0,
+              "Repository B": 6,
+              "Team A": 2,
+              "Tests A": 3,
+              "Title B": 1
+            },
+            "renameByName": {
+              "Environment A": "Environment",
+              "FailingSinceBuildId A": "CD build",
+              "LastFailed A": "Last failed",
+              "Merged B": "Merged",
+              "Organization A": "Organization",
+              "Project A": "Project",
+              "Repository B": "Repository",
+              "Team A": "Team",
+              "Tests A": "Tests that started failing",
+              "Title B": "Title"
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "dateFormat": "X",
+                "destinationType": "time",
+                "targetField": "Last failed"
+              }
+            ],
+            "fields": {}
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "Tests that started failing"
+              }
+            ]
+          }
+        },
+        {
+          "id": "limit",
+          "options": {
+            "limitField": 500
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 35
+      },
+      "id": 15,
+      "panels": [],
+      "title": "Tests: flaky or broken?",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Per test in the range: how many separate failure streaks it had (Streaks; a streak restarts after the test passes), builds it failed in, and its longest streak in days. Many short streaks = flaky (quarantine/fix the test). One long streak = broken (fix the code or the environment).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": true
+          },
+          "decimals": 1,
+          "noValue": "No data"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Streaks"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "text"
+                    },
+                    {
+                      "color": "#f2a33a",
+                      "value": 3
+                    },
+                    {
+                      "color": "#9d7cd8",
+                      "value": 5
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Failed builds"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#e5534b",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Longest streak (days)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "text"
+                    },
+                    {
+                      "color": "#f2a33a",
+                      "value": 3
+                    },
+                    {
+                      "color": "#e5534b",
+                      "value": 7
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Test"
+            },
+            "properties": [
+              {
+                "id": "custom.minWidth",
+                "value": 480
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 16,
+        "x": 0,
+        "y": 36
+      },
+      "id": 16,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOTestFailuresTyped",
+            "name": "ADOTelemetry.ADOTestFailuresTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOTestFailuresTyped",
+          "oDataQueryString": "ADOTelemetry.ADOTestFailuresTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Suite:singlequote}) or TestRun in (${Suite:singlequote})) and FailedAt ge ${__from:date:iso} and FailedAt lt ${__to:date:iso})/groupby((Test,Pipeline,TestRun),aggregate(FailingSinceBuildId with countdistinct as Streaks,BuildId with countdistinct as FailedBuilds,FailingDays with max as LongestStreak,FailedAt with max as LastFailed))&$orderby=FailedBuilds desc&$top=300",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Failing tests: flaky vs broken",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Test",
+                "Pipeline",
+                "Streaks",
+                "FailedBuilds",
+                "LongestStreak",
+                "LastFailed",
+                "TestRun"
+              ]
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "BuildsPerStreak",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "FailedBuilds"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Streaks"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "FailedBuilds"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "BuildsPerStreak": 3,
+              "FailedBuilds": 2,
+              "LastFailed": 5,
+              "LongestStreak": 4,
+              "Pipeline": 6,
+              "Streaks": 1,
+              "Test": 0
+            },
+            "renameByName": {
+              "BuildsPerStreak": "Builds per streak",
+              "FailedBuilds": "Failed builds",
+              "LastFailed": "Last failure",
+              "LongestStreak": "Longest streak (days)",
+              "TestRun": "Suite"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Failing tests counted by number of separate failure streaks in the range. Bars on the left (1 streak) are mostly broken tests; bars to the right are flaky ones.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "fillOpacity": 85,
+            "gradientMode": "none",
+            "lineWidth": 0,
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "noValue": "No data",
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tests"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#9d7cd8",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 8,
+        "x": 16,
+        "y": 36
+      },
+      "id": 17,
+      "options": {
+        "barWidth": 0.8,
+        "groupWidth": 0.75,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "Failure streaks",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOTestFailuresTyped",
+            "name": "ADOTelemetry.ADOTestFailuresTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOTestFailuresTyped",
+          "oDataQueryString": "ADOTelemetry.ADOTestFailuresTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and FailedAt ge ${__from:date:iso} and FailedAt lt ${__to:date:iso})/groupby((Test),aggregate(FailingSinceBuildId with countdistinct as Streaks))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Tests by failure pattern",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Test",
+                "Streaks"
+              ]
+            }
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Streaks": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "Test": {
+                "aggregations": [
+                  "count"
+                ],
+                "operation": "aggregate"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": false,
+                "field": "Streaks"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "string",
+                "targetField": "Streaks"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Streaks": "Failure streaks",
+              "Test (count)": "Tests"
+            }
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 48
+      },
+      "id": 18,
+      "panels": [],
+      "title": "Cost of failure",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Wall-clock hours of CD runs that did not release (not released, failed or cancelled), excluding approval waits is not possible at run level.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#e5534b",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 1,
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 49
+      },
+      "id": 19,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^Wasted$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and Role eq 'CD' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and ReleaseOutcome ne 'ReleasedClean' and ReleaseOutcome ne 'ReleasedWithFailures')/groupby((Organization),aggregate(DurationSeconds with sum as Wasted))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "CD time on runs not released",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Run time of PR and CI pipeline runs that failed: compute spent before a re-run.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#f2a33a",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 1,
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 49
+      },
+      "id": 20,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^Failed$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Role ne 'CD' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso})/groupby((Organization),aggregate(DurationSeconds with sum as Failed))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "PR/CI time on failed runs",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Time in pipeline steps that ran a second (or later) attempt.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#9d7cd8",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 1,
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 49
+      },
+      "id": 21,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^Retried$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Attempt gt 1 and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso})/groupby((Organization),aggregate(DurationSeconds with sum as Retried))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Retried steps",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 60
+      },
+      "id": 24,
+      "panels": [],
+      "title": "CD attempts and package attribution (from Delivery outcomes)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Recorded CD retention outcomes across selected environments, not unique package versions and not proven production deployments. Shared signal: the team filter does not attribute CD runs to a team.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#3fb68b",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 0,
+          "noValue": "No data",
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 61
+      },
+      "id": 25,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^Releases$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and Role eq 'CD' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and (ReleaseOutcome eq 'ReleasedClean' or ReleaseOutcome eq 'ReleasedWithFailures'))/groupby((Organization),aggregate(BuildId with countdistinct as Releases))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Approved and retained CD runs",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Shared CD attempts without a recorded package version. Such attempts cannot establish on-time or late delivery of a particular package. The team filter does not attribute CD runs.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "yellow",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 0,
+          "noValue": "No data",
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 61
+      },
+      "id": 26,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^MissingVersion$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and Role eq 'CD' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and (Version eq null or Version eq ''))/aggregate(BuildId with countdistinct as MissingVersion)",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "CD runs missing package version",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "MissingVersion"
+              ]
+            }
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 12,
+        "x": 12,
+        "y": 61
+      },
+      "id": 27,
+      "options": {
+        "content": "**Production deployment and incident/recovery linkage is not available in this dataset.**\n\nProduction deployment frequency, commit-to-production lead time, production change failure rate and failed-deployment recovery time are therefore unmeasured. CD approval/retention and pre-release test failures are separate package-delivery signals.",
+        "mode": "markdown"
+      },
+      "title": "Production DORA: not measured",
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Latest 100 CD attempts. Missing version remains unknown; an approval/retention event without package attribution is not proof that a selected package was delivered.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "filterable": true
+          },
+          "decimals": 0,
+          "noValue": "Unknown",
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Version"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "color": "yellow",
+                        "text": "Unknown package"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 65
+      },
+      "id": 28,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$filter=('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and Role eq 'CD' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso}&$select=BuildId,Pipeline,Environment,Version,Result,ReleaseOutcome,StartedAt,FinishedAt&$orderby=StartedAt desc&$top=100",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Recent CD attempts and package attribution",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 75
+      },
+      "id": 29,
+      "panels": [],
+      "title": "Where release time goes (last range)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "CD runs that ended failed. Includes approval timeouts and install failures.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#e5534b",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 0,
+          "noValue": "No data",
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 5,
+        "x": 0,
+        "y": 76
+      },
+      "id": 30,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^N$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and Pipeline eq '${CdPipeline}' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and Result eq 'failed')/groupby((Organization),aggregate(BuildId with countdistinct as N))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Failed CD attempts",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Run time of failed install/deploy/master-data/test stages (approval wait excluded).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#f2a33a",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 1,
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 5,
+        "x": 5,
+        "y": 76
+      },
+      "id": 31,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^T$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq '${CdPipeline}' and RecordType eq 'Job' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and Stage ne 'Manual Approval')/groupby((Organization),aggregate(DurationSeconds with sum as T))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Hours in failed deploy/test stages",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "CD runs whose Manual Approval stage failed (it waits 48 h, then rejects). This is waiting for a person to approve, not a code failure.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#9d7cd8",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 0,
+          "noValue": "No data",
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 5,
+        "x": 10,
+        "y": 76
+      },
+      "id": 32,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^N$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq '${CdPipeline}' and RecordType eq 'Job' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and Stage eq 'Manual Approval')/groupby((Organization),aggregate(BuildId with countdistinct as N))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Approval timeouts",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Sum of the time the timed-out approvals waited.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#9d7cd8",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 1,
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 5,
+        "x": 15,
+        "y": 76
+      },
+      "id": 33,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^T$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq '${CdPipeline}' and RecordType eq 'Job' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and Stage eq 'Manual Approval')/groupby((Organization),aggregate(DurationSeconds with sum as T))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Hours spent waiting on timed-out approvals",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Package builds that failed: they stop a package from existing at all.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#e5534b",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 0,
+          "noValue": "No data",
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 76
+      },
+      "id": 34,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^N$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq 'CI-Package' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso})/groupby((Organization),aggregate(BuildId with countdistinct as N))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Failed CI-Package builds",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "How many failed attempts each cause accounts for. Mapping: install / deploy = Publish Release Manifest, Check Environment Type, Prepare Environment, Installation, Restore Point, Daily Backup, Run Test Master Data. Tests = Run Tests. Approval timeout = Manual Approval. Build / code = failed CI-Package. A build failing in two stages counts in both.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {},
+          "decimals": 0,
+          "min": 0,
+          "noValue": "No data",
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Install / deploy"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2a33a",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tests"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#e5534b",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Approval timeout"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#9d7cd8",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Build / code (CI-Package)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f8ff7",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 80
+      },
+      "id": 35,
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq '${CdPipeline}' and RecordType eq 'Job' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and (Stage eq 'Publish Release Manifest' or Stage eq 'Check Environment Type' or Stage eq 'Prepare Environment' or Stage eq 'Installation' or Stage eq 'Restore Point' or Stage eq 'Daily Backup' or Stage eq 'Run Test Master Data'))/groupby((Organization),aggregate(BuildId with countdistinct as Install))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq '${CdPipeline}' and RecordType eq 'Job' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and Stage eq 'Run Tests')/groupby((Organization),aggregate(BuildId with countdistinct as Tests))&$top=20000",
+          "refId": "B",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq '${CdPipeline}' and RecordType eq 'Job' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and Stage eq 'Manual Approval')/groupby((Organization),aggregate(BuildId with countdistinct as Approval))&$top=20000",
+          "refId": "C",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq 'CI-Package' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso})/groupby((Organization),aggregate(BuildId with countdistinct as Build))&$top=20000",
+          "refId": "D",
+          "usePost": true
+        }
+      ],
+      "title": "Failed attempts by cause",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Install",
+                "Tests",
+                "Approval",
+                "Build"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Approval": "Approval timeout",
+              "Build": "Build / code (CI-Package)",
+              "Install": "Install / deploy",
+              "Tests": "Tests"
+            }
+          }
+        }
+      ],
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Run time of the failed stage per cause. For approval timeout this is the wait before rejection.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {},
+          "decimals": 0,
+          "min": 0,
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Install / deploy"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2a33a",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tests"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#e5534b",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Approval timeout"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#9d7cd8",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Build / code (CI-Package)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f8ff7",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 80
+      },
+      "id": 36,
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq '${CdPipeline}' and RecordType eq 'Job' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and (Stage eq 'Publish Release Manifest' or Stage eq 'Check Environment Type' or Stage eq 'Prepare Environment' or Stage eq 'Installation' or Stage eq 'Restore Point' or Stage eq 'Daily Backup' or Stage eq 'Run Test Master Data'))/groupby((Organization),aggregate(DurationSeconds with sum as Install))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq '${CdPipeline}' and RecordType eq 'Job' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and Stage eq 'Run Tests')/groupby((Organization),aggregate(DurationSeconds with sum as Tests))&$top=20000",
+          "refId": "B",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq '${CdPipeline}' and RecordType eq 'Job' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and Stage eq 'Manual Approval')/groupby((Organization),aggregate(DurationSeconds with sum as Approval))&$top=20000",
+          "refId": "C",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq 'CI-Package' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso})/groupby((Organization),aggregate(DurationSeconds with sum as Build))&$top=20000",
+          "refId": "D",
+          "usePost": true
+        }
+      ],
+      "title": "Time lost by cause",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Install",
+                "Tests",
+                "Approval",
+                "Build"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Approval": "Approval timeout",
+              "Build": "Build / code (CI-Package)",
+              "Install": "Install / deploy",
+              "Tests": "Tests"
+            }
+          }
+        }
+      ],
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Failed-stage time per week and cause (week starts Monday, UTC). Approval wait is shown separately because it is people waiting, not pipeline work.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "showPoints": "never",
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            }
+          },
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Install / deploy"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2a33a",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tests"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#e5534b",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Approval timeout"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#9d7cd8",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Build / code"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f8ff7",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 87
+      },
+      "id": 37,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq '${CdPipeline}' and RecordType eq 'Job' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and (Stage eq 'Publish Release Manifest' or Stage eq 'Check Environment Type' or Stage eq 'Prepare Environment' or Stage eq 'Installation' or Stage eq 'Restore Point' or Stage eq 'Daily Backup' or Stage eq 'Run Test Master Data'))/groupby((BuildId,StartedAt),aggregate(DurationSeconds with sum as Install))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq '${CdPipeline}' and RecordType eq 'Job' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and Stage eq 'Run Tests')/groupby((BuildId,StartedAt),aggregate(DurationSeconds with sum as Tests))&$top=20000",
+          "refId": "B",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+            "name": "ADOTelemetry.ADOPipelineStepsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStepsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStepsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq '${CdPipeline}' and RecordType eq 'Job' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and Stage eq 'Manual Approval')/groupby((BuildId,StartedAt),aggregate(DurationSeconds with sum as Approval))&$top=20000",
+          "refId": "C",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq 'CI-Package' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso})/groupby((BuildId,StartedAt),aggregate(DurationSeconds with sum as Build))&$top=20000",
+          "refId": "D",
+          "usePost": true
+        }
+      ],
+      "title": "Time lost per week, by cause",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "StartedAt"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week0",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "StartedAt"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "fixed": "345600000"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week1",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week0"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "604800000"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week2",
+            "mode": "unary",
+            "replaceFields": false,
+            "unary": {
+              "fieldName": "Week1",
+              "operator": "floor"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week3",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week2"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "604800000"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week3"
+                }
+              },
+              "operator": "+",
+              "right": {
+                "fixed": "345600000"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Approval": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "Build": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "Install": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "Tests": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "Week": {
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "time",
+                "targetField": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Approval (sum)": "Approval timeout",
+              "Build (sum)": "Build / code",
+              "Install (sum)": "Install / deploy",
+              "Tests (sum)": "Tests"
+            }
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 96
+      },
+      "id": 38,
+      "panels": [],
+      "title": "Failed package builds (candidates, not proven causes)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Each failed package build with its branch and the commits and PRs in its change list. Read a PR as a candidate only when the list is short; with many PRs the failure cannot be pinned on one team.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "align": "auto",
+            "filterable": true,
+            "inspect": true
+          },
+          "decimals": 0,
+          "noValue": "No data"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Duration"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Started"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsLocal"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "BuildId"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "Open build",
+                    "url": "https://dev.azure.com/${Organization}/${Project}/_build/results?buildId=${__value.raw}"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/^(Organization|Project)$/"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 97
+      },
+      "id": 39,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq 'CI-Package' and Result eq 'failed' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso})/groupby((Organization,Project,BuildId,SourceBranch,StartedAt,DurationSeconds),aggregate(Result with countdistinct as N))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADORunChangesTyped",
+            "name": "ADOTelemetry.ADORunChangesTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADORunChangesTyped",
+          "oDataQueryString": "ADOTelemetry.ADORunChangesTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and Pipeline eq 'CI-Package')/groupby((BuildId),aggregate(Commits with max as Commits,PullRequestIds with max as PullRequests))&$top=20000",
+          "refId": "B",
+          "usePost": true
+        }
+      ],
+      "title": "Failed CI-Package builds and what they carried",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "BuildId",
+                "SourceBranch",
+                "StartedAt",
+                "DurationSeconds",
+                "N",
+                "Commits",
+                "PullRequests"
+              ]
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "string",
+                "targetField": "BuildId"
+              }
+            ]
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "BuildId",
+            "mode": "inner"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "N": true,
+              "N A": true,
+              "N B": true
+            },
+            "indexByName": {
+              "BuildId": 0
+            },
+            "renameByName": {
+              "Commits B": "Commits",
+              "DurationSeconds A": "Duration",
+              "PullRequests B": "PRs in change list",
+              "SourceBranch A": "Branch",
+              "StartedAt A": "Started"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "Started"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 106
+      },
+      "id": 40,
+      "panels": [],
+      "title": "CD DORA (pre-production environments)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "A deployment = a CD run that got through install, master data and tests and reached the approval stage (released, released with failures, or timed out waiting). Deployment frequency. Lines: use the Environment filter at the top, one environment is one line (each environment is fed by one release line, development or release/x.y). Merge and release times are per environment, so compare a line only with itself.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "fillOpacity": 85,
+            "lineWidth": 0
+          },
+          "decimals": 0,
+          "noValue": "No data",
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 107
+      },
+      "id": 41,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "stacking": "normal",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "Week\\Environment"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and Pipeline eq '${CdPipeline}' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and ReleaseOutcome ne null)/groupby((BuildId,Environment,StartedAt),aggregate(Result with countdistinct as N))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Deployments per week, by environment",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "BuildId",
+                "Environment",
+                "StartedAt"
+              ]
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "StartedAt"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week0",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "StartedAt"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "fixed": "345600000"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week1",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week0"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "604800000"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week2",
+            "mode": "unary",
+            "replaceFields": false,
+            "unary": {
+              "fieldName": "Week1",
+              "operator": "floor"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week3",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week2"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "604800000"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week3"
+                }
+              },
+              "operator": "+",
+              "right": {
+                "fixed": "345600000"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "BuildId": {
+                "aggregations": [
+                  "distinctCount"
+                ],
+                "operation": "aggregate"
+              },
+              "Environment": {
+                "operation": "groupby"
+              },
+              "Week": {
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "time",
+                "targetField": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "Environment",
+            "emptyValue": "zero",
+            "rowField": "Week",
+            "valueField": "BuildId (distinctCount)"
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Time from the first failed CD attempt (failed before the approval stage) to the start of the next run that reached the approval stage in the same environment. Understates the true restore by that run own install/test time. Episodes still open are not counted. Lines: use the Environment filter at the top, one environment is one line (each environment is fed by one release line, development or release/x.y). Merge and release times are per environment, so compare a line only with itself.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#2ec4c4",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 1,
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 116
+      },
+      "id": 42,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "median"
+          ],
+          "fields": "/^TimeToRestore$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOTimeToRestoreTyped",
+            "name": "ADOTelemetry.ADOTimeToRestoreTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOTimeToRestoreTyped",
+          "oDataQueryString": "ADOTelemetry.ADOTimeToRestoreTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and FirstFailed ge ${__from:date:seconds} and FirstFailed lt ${__to:date:seconds} and IsOpen eq 0)/groupby((Organization,Project,Environment,FirstFailed,TimeToRestore))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Time to restore (median)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Failure episodes with no later run that reached the approval stage yet. Lines: use the Environment filter at the top, one environment is one line (each environment is fed by one release line, development or release/x.y). Merge and release times are per environment, so compare a line only with itself.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#e5534b",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 0,
+          "noValue": "No data",
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 116
+      },
+      "id": 43,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^Open$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOTimeToRestoreTyped",
+            "name": "ADOTelemetry.ADOTimeToRestoreTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOTimeToRestoreTyped",
+          "oDataQueryString": "ADOTelemetry.ADOTimeToRestoreTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and FirstFailed ge ${__from:date:seconds} and FirstFailed lt ${__to:date:seconds})/groupby((Organization),aggregate(IsOpen with sum as Open))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Environments currently failing",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Each episode = consecutive failed CD attempts in one environment until a run gets through to the approval stage. Open episodes have no restore time yet. Many attempts in one episode means repeated retries before it was fixed. Lines: use the Environment filter at the top, one environment is one line (each environment is fed by one release line, development or release/x.y). Merge and release times are per environment, so compare a line only with itself.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "align": "auto",
+            "filterable": true
+          },
+          "decimals": 0,
+          "noValue": "No data"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time to restore"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#2ec4c4",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Still failing"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "text": "restored"
+                      },
+                      "1": {
+                        "color": "#e5534b",
+                        "text": "open"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 120
+      },
+      "id": 44,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOTimeToRestoreTyped",
+            "name": "ADOTelemetry.ADOTimeToRestoreTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOTimeToRestoreTyped",
+          "oDataQueryString": "ADOTelemetry.ADOTimeToRestoreTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and FirstFailed ge ${__from:date:seconds} and FirstFailed lt ${__to:date:seconds})/groupby((Organization,Project,Environment,FirstFailedBuildId,FirstFailed,FailedAttempts,Restored,TimeToRestore,IsOpen))&$top=2000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Failure episodes (time to restore)",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Environment",
+                "FirstFailedBuildId",
+                "FirstFailed",
+                "FailedAttempts",
+                "Restored",
+                "TimeToRestore",
+                "IsOpen"
+              ]
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "FirstFailed"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "dateFormat": "X",
+                "destinationType": "time",
+                "targetField": "FirstFailed"
+              },
+              {
+                "dateFormat": "X",
+                "destinationType": "time",
+                "targetField": "Restored"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "Environment": 0,
+              "FailedAttempts": 3,
+              "FirstFailed": 1,
+              "FirstFailedBuildId": 2,
+              "IsOpen": 6,
+              "Restored": 5,
+              "TimeToRestore": 4
+            },
+            "renameByName": {
+              "FailedAttempts": "Failed attempts",
+              "FirstFailed": "First failure",
+              "FirstFailedBuildId": "First failed build",
+              "IsOpen": "Still failing",
+              "Restored": "Restored",
+              "TimeToRestore": "Time to restore"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 129
+      },
+      "id": 45,
+      "panels": [],
+      "title": "CD runs by installed package version (Version tag, from the env branch /cmfpackage.json)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "CD runs that carry a ReleaseOutcome, per week, split by the package version the run installs (Version tag read from /cmfpackage.json of the env branch at the run commit). each version belongs to the line that installs it (development or release/x.y); other versions are older environment contents. Runs with no Version are CD runs that are not on an env/* branch (the older layout, run on development or release branches) or whose commit could not be read; they show as an empty series or row.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "fillOpacity": 85,
+            "lineWidth": 0
+          },
+          "decimals": 0,
+          "noValue": "No data",
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 130
+      },
+      "id": 46,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "stacking": "normal",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "Week\\Environment"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and Pipeline eq '${CdPipeline}' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and ReleaseOutcome ne null)/groupby((BuildId,Version,StartedAt),aggregate(Result with countdistinct as N))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "CD attempts per week, by installed package version",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "BuildId",
+                "Version",
+                "StartedAt"
+              ]
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "StartedAt"
+              }
+            ]
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week0",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "StartedAt"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "fixed": "345600000"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week1",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week0"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "604800000"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week2",
+            "mode": "unary",
+            "replaceFields": false,
+            "unary": {
+              "fieldName": "Week1",
+              "operator": "floor"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week3",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week2"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "604800000"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week3"
+                }
+              },
+              "operator": "+",
+              "right": {
+                "fixed": "345600000"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "BuildId": {
+                "aggregations": [
+                  "distinctCount"
+                ],
+                "operation": "aggregate"
+              },
+              "Version": {
+                "operation": "groupby"
+              },
+              "Week": {
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "time",
+                "targetField": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "Version",
+            "emptyValue": "zero",
+            "rowField": "Week",
+            "valueField": "BuildId (distinctCount)"
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Distinct CD runs per installed package version and ReleaseOutcome (NotReleased, ReleasedWithFailures, ReleasedClean). Compare a version with its own earlier weeks, not across teams or lines. Runs with no Version are CD runs that are not on an env/* branch (the older layout, run on development or release branches) or whose commit could not be read; they show as an empty series or row.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 130
+      },
+      "id": 47,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+            "name": "ADOTelemetry.ADOPipelineRunsTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineRunsTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Environment:singlequote}) or Environment in (${Environment:singlequote})) and Pipeline eq '${CdPipeline}' and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and ReleaseOutcome ne null)/groupby((Version,ReleaseOutcome),aggregate(BuildId with countdistinct as Runs))&$top=500",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Runs and outcome per installed package version",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Version",
+                "ReleaseOutcome",
+                "Runs"
+              ]
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": true,
+                "field": "Version"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Stages that failed most often in CD/CI runs.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": true
+          },
+          "decimals": 1,
+          "noValue": "No data"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Failures"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#e5534b",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 16,
+        "y": 139
+      },
+      "id": 48,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOPipelineStagesTyped",
+            "name": "ADOTelemetry.ADOPipelineStagesTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOPipelineStagesTyped",
+          "oDataQueryString": "ADOTelemetry.ADOPipelineStagesTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and StartedAt ge ${__from:date:iso} and StartedAt lt ${__to:date:iso} and Result eq 'failed')/groupby((Pipeline,Stage),aggregate(BuildId with countdistinct as Failures))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Failing stages",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Pipeline",
+                "Stage",
+                "Failures"
+              ]
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "Failures"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 149
+      },
+      "id": 49,
+      "panels": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "description": "Pull requests merged in the time range (traces exist for the last 60 days). Click the PR number or title and choose Show the lead-time trace.",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto",
+                "cellOptions": {
+                  "type": "auto"
+                },
+                "filterable": true
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "PR"
+                },
+                "properties": [
+                  {
+                    "id": "links",
+                    "value": [
+                      {
+                        "title": "Show the lead-time trace of this pull request",
+                        "url": "${__url.path}${__url.params:exclude:var-Change}&var-Change=PR ${__data.fields.PR}"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 0
+                  },
+                  {
+                    "id": "unit",
+                    "value": "none"
+                  },
+                  {
+                    "id": "custom.width",
+                    "value": 80
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Title"
+                },
+                "properties": [
+                  {
+                    "id": "links",
+                    "value": [
+                      {
+                        "title": "Show the lead-time trace of this pull request",
+                        "url": "${__url.path}${__url.params:exclude:var-Change}&var-Change=PR ${__data.fields.PR}"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "custom.width",
+                    "value": 520
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Merged"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "dateTimeAsIso"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Open for"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "s"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Target branch"
+                },
+                "properties": [
+                  {
+                    "id": "mappings",
+                    "value": [
+                      {
+                        "options": {
+                          "pattern": "refs/heads/(.*)",
+                          "result": {
+                            "text": "$1"
+                          }
+                        },
+                        "type": "regex"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 150
+          },
+          "id": 60,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "show": false
+            },
+            "showHeader": true
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "PD36424FC765F148A"
+              },
+              "entitySet": {
+                "entityType": "UserDefined.ADOTelemetry.ADOPullRequestsTyped",
+                "name": "ADOTelemetry.ADOPullRequestsTyped"
+              },
+              "entityType": "UserDefined.ADOTelemetry.ADOPullRequestsTyped",
+              "oDataQueryString": "ADOTelemetry.ADOPullRequestsTyped?$apply=filter(Status eq 'completed' and ('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ClosedAt ge ${__from:date:iso} and ClosedAt lt ${__to:date:iso})/groupby((PullRequestId,Title,TargetBranch,AreaPath,WorkItemType,ClosedAt,OpenSeconds))&$orderby=ClosedAt desc&$top=300",
+              "refId": "A",
+              "usePost": true
+            }
+          ],
+          "title": "Merged pull requests: click one to see its lead-time trace below",
+          "transformations": [
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "PullRequestId",
+                    "Title",
+                    "TargetBranch",
+                    "AreaPath",
+                    "WorkItemType",
+                    "ClosedAt",
+                    "OpenSeconds"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "sortBy",
+              "options": {
+                "sort": [
+                  {
+                    "desc": true,
+                    "field": "ClosedAt"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "indexByName": {
+                  "AreaPath": 4,
+                  "ClosedAt": 5,
+                  "OpenSeconds": 6,
+                  "PullRequestId": 0,
+                  "TargetBranch": 2,
+                  "Title": 1,
+                  "WorkItemType": 3
+                },
+                "renameByName": {
+                  "AreaPath": "Area",
+                  "ClosedAt": "Merged",
+                  "OpenSeconds": "Open for",
+                  "PullRequestId": "PR",
+                  "TargetBranch": "Target branch",
+                  "WorkItemType": "Work item"
+                }
+              }
+            }
+          ],
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "description": "Pick a merged pull request (filtered by Team). Bars: review phases, linked work items, waiting for each CD pipeline and every CD attempt until it was released.",
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 16,
+            "w": 24,
+            "x": 0,
+            "y": 160
+          },
+          "id": 50,
+          "options": {},
+          "targets": [
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "PD36424FC765F148A"
+              },
+              "entitySet": {
+                "entityType": "UserDefined.ADOTelemetry.ADOChangeSpansTyped",
+                "name": "ADOTelemetry.ADOChangeSpansTyped"
+              },
+              "entityType": "UserDefined.ADOTelemetry.ADOChangeSpansTyped",
+              "oDataQueryString": "ADOTelemetry.ADOChangeSpansTyped?$filter=traceID eq '${Change}'&$top=2000",
+              "refId": "A",
+              "usePost": true
+            }
+          ],
+          "title": "Lead-time trace of the selected merged PR (review phases, work items Active to Resolved, wait for CD, CD attempts)",
+          "type": "traces"
+        }
+      ],
+      "title": "How one change flowed: review, work items, wait and CD attempts (expand to load; pick a merged PR in the table)",
+      "type": "row"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [
+    "ado",
+    "cmf-audit"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Organization",
+        "multi": true,
+        "name": "Organization",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=groupby((Organization))&$select=Organization&$orderby=Organization",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Project",
+        "multi": true,
+        "name": "Project",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})))/groupby((Project))&$select=Project&$orderby=Project",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Environment",
+        "multi": true,
+        "name": "Environment",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOChangeLeadTimeTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})))/groupby((Environment))&$select=Environment&$orderby=Environment",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Team",
+        "multi": true,
+        "name": "Team",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOChangeLeadTimeTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})))/groupby((Team))&$select=Team&$orderby=Team",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": [
+            "$__all"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "includeAll": true,
+        "label": "Test suite (dll)",
+        "multi": true,
+        "name": "Suite",
+        "options": [],
+        "query": "Business : Business Tests, IoT : IoT Tests, IoTOrchestrator : IoTOrchestrator Tests, HTML (GUI) : GUI Tests",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "PR 5303",
+          "value": "PR 5303"
+        },
+        "hide": 2,
+        "label": "Merged pull request (lead-time trace)",
+        "name": "Change",
+        "options": [
+          {
+            "selected": true,
+            "text": "PR 5303",
+            "value": "PR 5303"
+          }
+        ],
+        "query": "PR 5303",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "CD-Containers",
+          "value": "CD-Containers"
+        },
+        "hide": 0,
+        "label": "CD pipeline",
+        "name": "CdPipeline",
+        "options": [
+          {
+            "selected": true,
+            "text": "CD-Containers",
+            "value": "CD-Containers"
+          }
+        ],
+        "query": "CD-Containers",
+        "type": "textbox"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-120d",
+    "to": "now"
+  },
+  "timepicker": {
+    "quick_ranges": [
+      {
+        "display": "Last 7 days",
+        "from": "now-7d",
+        "to": "now"
+      },
+      {
+        "display": "Last 14 days",
+        "from": "now-14d",
+        "to": "now"
+      },
+      {
+        "display": "Last 30 days",
+        "from": "now-30d",
+        "to": "now"
+      },
+      {
+        "display": "Last 60 days",
+        "from": "now-60d",
+        "to": "now"
+      },
+      {
+        "display": "Last 90 days",
+        "from": "now-90d",
+        "to": "now"
+      },
+      {
+        "display": "Last 120 days",
+        "from": "now-120d",
+        "to": "now"
+      },
+      {
+        "display": "Last 180 days",
+        "from": "now-180d",
+        "to": "now"
+      }
+    ]
+  },
+  "timezone": "browser",
+  "title": "ADO - Package release flow",
+  "uid": "cmf-ado-release-flow",
+  "version": 24
+}
