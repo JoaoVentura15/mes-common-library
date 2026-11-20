@@ -105,6 +105,8 @@ namespace Cmf.Cli.Plugin.Audit.Commands
 
             cmd.AddOption(new Option<int>("--parallelism", () => 8, "Azure DevOps requests in flight at once while reading runs and pull requests (lower it if Azure DevOps answers 429)"));
             cmd.AddOption(new Option<bool>("--strictCollection", "Fail if requested collection is incomplete instead of posting partial results"));
+            cmd.AddOption(new Option<string>("--checkpointDirectory", "Persist successful ADO reads and upload receipts locally; use a new directory for each extraction snapshot"));
+            cmd.AddOption(new Option<bool>("--resume", "Resume the same command and destination from --checkpointDirectory; reuse completed extraction and acknowledged batches"));
             cmd.AddOption(new Option<bool>("--refreshOpenPullRequests", "Refresh all open pull requests, including those created before the lookback window"));
             cmd.AddOption(new Option<bool>("--refreshChangedWorkItems", "Also refresh the pull requests of any age that are linked to work items changed since the lookback window starts"));
             cmd.AddOption(new Option<int>("--batchDelayMs", () => 1000, "Pause between PostMultipleIoTEvents calls in milliseconds; 0 posts back to back (Kafka accepts the events and the housekeeper writes them to ClickHouse afterwards)"));
@@ -153,7 +155,16 @@ namespace Cmf.Cli.Plugin.Audit.Commands
                 return;
             }
 
-            var settings = PipelineRunsSettings.From(options, DateTime.UtcNow);
+            if (options.resume && string.IsNullOrWhiteSpace(options.checkpointDirectory)) throw new CliException("--resume requires --checkpointDirectory");
+            if (!string.IsNullOrWhiteSpace(options.checkpointDirectory) && !options.strictCollection) throw new CliException("--checkpointDirectory requires --strictCollection so incomplete extraction is not marked complete");
+            if (!string.IsNullOrWhiteSpace(options.checkpointDirectory) && clientFactory != null) throw new CliException("Checkpoints require the built-in ADO REST client");
+            // Resolve the actual tenant before binding the checkpoint to its destination.
+            if (options.postEvent && string.IsNullOrWhiteSpace(options.tenantName))
+                options.tenantName = CLI.Core.Objects.ExecutionContext.Instance.ProjectConfig?.Tenant;
+            using var checkpoint = string.IsNullOrWhiteSpace(options.checkpointDirectory) ? null
+                : new PipelineCheckpoint(options.checkpointDirectory, PipelineCheckpoint.Fingerprint(options), options.resume);
+            if (checkpoint != null) Log.Information($"Checkpoint snapshot: {checkpoint.CreatedUtc:O}. Reuse this directory with --resume after failure; use a new directory to collect newer data.");
+            var settings = PipelineRunsSettings.From(options, checkpoint?.CreatedUtc ?? DateTime.UtcNow);
             var (token, useBearer) = ResolveAdoToken(options.personalAccessToken,
                 Environment.GetEnvironmentVariable(AzureDevOpsOptions.ENV_SYSTEM_ACCESSTOKEN),
                 Environment.GetEnvironmentVariable(ENV_ADO_PAT));
@@ -162,11 +173,13 @@ namespace Cmf.Cli.Plugin.Audit.Commands
                 throw new CliException($"No Azure DevOps token: set SYSTEM_ACCESSTOKEN or {ENV_ADO_PAT}, or pass --personalAccessToken");
             }
 
-            var ado = clientFactory?.Invoke(settings.OrganizationUrl, token) ?? new AzureDevOpsRestClient(settings.OrganizationUrl, token, useBearer: useBearer);
+            var ado = clientFactory?.Invoke(settings.OrganizationUrl, token) ?? new AzureDevOpsRestClient(settings.OrganizationUrl, token, useBearer: useBearer, checkpoint: checkpoint);
             List<PostTelemetry> events;
             try
             {
-                events = await new PipelineRunsCollector(ado, settings, options.parallelism).CollectAsync();
+                var collector = new PipelineRunsCollector(ado, settings, options.parallelism);
+                events = checkpoint == null ? await collector.CollectAsync()
+                    : await checkpoint.GetOrCreateAsync("collected-events", collector.CollectAsync);
             }
             finally
             {
@@ -196,13 +209,18 @@ namespace Cmf.Cli.Plugin.Audit.Commands
                 if (poster is RestApiService rest) rest.BatchDelay = TimeSpan.FromMilliseconds(Math.Max(0, options.batchDelayMs));
                 if (options.telemetryEvents)
                 {
-                    await poster.PostEventsAsync(events, Math.Max(1, options.batchSize));
+                    if (checkpoint == null) await poster.PostEventsAsync(events, Math.Max(1, options.batchSize));
+                    else await checkpoint.PostBatchesAsync("generic", events, options.batchSize,
+                        batch => poster.PostEventsAsync(batch, batch.Count), TimeSpan.FromMilliseconds(Math.Max(0, options.batchDelayMs)));
                     Log.Information($"Posted {events.Count} PostTelemetry event(s) to {options.hostAddress}");
                 }
                 if (options.typedEvents)
                 {
-                    var typed = AdoTelemetryEvents.Convert(events);
-                    await poster.PostTypedEventsAsync(typed, Math.Max(1, options.batchSize));
+                    var typed = checkpoint == null ? AdoTelemetryEvents.Convert(events)
+                        : await checkpoint.GetOrCreateAsync("typed-events", () => Task.FromResult(AdoTelemetryEvents.Convert(events)));
+                    if (checkpoint == null) await poster.PostTypedEventsAsync(typed, Math.Max(1, options.batchSize));
+                    else await checkpoint.PostBatchesAsync("typed", typed, options.batchSize,
+                        batch => poster.PostTypedEventsAsync(batch, batch.Count), TimeSpan.FromMilliseconds(Math.Max(0, options.batchDelayMs)));
                     Log.Information($"Posted {typed.Count} typed IoT event(s) ({string.Join(", ", typed.GroupBy(x => x.Definition.Split('\\').Last()).Select(g => $"{g.Key}={g.Count()}"))}) to {options.hostAddress}");
                 }
             }

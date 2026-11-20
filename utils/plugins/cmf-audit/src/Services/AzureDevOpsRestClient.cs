@@ -50,9 +50,11 @@ namespace audit.Services
         private const string ApiVersion = "7.1";
         private readonly HttpClient http;
         private readonly string orgUrl;
+        private readonly PipelineCheckpoint? checkpoint;
 
-        public AzureDevOpsRestClient(string organizationUrl, string token, HttpMessageHandler? handler = null, bool useBearer = false)
+        public AzureDevOpsRestClient(string organizationUrl, string token, HttpMessageHandler? handler = null, bool useBearer = false, PipelineCheckpoint? checkpoint = null)
         {
+            this.checkpoint = checkpoint;
             orgUrl = organizationUrl.TrimEnd('/') + "/";
             http = handler == null ? new HttpClient() : new HttpClient(handler);
             http.Timeout = TimeSpan.FromSeconds(100);
@@ -68,6 +70,19 @@ namespace audit.Services
 
         /// <summary>GET with up to 3 retries on throttling or transient server errors.</summary>
         private async Task<(JsonElement body, string? continuation)> GetAsync(string url, bool requireFound = false)
+        {
+            if (checkpoint == null) return await GetUncachedAsync(url, requireFound);
+            var saved = await checkpoint.GetOrCreateAsync("GET:" + requireFound + ":" + url, async () =>
+            {
+                var (body, continuation) = await GetUncachedAsync(url, requireFound);
+                return new CheckpointResponse(body.ValueKind == JsonValueKind.Undefined ? JsonSerializer.SerializeToElement<object?>(null) : body, continuation);
+            });
+            return (saved.Body, saved.Continuation);
+        }
+
+        private record CheckpointResponse(JsonElement Body, string? Continuation);
+
+        private async Task<(JsonElement body, string? continuation)> GetUncachedAsync(string url, bool requireFound = false)
         {
             for (var attempt = 1; ; attempt++)
             {
@@ -396,6 +411,13 @@ namespace audit.Services
 
         private async Task<List<int>> QueryWorkItemIdPageAsync(string project, string wiql)
         {
+            if (checkpoint == null) return await QueryWorkItemIdPageUncachedAsync(project, wiql);
+            return await checkpoint.GetOrCreateAsync("WIQL:" + project + ":" + wiql,
+                () => QueryWorkItemIdPageUncachedAsync(project, wiql));
+        }
+
+        private async Task<List<int>> QueryWorkItemIdPageUncachedAsync(string project, string wiql)
+        {
             var url = $"{orgUrl}{Q(project)}/_apis/wit/wiql?$top=10000&api-version={ApiVersion}";
             for (var attempt = 1; ; attempt++)
             {
@@ -471,8 +493,28 @@ namespace audit.Services
 
         public async Task<List<JsonElement>> ListJobRequestsAsync(int poolId)
         {
-            var (body, _) = await GetAsync($"{orgUrl}_apis/distributedtask/pools/{poolId}/jobrequests?completedRequestCount=2000&api-version={ApiVersion}");
-            return Values(body);
+            var all = new Dictionary<long, JsonElement>();
+            var tokens = new HashSet<string>(StringComparer.Ordinal);
+            string? token = null;
+            do
+            {
+                var url = $"{orgUrl}_apis/distributedtask/pools/{poolId}/jobrequests?$top=1000&api-version=7.1-preview.1";
+                if (token != null) url += "&continuationToken=" + Q(token);
+                var (body, next) = await GetAsync(url, requireFound: true);
+                if (body.ValueKind != JsonValueKind.Object || !body.TryGetProperty("value", out var items) || items.ValueKind != JsonValueKind.Array)
+                    throw new InvalidDataException("Agent job page did not contain a value array");
+                var added = 0;
+                foreach (var item in items.EnumerateArray())
+                {
+                    if (!item.TryGetProperty("requestId", out var id) || !id.TryGetInt64(out var requestId) || requestId <= 0)
+                        throw new InvalidDataException("Agent job page contains an invalid request ID");
+                    if (all.TryAdd(requestId, item.Clone())) added++;
+                }
+                if (!string.IsNullOrEmpty(next) && (!tokens.Add(next) || added == 0))
+                    throw new InvalidDataException("Agent job pagination repeated a token or made no progress");
+                token = next;
+            } while (!string.IsNullOrEmpty(token));
+            return all.Values.ToList();
         }
     }
 }
