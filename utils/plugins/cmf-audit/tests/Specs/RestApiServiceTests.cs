@@ -131,6 +131,69 @@ namespace specs
             Assert.True(watch.ElapsedMilliseconds >= 450, $"took {watch.ElapsedMilliseconds} ms"); // two pauses
         }
 
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task CheckpointResumeReportsOriginalBatchPositionsAndSkipsAcknowledgedUploads(bool typed)
+        {
+            var directory = Path.Combine(Path.GetTempPath(), "audit-upload-progress-" + Guid.NewGuid().ToString("N"));
+            var console = Cmf.CLI.Core.Log.AnsiConsole;
+            using var writer = TestSupport.GetLogStringWriter();
+            var generic = Enumerable.Range(1, 5).Select(_ => new PostTelemetry { Area = new Entity("PipelineRun") }).ToList();
+            var time = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var typedEvents = Enumerable.Range(1, 5).Select(i => new audit.Objects.PipelineRuns.TypedEvent(
+                "ADOTelemetry/PipelineRun", time, new Dictionary<string, object?> { ["BuildId"] = i })).ToList();
+            var kind = typed ? "typed" : "generic";
+            var label = typed ? "typed batch" : "batch";
+            Task Upload(PipelineCheckpoint checkpoint, RestApiService service) => typed
+                ? checkpoint.PostBatchesAsync(kind, typedEvents, 2,
+                    (batch, progress) => service.PostTypedEventsAsync(batch, batch.Count, progress), TimeSpan.Zero)
+                : checkpoint.PostBatchesAsync(kind, generic, 2,
+                    (batch, progress) => service.PostEventsAsync(batch, batch.Count, progress), TimeSpan.Zero);
+            try
+            {
+                var failing = new FailingPostHandler(1, HttpStatusCode.OK, "{\"HasErrors\":true}");
+                using (var client = new HttpClient(failing))
+                using (var service = new RestApiService(new ClientConfiguration("example.test", "Tenant", "MES", "unused", true), client))
+                using (var checkpoint = new PipelineCheckpoint(directory, "scope", false))
+                {
+                    var error = await Assert.ThrowsAsync<Exception>(() => Upload(checkpoint, service));
+                    Assert.Contains($"{label} 2/3 (events 3-4 of 5", error.Message);
+                    Assert.Contains("2 event(s) were acknowledged", error.Message);
+                }
+                writer.GetStringBuilder().Clear();
+                var accepting = new FailingPostHandler(int.MaxValue);
+                using (var client = new HttpClient(accepting))
+                using (var service = new RestApiService(new ClientConfiguration("example.test", "Tenant", "MES", "unused", true), client))
+                using (var checkpoint = new PipelineCheckpoint(directory, "scope", true))
+                    await Upload(checkpoint, service);
+                var log = writer.ToString();
+                Assert.Contains($"Checkpoint {kind}: batch 1/3, 2/5 event(s) previously acknowledged; skipped", log);
+                Assert.Contains($"Posting {label} 2/3: events 3-4 of 5", log);
+                Assert.Contains($"Posted {label} 3/3: 5/5 event(s) acknowledged", log);
+                Assert.DoesNotContain("batch 1/1", log);
+                Assert.DoesNotContain($"Posting {label} 1/3", log);
+                Assert.Equal(2, accepting.Payloads.Count);
+                using var last = JsonDocument.Parse(accepting.Payloads.Last());
+                Assert.Single(last.RootElement.GetProperty("IoTEvents").EnumerateArray());
+
+                writer.GetStringBuilder().Clear();
+                var completed = new FailingPostHandler(0);
+                using (var client = new HttpClient(completed))
+                using (var service = new RestApiService(new ClientConfiguration("example.test", "Tenant", "MES", "unused", true), client))
+                using (var checkpoint = new PipelineCheckpoint(directory, "scope", true))
+                    await Upload(checkpoint, service);
+                Assert.Empty(completed.Payloads);
+                Assert.Contains($"Checkpoint {kind}: batch 3/3, 5/5 event(s) previously acknowledged; skipped", writer.ToString());
+                Assert.DoesNotContain("Posting ", writer.ToString());
+            }
+            finally
+            {
+                Cmf.CLI.Core.Log.AnsiConsole = console;
+                if (Directory.Exists(directory)) Directory.Delete(directory, recursive: true);
+            }
+        }
+
         private sealed class FailingPostHandler(int acknowledgedBatches,
             HttpStatusCode failureStatus = HttpStatusCode.BadGateway, string failureBody = "upstream request timed out") : HttpMessageHandler
         {

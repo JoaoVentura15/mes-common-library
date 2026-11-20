@@ -60,7 +60,10 @@ namespace audit.Services
             return accessToken;
         }
 
-        public async Task PostEventsAsync(List<PostTelemetry> eventsData, int batchSize = 0)
+        public Task PostEventsAsync(List<PostTelemetry> eventsData, int batchSize = 0) =>
+            PostEventsAsync(eventsData, batchSize, null);
+
+        public async Task PostEventsAsync(List<PostTelemetry> eventsData, int batchSize, UploadBatchProgress? progress)
         {
             // 0 = everything in one call (previous behaviour)
             batchSize = batchSize > 0 ? batchSize : Math.Max(1, eventsData.Count);
@@ -68,8 +71,10 @@ namespace audit.Services
             for (int i = 0; i < eventsData.Count; i += batchSize)
             {
                 var batch = eventsData.Skip(i).Take(batchSize).ToList();
-                var batchNumber = i / batchSize + 1;
-                var totalBatches = (eventsData.Count - 1) / batchSize + 1;
+                var batchNumber = (progress?.BatchNumber ?? 1) + i / batchSize;
+                var totalBatches = progress?.TotalBatches ?? (eventsData.Count - 1) / batchSize + 1;
+                var eventOffset = (progress?.EventOffset ?? 0) + i;
+                var totalEvents = progress?.TotalEvents ?? eventsData.Count;
                 var eventTypes = string.Join(", ", batch.GroupBy(item => item.Area?.Name ?? "Unknown")
                     .Select(group => $"{group.Key}={group.Count()}"));
 
@@ -108,7 +113,7 @@ namespace audit.Services
                 var json = JsonSerializer.Serialize(call);
                 request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                Log.Information($"Posting batch {batchNumber}/{totalBatches}: {batch.Count} event(s) ({eventTypes}) to {_clientConfiguration.HostAddress}");
+                Log.Information($"Posting batch {batchNumber}/{totalBatches}: events {eventOffset + 1}-{eventOffset + batch.Count} of {totalEvents} ({eventTypes}) to {_clientConfiguration.HostAddress}");
 
                 try
                 {
@@ -134,11 +139,11 @@ namespace audit.Services
                 catch (Exception ex)
                 {
                     throw new Exception(
-                        $"Failed posting batch {batchNumber}/{totalBatches} (events {i + 1}-{i + batch.Count} of {eventsData.Count}; {eventTypes}). " +
-                        $"{i} event(s) were acknowledged before this batch. The failed batch may already have been accepted; it was not retried.", ex);
+                        $"Failed posting batch {batchNumber}/{totalBatches} (events {eventOffset + 1}-{eventOffset + batch.Count} of {totalEvents}; {eventTypes}). " +
+                        $"{eventOffset} event(s) were acknowledged before this batch. The failed batch may already have been accepted; it was not retried.", ex);
                 }
 
-                Log.Information($"Posted batch {batchNumber}/{totalBatches}: {i + batch.Count}/{eventsData.Count} event(s) acknowledged");
+                Log.Information($"Posted batch {batchNumber}/{totalBatches}: {eventOffset + batch.Count}/{totalEvents} event(s) acknowledged");
 
                 // Wait 1 second before next batch (except for the last batch)
                 if (i + batchSize < eventsData.Count)
@@ -151,15 +156,20 @@ namespace audit.Services
         private const int MaxAttempts = 5;
 
         /// <summary>Posts typed IoT events (one event definition per table, flat column data) with PostMultipleIoTEvents.</summary>
-        public async Task PostTypedEventsAsync(List<audit.Objects.PipelineRuns.TypedEvent> eventsData, int batchSize = 0)
+        public Task PostTypedEventsAsync(List<audit.Objects.PipelineRuns.TypedEvent> eventsData, int batchSize = 0) =>
+            PostTypedEventsAsync(eventsData, batchSize, null);
+
+        public async Task PostTypedEventsAsync(List<audit.Objects.PipelineRuns.TypedEvent> eventsData, int batchSize, UploadBatchProgress? progress)
         {
             batchSize = batchSize > 0 ? batchSize : Math.Max(1, eventsData.Count);
 
             for (int i = 0; i < eventsData.Count; i += batchSize)
             {
                 var batch = eventsData.Skip(i).Take(batchSize).ToList();
-                var batchNumber = i / batchSize + 1;
-                var totalBatches = (eventsData.Count - 1) / batchSize + 1;
+                var batchNumber = (progress?.BatchNumber ?? 1) + i / batchSize;
+                var totalBatches = progress?.TotalBatches ?? (eventsData.Count - 1) / batchSize + 1;
+                var eventOffset = (progress?.EventOffset ?? 0) + i;
+                var totalEvents = progress?.TotalEvents ?? eventsData.Count;
                 var eventTypes = string.Join(", ", batch.GroupBy(item => item.Definition.Split('\\').Last())
                     .Select(group => $"{group.Key}={group.Count()}"));
 
@@ -191,7 +201,7 @@ namespace audit.Services
                     return request;
                 }
 
-                Log.Information($"Posting typed batch {batchNumber}/{totalBatches}: {batch.Count} event(s) ({eventTypes}) to {_clientConfiguration.HostAddress}");
+                Log.Information($"Posting typed batch {batchNumber}/{totalBatches}: events {eventOffset + 1}-{eventOffset + batch.Count} of {totalEvents} ({eventTypes}) to {_clientConfiguration.HostAddress}");
 
                 try
                 {
@@ -233,11 +243,11 @@ namespace audit.Services
                 catch (Exception ex)
                 {
                     throw new Exception(
-                        $"Failed posting typed batch {batchNumber}/{totalBatches} (events {i + 1}-{i + batch.Count} of {eventsData.Count}; {eventTypes}). " +
-                        $"{i} event(s) were acknowledged before this batch. Re-posting is safe: rows with the same key are replaced.", ex);
+                        $"Failed posting typed batch {batchNumber}/{totalBatches} (events {eventOffset + 1}-{eventOffset + batch.Count} of {totalEvents}; {eventTypes}). " +
+                        $"{eventOffset} event(s) were acknowledged before this batch. Re-posting is safe: rows with the same key are replaced.", ex);
                 }
 
-                Log.Information($"Posted typed batch {batchNumber}/{totalBatches}: {i + batch.Count}/{eventsData.Count} event(s) acknowledged");
+                Log.Information($"Posted typed batch {batchNumber}/{totalBatches}: {eventOffset + batch.Count}/{totalEvents} event(s) acknowledged");
 
                 if (i + batchSize < eventsData.Count)
                 {
