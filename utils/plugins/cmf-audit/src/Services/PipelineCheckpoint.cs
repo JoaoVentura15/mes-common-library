@@ -7,6 +7,9 @@ using Cmf.CLI.Core;
 
 namespace audit.Services;
 
+/// <summary>Position of an upload batch within the original event stream, including resumed batches.</summary>
+public sealed record UploadBatchProgress(int BatchNumber, int TotalBatches, int EventOffset, int TotalEvents);
+
 /// <summary>A local extraction snapshot. Successful reads and acknowledged batches survive process failure.</summary>
 public sealed class PipelineCheckpoint : IDisposable
 {
@@ -101,22 +104,27 @@ public sealed class PipelineCheckpoint : IDisposable
         finally { if (File.Exists(temporary)) File.Delete(temporary); }
     }
 
-    public async Task PostBatchesAsync<T>(string kind, List<T> events, int batchSize, Func<List<T>, Task> post, TimeSpan delay)
+    public Task PostBatchesAsync<T>(string kind, List<T> events, int batchSize, Func<List<T>, Task> post, TimeSpan delay) =>
+        PostBatchesAsync(kind, events, batchSize, (batch, _) => post(batch), delay);
+
+    public async Task PostBatchesAsync<T>(string kind, List<T> events, int batchSize, Func<List<T>, UploadBatchProgress, Task> post, TimeSpan delay)
     {
         batchSize = Math.Max(1, batchSize);
         for (var offset = 0; offset < events.Count; offset += batchSize)
         {
             var batch = events.GetRange(offset, Math.Min(batchSize, events.Count - offset));
+            var progress = new UploadBatchProgress(offset / batchSize + 1, (events.Count - 1) / batchSize + 1, offset, events.Count);
             var hash = Hash(JsonSerializer.Serialize(batch));
             var sent = false;
             var receipt = await GetOrCreateAsync("acknowledged:" + kind + ":" + offset, async () =>
             {
-                await post(batch);
+                await post(batch, progress);
                 sent = true;
                 return hash;
             });
             if (receipt != hash) throw new InvalidDataException("Upload batch differs from its checkpoint receipt; refusing to skip data");
-            Log.Information($"Checkpoint {kind}: {offset + batch.Count}/{events.Count} event(s) acknowledged or previously acknowledged");
+            Log.Information($"Checkpoint {kind}: batch {progress.BatchNumber}/{progress.TotalBatches}, {offset + batch.Count}/{events.Count} event(s) " +
+                (sent ? "acknowledged" : "previously acknowledged; skipped"));
             if (sent && offset + batch.Count < events.Count && delay > TimeSpan.Zero) await Task.Delay(delay);
         }
     }
