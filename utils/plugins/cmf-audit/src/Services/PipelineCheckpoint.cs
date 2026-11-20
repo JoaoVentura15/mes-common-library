@@ -22,7 +22,7 @@ public sealed class PipelineCheckpoint : IDisposable
     private record Manifest(int Version, string Fingerprint, DateTime CreatedUtc);
     private record Entry<T>(int Version, string Key, T Value);
 
-    public PipelineCheckpoint(string directory, string fingerprint, bool resume)
+    public PipelineCheckpoint(string directory, string fingerprint, bool resume, string? compatibleFingerprint = null)
     {
         this.directory = Path.GetFullPath(directory);
         if (resume && !Directory.Exists(this.directory)) throw new InvalidOperationException("Checkpoint directory does not exist; resume cannot start a new extraction");
@@ -36,7 +36,7 @@ public sealed class PipelineCheckpoint : IDisposable
                 if (!File.Exists(path)) throw new InvalidDataException("Checkpoint manifest is missing");
                 using var stream = File.OpenRead(path);
                 var manifest = JsonSerializer.Deserialize<Manifest>(stream) ?? throw new InvalidDataException("Invalid checkpoint manifest");
-                if (manifest.Version != Version || manifest.Fingerprint != fingerprint)
+                if (manifest.Version != Version || (manifest.Fingerprint != fingerprint && manifest.Fingerprint != compatibleFingerprint))
                     throw new InvalidOperationException("Checkpoint options or format do not match. Use the original command and destination, or a new directory");
                 CreatedUtc = manifest.CreatedUtc;
             }
@@ -51,12 +51,13 @@ public sealed class PipelineCheckpoint : IDisposable
         catch { lease.Dispose(); throw; }
     }
 
-    public static string Fingerprint(PipelineRunsOptions options)
+    public static string Fingerprint(PipelineRunsOptions options, bool? telemetryEvents = null)
     {
         // Authentication may be renewed between attempts. Never put credentials in the manifest or cache keys.
         var ignored = new HashSet<string> { "personalAccessToken", "securityAccessToken", "checkpointDirectory", "resume", "parallelism", "batchDelayMs" };
         var values = typeof(PipelineRunsOptions).GetProperties().Where(p => !ignored.Contains(p.Name))
             .OrderBy(p => p.Name, StringComparer.Ordinal).ToDictionary(p => p.Name, p => p.GetValue(options));
+        if (telemetryEvents.HasValue) values["telemetryEvents"] = telemetryEvents.Value;
         if (!string.IsNullOrWhiteSpace(options.fieldsConfig)) values["fieldsConfigContentsHash"] = Hash(File.ReadAllText(options.fieldsConfig));
         return Hash(JsonSerializer.Serialize(values));
     }
