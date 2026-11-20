@@ -23,7 +23,7 @@ Add these flags to the first execution of your existing `pipeline-runs` command:
 --strictCollection --checkpointDirectory "C:\Work\AuditCheckpoints\full-backfill-20261120"
 ```
 
-If collection or posting fails, rerun the same command with the same directory and add `--resume`. Successful JSON reads (including WIQL queries and individual revision pages) are reused. Agent job collection follows continuation tokens beyond 2,000 requests and rejects repeated tokens, pages that make no progress and malformed responses. Only jobs finished since the configured lookback are emitted; Azure DevOps retention still limits what is available.
+If collection or posting fails, rerun the same command with the same directory and add `--resume`. Successful JSON reads (including WIQL queries and individual revision pages) are reused. Agent job collection follows continuation tokens beyond 2,000 requests and rejects repeated tokens, pages that make no progress and malformed responses. An empty final page carrying ADO's `||` cursor is accepted as completion, including when replayed from an existing checkpoint. Only jobs finished since the configured lookback are emitted; Azure DevOps retention still limits what is available.
 
 After extraction completes, the generated events and typed payloads are saved, so an upload retry does not collect again. Acknowledged upload batches are recorded separately for generic and typed events and skipped on resume. A batch whose acknowledgement was lost can be resent: delivery is at least once, with the existing typed event keys supporting deduplication. Generic events do not gain an exactly-once guarantee.
 
