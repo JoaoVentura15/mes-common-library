@@ -161,8 +161,12 @@ namespace Cmf.Cli.Plugin.Audit.Commands
             // Resolve the actual tenant before binding the checkpoint to its destination.
             if (options.postEvent && string.IsNullOrWhiteSpace(options.tenantName))
                 options.tenantName = CLI.Core.Objects.ExecutionContext.Instance.ProjectConfig?.Tenant;
+            // Allow dropping generic uploads from a dual-stream resume without invalidating saved extraction.
+            // Every other option, including the destination and batch size, must still match.
+            var compatibleFingerprint = options.resume && options.typedEvents && !options.telemetryEvents
+                ? PipelineCheckpoint.Fingerprint(options, telemetryEvents: true) : null;
             using var checkpoint = string.IsNullOrWhiteSpace(options.checkpointDirectory) ? null
-                : new PipelineCheckpoint(options.checkpointDirectory, PipelineCheckpoint.Fingerprint(options), options.resume);
+                : new PipelineCheckpoint(options.checkpointDirectory, PipelineCheckpoint.Fingerprint(options), options.resume, compatibleFingerprint);
             if (checkpoint != null) Log.Information($"Checkpoint snapshot: {checkpoint.CreatedUtc:O}. Reuse this directory with --resume after failure; use a new directory to collect newer data.");
             var settings = PipelineRunsSettings.From(options, checkpoint?.CreatedUtc ?? DateTime.UtcNow);
             var (token, useBearer) = ResolveAdoToken(options.personalAccessToken,
