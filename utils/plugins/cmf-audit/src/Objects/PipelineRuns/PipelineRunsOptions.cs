@@ -47,6 +47,8 @@ namespace audit.Objects.PipelineRuns
         public string? sprintFromIterationPath { get; set; }
         public bool workItemHistory { get; set; }
         public bool allWorkItemHistory { get; set; }
+        public string? checkpointDirectory { get; set; }
+        public bool resume { get; set; }
         public bool stepErrors { get; set; } = true;
         public bool logErrors { get; set; }
         public int logMaxLines { get; set; } = 50000;
