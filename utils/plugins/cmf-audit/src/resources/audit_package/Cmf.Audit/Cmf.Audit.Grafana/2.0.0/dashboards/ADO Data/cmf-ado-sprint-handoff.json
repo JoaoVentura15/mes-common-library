@@ -1,0 +1,2046 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Sprint handoff by team and ending sprint. General activity and reconciliation use unqualified created/merged populations in each handoff window, not whole-sprint totals. The WI package selector applies only to dedicated qualified follow-up panels. Qualified follow-ups require matching linked-WI sprint and latest target-package evidence; historical package values and causation are not established. Shared CD/test signals are deduplicated per sprint, not attributed to a team or package. Calendar dates are exposed in the evidence section.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [
+    {
+      "includeVars": true,
+      "keepTime": true,
+      "title": "Package release flow",
+      "type": "link",
+      "url": "/Grafana/d/cmf-ado-release-flow"
+    },
+    {
+      "asDropdown": true,
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "ado"
+      ],
+      "title": "ADO dashboards",
+      "type": "dashboards"
+    }
+  ],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "panels": [],
+      "title": "Sprints that ended in the selected time range",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Distinct PRs merged on the last two working days of their sprint (days −2 and −1 before the sprint finish).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#4f8ff7",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "count"
+          ],
+          "fields": "/^RecordId$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+            "name": "ADOTelemetry.ADOSprintHandoffTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+          "oDataQueryString": "ADOTelemetry.ADOSprintHandoffTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${Sprint:singlequote}) or Sprint in (${Sprint:singlequote})) and ExpectedFinish ge ${__from:date:seconds} and ExpectedFinish lt ${__to:date:seconds} and Kind eq 'MergedPR' and DaysFromSprintEnd ge -2 and DaysFromSprintEnd lt 0)/groupby((RecordId))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "PRs merged in the last 2 days",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "RecordId"
+              ]
+            }
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Distinct PRs created in the first three days of the next team sprint, with at least one linked WI assigned to the ending sprint in its current or recorded initial iteration. The same WI must have a usable target package matching the package filter. All packages includes any recorded target version. Package values are latest WI snapshots, not historical assignments. Unverified links are excluded. Temporal proximity does not prove a test fix.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#f2a33a",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 1
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^QualifiedPRs$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+            "name": "ADOTelemetry.ADOSprintHandoffTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+          "oDataQueryString": "ADOTelemetry.ADOSprintHandoffTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${Sprint:singlequote}) or Sprint in (${Sprint:singlequote})) and ExpectedFinish ge ${__from:date:seconds} and ExpectedFinish lt ${__to:date:seconds} and Kind eq 'CreatedPR' and EarlyNextSprint eq 1 and (Kind ne 'CreatedPR' or EarlyNextSprint ne 1 or (('__all' in (${PackageVersion:singlequote}) or PackageVersion in (${PackageVersion:singlequote})) and SprintLinkEvidence in ('CurrentAssignment','RecordedInitialAssignment') and PackageVersion ne null and PackageVersion ne '' and PackageVersion ne 'N/A')))/aggregate(RecordId with countdistinct as QualifiedPRs)",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Qualified follow-up PRs, first 3 days of next sprint",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "QualifiedPRs"
+              ]
+            }
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Distinct failed test executions on shared CD in the first three days of the next sprint (shared signal, not team-owned).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#e5534b",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "count"
+          ],
+          "fields": "/^RecordId$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+            "name": "ADOTelemetry.ADOSprintHandoffTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+          "oDataQueryString": "ADOTelemetry.ADOSprintHandoffTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${Sprint:singlequote}) or Sprint in (${Sprint:singlequote})) and ExpectedFinish ge ${__from:date:seconds} and ExpectedFinish lt ${__to:date:seconds} and Kind eq 'TestFailure' and EarlyNextSprint eq 1)/groupby((RecordId))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Test failures, first 3 days of next sprint",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "RecordId"
+              ]
+            }
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "CD runs/retentions in the handoff window whose package version could not be read from the run parameters.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#9d7cd8",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 1
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "count"
+          ],
+          "fields": "/^RecordId$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+            "name": "ADOTelemetry.ADOSprintHandoffTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+          "oDataQueryString": "ADOTelemetry.ADOSprintHandoffTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${Sprint:singlequote}) or Sprint in (${Sprint:singlequote})) and ExpectedFinish ge ${__from:date:seconds} and ExpectedFinish lt ${__to:date:seconds} and CDVersionMissing eq 1)/groupby((RecordId))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "CD runs without a package version",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "RecordId"
+              ]
+            }
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 6,
+      "panels": [],
+      "title": "The handoff curve: activity around sprint end",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Unqualified distinct records in each ending sprint's handoff window (DaysFromSprintEnd -7 through +7), not full-sprint totals. Created and merged PRs use the same eligibility rules; their cohorts need not be equal. WI package selection applies only to qualified follow-up panels. Team calendars can have different dates; see the calendar details.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 85,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 0,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRs created"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#8e8e8e",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRs merged"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f8ff7",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CD runs"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#9d7cd8",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CD approved & retained"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#3fb68b",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Test failures"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#e5534b",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 16,
+        "x": 0,
+        "y": 6
+      },
+      "id": 7,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.85,
+        "fullHighlight": false,
+        "groupWidth": 0.75,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "Day",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+            "name": "ADOTelemetry.ADOSprintHandoffTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+          "oDataQueryString": "ADOTelemetry.ADOSprintHandoffTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${Sprint:singlequote}) or Sprint in (${Sprint:singlequote})) and ExpectedFinish ge ${__from:date:seconds} and ExpectedFinish lt ${__to:date:seconds} and DaysFromSprintEnd ge -7 and DaysFromSprintEnd le 7 and Kind ne 'TestFailure')/groupby((DaysFromSprintEnd,Kind),aggregate(RecordId with countdistinct as N))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "PR/CD activity in handoff window",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "DaysFromSprintEnd",
+                "Kind",
+                "N"
+              ]
+            }
+          }
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "Kind",
+            "emptyValue": "zero",
+            "rowField": "DaysFromSprintEnd",
+            "valueField": "N"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "CDRetained": "CD approved & retained",
+              "CDRun": "CD runs",
+              "CreatedPR": "PRs created",
+              "DaysFromSprintEnd\\Kind": "Day",
+              "MergedPR": "PRs merged",
+              "TestFailure": "Test failures"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": false,
+                "field": "Day"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "string",
+                "targetField": "Day"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Unqualified distinct records in each ending sprint's handoff window (DaysFromSprintEnd -7 through +7), not full-sprint totals. Created and merged PRs use the same eligibility rules; their cohorts need not be equal. WI package selection applies only to qualified follow-up panels. Team calendars can have different dates; see the calendar details.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": true
+          },
+          "decimals": 1,
+          "fieldMinMax": true,
+          "mappings": [],
+          "min": 0,
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRs merged"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f8ff7",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRs created"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#8e8e8e",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CD runs"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#9d7cd8",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CD approved & retained"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#3fb68b",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Test failures"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#e5534b",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*/"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 8,
+        "x": 16,
+        "y": 6
+      },
+      "id": 9,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+            "name": "ADOTelemetry.ADOSprintHandoffTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+          "oDataQueryString": "ADOTelemetry.ADOSprintHandoffTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${Sprint:singlequote}) or Sprint in (${Sprint:singlequote})) and ExpectedFinish ge ${__from:date:seconds} and ExpectedFinish lt ${__to:date:seconds} and DaysFromSprintEnd ge -7 and DaysFromSprintEnd le 7)/groupby((Sprint,Kind),aggregate(RecordId with countdistinct as N))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Handoff-window activity",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Sprint",
+                "Kind",
+                "N"
+              ]
+            }
+          }
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "Kind",
+            "emptyValue": "zero",
+            "rowField": "Sprint",
+            "valueField": "N"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "CDRetained": "CD approved & retained",
+              "CDRun": "CD runs",
+              "CreatedPR": "PRs created",
+              "MergedPR": "PRs merged",
+              "Sprint\\Kind": "Sprint",
+              "TestFailure": "Test failures"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "Sprint"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Distinct failed test executions per day relative to the sprint finish. Shared CD signal: the same failure can sit in several teams' windows, so do not add sprints up.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 85,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 0,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Test failures"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#e5534b",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 16,
+        "x": 0,
+        "y": 13
+      },
+      "id": 8,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.85,
+        "fullHighlight": false,
+        "groupWidth": 0.75,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "Day",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+            "name": "ADOTelemetry.ADOSprintHandoffTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+          "oDataQueryString": "ADOTelemetry.ADOSprintHandoffTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${Sprint:singlequote}) or Sprint in (${Sprint:singlequote})) and ExpectedFinish ge ${__from:date:seconds} and ExpectedFinish lt ${__to:date:seconds} and DaysFromSprintEnd ge -7 and DaysFromSprintEnd le 7 and Kind eq 'TestFailure')/groupby((DaysFromSprintEnd),aggregate(RecordId with countdistinct as Failures))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Test failures around sprint end (shared CD)",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "DaysFromSprintEnd",
+                "Failures"
+              ]
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": false,
+                "field": "DaysFromSprintEnd"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "DaysFromSprintEnd": "Day",
+              "Failures": "Test failures"
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "string",
+                "targetField": "Day"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "id": 14,
+      "panels": [],
+      "title": "Reconcile handoff-window PR activity",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "PR identities are deduplicated by organization, project, repository and sprint. Created = both + created without a merge event in the selected window; merged = both + merged without a creation event in that window. The latter is not automatically prior-sprint carryover: verify lifecycle dates and team calendars. This is not a complete open-backlog balance. Package qualification is excluded. Each query is capped at 20,000 PR/sprint identities.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": false
+          },
+          "decimals": 0,
+          "mappings": [],
+          "min": 0,
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 19
+      },
+      "id": 15,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.0.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+            "name": "ADOTelemetry.ADOSprintHandoffTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+          "oDataQueryString": "ADOTelemetry.ADOSprintHandoffTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${Sprint:singlequote}) or Sprint in (${Sprint:singlequote})) and ExpectedFinish ge ${__from:date:seconds} and ExpectedFinish lt ${__to:date:seconds} and DaysFromSprintEnd ge -7 and DaysFromSprintEnd le 7 and Kind eq 'CreatedPR')/groupby((Organization,Project,Repository,Sprint,RecordId),aggregate(RecordId with countdistinct as Created))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+            "name": "ADOTelemetry.ADOSprintHandoffTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+          "oDataQueryString": "ADOTelemetry.ADOSprintHandoffTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${Sprint:singlequote}) or Sprint in (${Sprint:singlequote})) and ExpectedFinish ge ${__from:date:seconds} and ExpectedFinish lt ${__to:date:seconds} and DaysFromSprintEnd ge -7 and DaysFromSprintEnd le 7 and Kind eq 'MergedPR')/groupby((Organization,Project,Repository,Sprint,RecordId),aggregate(RecordId with countdistinct as Merged))&$top=20000",
+          "refId": "B",
+          "usePost": true
+        }
+      ],
+      "title": "PR cohort reconciliation",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Organization",
+                "Project",
+                "Repository",
+                "Sprint",
+                "RecordId",
+                "Created",
+                "Merged"
+              ]
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Both",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Created"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Merged"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "NegativeBoth",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Both"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "-1"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "EarlierCreatedMerges",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "Merged",
+                "NegativeBoth"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "CreatedNotMerged",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "Created",
+                "NegativeBoth"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Both": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "Created": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "CreatedNotMerged": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "EarlierCreatedMerges": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "Merged": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "Sprint": {
+                "aggregations": [],
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "extractFields",
+          "options": {
+            "format": "regexp",
+            "regExp": "/(?<SprintNumber>\\d+)$/",
+            "replace": false,
+            "source": "Sprint"
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "SprintNumber"
+              }
+            ]
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": false,
+                "field": "SprintNumber"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "SprintNumber": true
+            },
+            "indexByName": {
+              "Both (sum)": 3,
+              "Created (sum)": 1,
+              "CreatedNotMerged (sum)": 5,
+              "EarlierCreatedMerges (sum)": 4,
+              "Merged (sum)": 2,
+              "Sprint": 0
+            },
+            "renameByName": {
+              "Both (sum)": "Created and merged",
+              "Created (sum)": "Created in window",
+              "CreatedNotMerged (sum)": "Created; not merged in window",
+              "EarlierCreatedMerges (sum)": "Merged; creation outside window",
+              "Merged (sum)": "Merged in window"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 29
+      },
+      "id": 10,
+      "panels": [],
+      "title": "By team",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Distinct PRs created in the first three days of the next team sprint, with at least one linked WI assigned to the ending sprint in its current or recorded initial iteration. The same WI must have a usable target package matching the package filter. All packages includes any recorded target version. Package values are latest WI snapshots, not historical assignments. Unverified links are excluded. Temporal proximity does not prove a test fix. Team counts are memberships, not an additive global PR total.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "fillOpacity": 85,
+            "gradientMode": "none",
+            "lineWidth": 0
+          },
+          "noValue": "No data",
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Merged in last 2 days"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f8ff7",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Follow-up PRs next sprint"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2a33a",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 30
+      },
+      "id": 11,
+      "options": {
+        "barWidth": 0.85,
+        "groupWidth": 0.75,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "Team",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+            "name": "ADOTelemetry.ADOSprintHandoffTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+          "oDataQueryString": "ADOTelemetry.ADOSprintHandoffTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${Sprint:singlequote}) or Sprint in (${Sprint:singlequote})) and ExpectedFinish ge ${__from:date:seconds} and ExpectedFinish lt ${__to:date:seconds} and ((Kind eq 'MergedPR' and DaysFromSprintEnd ge -2 and DaysFromSprintEnd lt 0) or (Kind eq 'CreatedPR' and EarlyNextSprint eq 1)) and (Kind ne 'CreatedPR' or EarlyNextSprint ne 1 or (('__all' in (${PackageVersion:singlequote}) or PackageVersion in (${PackageVersion:singlequote})) and SprintLinkEvidence in ('CurrentAssignment','RecordedInitialAssignment') and PackageVersion ne null and PackageVersion ne '' and PackageVersion ne 'N/A')))/groupby((Team,Kind),aggregate(RecordId with countdistinct as N))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Last-2-days merges vs qualified follow-ups, by team",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Team",
+                "Kind",
+                "N"
+              ]
+            }
+          }
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "Kind",
+            "emptyValue": "zero",
+            "rowField": "Team",
+            "valueField": "N"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "CreatedPR": "Follow-up PRs next sprint",
+              "MergedPR": "Merged in last 2 days",
+              "Team\\Kind": "Team"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "Merged in last 2 days"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 38
+      },
+      "id": 13,
+      "panels": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "description": "Includes qualifying and unverified links across all packages so missing attribution remains inspectable. Follow-up counters exclude unverified links. One row per record/WI link, not one row per PR. Target package values are latest snapshots; historical package assignment is unavailable.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "align": "auto",
+                "cellOptions": {
+                  "type": "auto"
+                },
+                "filterable": true,
+                "inspect": true
+              },
+              "decimals": 1,
+              "noValue": "No data"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Kind"
+                },
+                "properties": [
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "mappings",
+                    "value": [
+                      {
+                        "options": {
+                          "CDRetained": {
+                            "color": "#3fb68b",
+                            "text": "CD retained"
+                          },
+                          "CDRun": {
+                            "color": "#9d7cd8",
+                            "text": "CD run"
+                          },
+                          "CreatedPR": {
+                            "color": "#8e8e8e",
+                            "text": "PR created"
+                          },
+                          "MergedPR": {
+                            "color": "#4f8ff7",
+                            "text": "PR merged"
+                          },
+                          "TestFailure": {
+                            "color": "#e5534b",
+                            "text": "Test failure"
+                          }
+                        },
+                        "type": "value"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/^(SprintLinkEvidence|Link evidence)$/"
+                },
+                "properties": [
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "mappings",
+                    "value": [
+                      {
+                        "options": {
+                          "CurrentAssignment": {
+                            "color": "green",
+                            "text": "Current sprint assignment"
+                          },
+                          "RecordedInitialAssignment": {
+                            "color": "green",
+                            "text": "Recorded initial assignment"
+                          },
+                          "Unverified": {
+                            "color": "yellow",
+                            "text": "Unverified: excluded"
+                          }
+                        },
+                        "type": "value"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/^(SprintLinkEvidence|Link evidence)$/"
+                },
+                "properties": [
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "mappings",
+                    "value": [
+                      {
+                        "options": {
+                          "CurrentAssignment": {
+                            "color": "green",
+                            "text": "Current sprint assignment"
+                          },
+                          "RecordedInitialAssignment": {
+                            "color": "green",
+                            "text": "Recorded initial assignment"
+                          },
+                          "Unverified": {
+                            "color": "yellow",
+                            "text": "Unverified: excluded"
+                          }
+                        },
+                        "type": "value"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 24,
+            "x": 0,
+            "y": 39
+          },
+          "id": 12,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "show": false
+            },
+            "showHeader": true
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "PD36424FC765F148A"
+              },
+              "entitySet": {
+                "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+                "name": "ADOTelemetry.ADOSprintHandoffTyped"
+              },
+              "entityType": "UserDefined.ADOTelemetry.ADOSprintHandoffTyped",
+              "oDataQueryString": "ADOTelemetry.ADOSprintHandoffTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${Sprint:singlequote}) or Sprint in (${Sprint:singlequote})) and ExpectedFinish ge ${__from:date:seconds} and ExpectedFinish lt ${__to:date:seconds} and EarlyNextSprint eq 1)/groupby((Team,Sprint,Kind,RecordId,WorkItemId,PackageVersion,SprintLinkEvidence,EventTime))&$top=20000",
+              "refId": "A",
+              "usePost": true
+            }
+          ],
+          "title": "Early-next-sprint records and WI attribution evidence",
+          "transformations": [
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "Team",
+                    "Sprint",
+                    "Kind",
+                    "RecordId",
+                    "WorkItemId",
+                    "PackageVersion",
+                    "SprintLinkEvidence",
+                    "EventTime"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "convertFieldType",
+              "options": {
+                "conversions": [
+                  {
+                    "dateFormat": "X",
+                    "destinationType": "time",
+                    "targetField": "EventTime"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "sortBy",
+              "options": {
+                "sort": [
+                  {
+                    "desc": true,
+                    "field": "EventTime"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "limit",
+              "options": {
+                "limitField": 500
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "indexByName": {},
+                "renameByName": {
+                  "EventTime": "When",
+                  "PackageVersion": "Package version",
+                  "RecordId": "Record",
+                  "SprintLinkEvidence": "Link evidence",
+                  "WorkItemId": "Work item"
+                }
+              }
+            }
+          ],
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "description": "Sprint dates originate in UTC and display in the dashboard timezone. Finish is exclusive. The same sprint number can end on different dates for different teams. These dates anchor handoff windows; the activity panels are not whole-sprint totals. At most 500 calendar rows are shown.",
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "filterable": true
+              },
+              "noValue": "Unknown"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 51
+          },
+          "id": 16,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "show": false
+            },
+            "showHeader": true
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "PD36424FC765F148A"
+              },
+              "entitySet": {
+                "entityType": "UserDefined.ADOTelemetry.ADOSprintsTyped",
+                "name": "ADOTelemetry.ADOSprintsTyped"
+              },
+              "entityType": "UserDefined.ADOTelemetry.ADOSprintsTyped",
+              "oDataQueryString": "ADOTelemetry.ADOSprintsTyped?$filter=('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${Sprint:singlequote}) or Sprint in (${Sprint:singlequote})) and Finish ge ${__from:date:iso} and Finish lt ${__to:date:iso}&$select=Team,Sprint,IterationPath,Start,Finish&$orderby=Finish desc,Team asc&$top=500",
+              "refId": "A",
+              "usePost": true
+            }
+          ],
+          "title": "Team sprint calendar dates",
+          "type": "table"
+        }
+      ],
+      "title": "Detail: early-next-sprint evidence",
+      "type": "row"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [
+    "ado",
+    "cmf-audit"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Organization",
+        "multi": true,
+        "name": "Organization",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=groupby((Organization))&$select=Organization&$orderby=Organization",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Project",
+        "multi": true,
+        "name": "Project",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})))/groupby((Project))&$select=Project&$orderby=Project",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Team",
+        "multi": true,
+        "name": "Team",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOSprintHandoffTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})))/groupby((Team))&$select=Team&$orderby=Team",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Sprint",
+        "multi": true,
+        "name": "Sprint",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOSprintHandoffTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})))/groupby((Sprint))&$select=Sprint&$orderby=Sprint",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "allowCustomValue": false,
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "WI package (follow-ups only)",
+        "multi": true,
+        "name": "PackageVersion",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOSprintHandoffTyped?$apply=filter(Kind eq 'CreatedPR' and PackageVersion ne null and PackageVersion ne '' and PackageVersion ne 'N/A')/groupby((PackageVersion))&$select=PackageVersion&$orderby=PackageVersion",
+          "usePost": true
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-120d",
+    "to": "now"
+  },
+  "timepicker": {
+    "quick_ranges": [
+      {
+        "display": "Last 7 days",
+        "from": "now-7d",
+        "to": "now"
+      },
+      {
+        "display": "Last 14 days",
+        "from": "now-14d",
+        "to": "now"
+      },
+      {
+        "display": "Last 30 days",
+        "from": "now-30d",
+        "to": "now"
+      },
+      {
+        "display": "Last 60 days",
+        "from": "now-60d",
+        "to": "now"
+      },
+      {
+        "display": "Last 90 days",
+        "from": "now-90d",
+        "to": "now"
+      },
+      {
+        "display": "Last 120 days",
+        "from": "now-120d",
+        "to": "now"
+      },
+      {
+        "display": "Last 180 days",
+        "from": "now-180d",
+        "to": "now"
+      }
+    ]
+  },
+  "timezone": "browser",
+  "title": "ADO - Sprint handoff",
+  "uid": "cmf-ado-sprint-handoff",
+  "version": 9
+}
