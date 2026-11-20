@@ -196,6 +196,26 @@ public class PipelineCheckpointTests : IDisposable
     }
 
     [Fact]
+    public async Task TypedOnlyResumeCanReuseDualStreamCheckpointWithoutChangingItsManifest()
+    {
+        var options = new PipelineRunsOptions { typedEvents = true, telemetryEvents = true, tenantName = "Tenant", repositories = "Repo" };
+        var original = PipelineCheckpoint.Fingerprint(options);
+        using (var checkpoint = new PipelineCheckpoint(root, original, false))
+            await checkpoint.GetOrCreateAsync("collected-events", () => Task.FromResult(new List<int> { 1, 2 }));
+        var manifest = File.ReadAllText(Path.Combine(root, "manifest.json"));
+        options.telemetryEvents = false;
+        var typedOnly = PipelineCheckpoint.Fingerprint(options);
+        Assert.NotEqual(original, typedOnly);
+        Assert.Throws<InvalidOperationException>(() => new PipelineCheckpoint(root, typedOnly, true));
+        using (var checkpoint = new PipelineCheckpoint(root, typedOnly, true, PipelineCheckpoint.Fingerprint(options, telemetryEvents: true)))
+            Assert.Equal(new[] { 1, 2 }, await checkpoint.GetOrCreateAsync<List<int>>("collected-events", () => throw new Exception("must not recollect")));
+        Assert.Equal(manifest, File.ReadAllText(Path.Combine(root, "manifest.json")));
+        options.tenantName = "Different";
+        Assert.Throws<InvalidOperationException>(() => new PipelineCheckpoint(root, PipelineCheckpoint.Fingerprint(options), true,
+            PipelineCheckpoint.Fingerprint(options, telemetryEvents: true)));
+    }
+
+    [Fact]
     public void FingerprintExcludesCredentialsButIncludesDestinationAndFilters()
     {
         var options = new PipelineRunsOptions { personalAccessToken = "old", securityAccessToken = "old", tenantName = "Tenant", repositories = "Repo" };
