@@ -62,6 +62,33 @@ public class PipelineCheckpointTests : IDisposable
         Assert.DoesNotContain("not-saved", string.Join("", Directory.EnumerateFiles(root, "*.json", SearchOption.AllDirectories).Select(File.ReadAllText)));
     }
 
+    [Fact]
+    public async Task AgentPaginationAcceptsEmptyTerminalCursorAndReusesSavedPages()
+    {
+        var calls = 0;
+        using (var checkpoint = new PipelineCheckpoint(root, "scope", false))
+        using (var client = new AzureDevOpsRestClient("https://dev.azure.com/example", "test", new Handler(_ =>
+        {
+            calls++;
+            return calls == 1 ? Json("{\"value\":[{\"requestId\":1}]}", "||12/2/2024 5:40:40 PM")
+                : Json("{\"value\":[]}", "||");
+        }), checkpoint: checkpoint))
+            Assert.Single(await client.ListJobRequestsAsync(1));
+        Assert.Equal(2, calls);
+        using (var checkpoint = new PipelineCheckpoint(root, "scope", true))
+        using (var client = new AzureDevOpsRestClient("https://dev.azure.com/example", "test",
+            new Handler(_ => throw new Exception("must not reread saved terminal page")), checkpoint: checkpoint))
+            Assert.Single(await client.ListJobRequestsAsync(1));
+    }
+
+    [Fact]
+    public async Task AgentPaginationRejectsEmptyPageWithAnUnfinishedCursor()
+    {
+        using var client = new AzureDevOpsRestClient("https://dev.azure.com/example", "test",
+            new Handler(_ => Json("{\"value\":[]}", "unfinished")));
+        await Assert.ThrowsAsync<InvalidDataException>(() => client.ListJobRequestsAsync(1));
+    }
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
