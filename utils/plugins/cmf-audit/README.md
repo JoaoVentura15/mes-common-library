@@ -6,7 +6,7 @@ Add `--allWorkItemHistory` to `pipeline-runs` to backfill every accessible work 
 
 Every revision is emitted using the existing `WorkItemHistory` schema. Revisions that leave state and iteration unchanged use `ChangeKind=Updated` and do not duplicate state-duration measurements. This retains the schema's state, iteration, area, reason, actor and timestamp fields; it does not archive arbitrary field snapshots, attachments, comments or deleted work items. No new event definition columns or data sets are required.
 
-Work-item queries use ascending ID pages of at most 10,000 and continue to an empty page, including beyond 20,000 items. Repeated pages and malformed responses are rejected. Revision requests use 200-row pages; full-history collection rejects missing, duplicate or mismatched revisions and empty histories before posting. Use `--strictCollection` for the remaining collections. Full history is rebuilt whenever this flag is supplied; revisions and generated events are held in memory, so large projects need adequate memory.
+Work-item queries use ascending ID pages of at most 10,000 and continue to an empty page, including beyond 20,000 items. Repeated pages and malformed responses are rejected. Revision requests use 200-row pages; full-history collection rejects missing, duplicate or mismatched revisions and empty histories before posting. Use `--strictCollection` for the remaining collections. Without checkpoint resume, full history is rebuilt whenever this flag is supplied; revisions and generated events are held in memory, so large projects need adequate memory.
 
 For example, append `--allWorkItemHistory --strictCollection` to an existing `pipeline-runs` command with `--typedEvents --postEvent`. Keep the organization's existing tenant, field mappings, repository and pool configuration. For incremental pipeline collection, retain a recent `--since`; the full work-item history remains independent of that lookback.
 
@@ -14,6 +14,27 @@ Plugin used to audit CM CLI based projects. This repo is split in two parts:
 
 - **Root** (`package.json`) — the build/release orchestrator. Not published; it drives `dotnet publish` for every platform and wraps the `npm/` package's version bump/publish scripts.
 - **`npm/`** (`npm/package.json`) — the actual package published as `@criticalmanufacturing/audit`. `postinstall.js` copies the right platform binary from `dist/<rid>` into `node_modules/.bin/...` when a consumer installs it. Its `files` field (`dist`, `postinstall.js`, `run.js`, `utils.js`) is exactly what ends up in the published tarball.
+
+## Resuming a long pipeline collection
+
+Add these flags to the first execution of your existing `pipeline-runs` command:
+
+```powershell
+--strictCollection --checkpointDirectory "C:\Work\AuditCheckpoints\full-backfill-20261120"
+```
+
+If collection or posting fails, rerun the same command with the same directory and add `--resume`. Successful JSON reads (including WIQL queries and individual revision pages) are reused. Agent job collection follows continuation tokens beyond 2,000 requests and rejects repeated tokens, pages that make no progress and malformed responses. Only jobs finished since the configured lookback are emitted; Azure DevOps retention still limits what is available.
+
+After extraction completes, the generated events and typed payloads are saved, so an upload retry does not collect again. Acknowledged upload batches are recorded separately for generic and typed events and skipped on resume. A batch whose acknowledgement was lost can be resent: delivery is at least once, with the existing typed event keys supporting deduplication. Generic events do not gain an exactly-once guarantee.
+
+Keep the original collection filters, lookback arguments, destination, typed/generic choices and batch size. Tokens may be renewed, and parallelism and batch delay may change. A changed fields configuration, mismatched options, missing/corrupt checkpoint or concurrent use of the directory is rejected. Atomic file replacement protects completed entries from an interrupted write.
+
+The original collection start time is retained for relative lookbacks and policy observation timestamps. Completed responses are reused; reads not yet completed occur when resumed, so this is not a transactionally consistent Azure DevOps snapshot. A completed checkpoint does not refresh newer data. Use a new empty directory for a new collection.
+
+Checkpoints contain confidential raw JSON responses and event payloads; keep them in an authorized local directory with enough disk space. Authentication headers and token options are not saved. Full task logs are not cached or written; failed-log reads may repeat when an incomplete extraction is resumed. Once final events are saved, they are reused without reading logs again. Existing large in-memory history processing still needs adequate memory.
+
+A previous execution without `--checkpointDirectory` cannot be recovered from these checkpoints; its next collection must run once with checkpointing enabled.
+
 
 ## Prerequisites
 
