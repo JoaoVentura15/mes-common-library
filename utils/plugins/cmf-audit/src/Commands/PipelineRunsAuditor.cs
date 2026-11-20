@@ -211,7 +211,9 @@ namespace Cmf.Cli.Plugin.Audit.Commands
                 {
                     if (checkpoint == null) await poster.PostEventsAsync(events, Math.Max(1, options.batchSize));
                     else await checkpoint.PostBatchesAsync("generic", events, options.batchSize,
-                        batch => poster.PostEventsAsync(batch, batch.Count), TimeSpan.FromMilliseconds(Math.Max(0, options.batchDelayMs)));
+                        (batch, progress) => poster is RestApiService service
+                            ? service.PostEventsAsync(batch, batch.Count, progress)
+                            : poster.PostEventsAsync(batch, batch.Count), TimeSpan.FromMilliseconds(Math.Max(0, options.batchDelayMs)));
                     Log.Information($"Posted {events.Count} PostTelemetry event(s) to {options.hostAddress}");
                 }
                 if (options.typedEvents)
@@ -220,7 +222,9 @@ namespace Cmf.Cli.Plugin.Audit.Commands
                         : await checkpoint.GetOrCreateAsync("typed-events", () => Task.FromResult(AdoTelemetryEvents.Convert(events)));
                     if (checkpoint == null) await poster.PostTypedEventsAsync(typed, Math.Max(1, options.batchSize));
                     else await checkpoint.PostBatchesAsync("typed", typed, options.batchSize,
-                        batch => poster.PostTypedEventsAsync(batch, batch.Count), TimeSpan.FromMilliseconds(Math.Max(0, options.batchDelayMs)));
+                        (batch, progress) => poster is RestApiService service
+                            ? service.PostTypedEventsAsync(batch, batch.Count, progress)
+                            : poster.PostTypedEventsAsync(batch, batch.Count), TimeSpan.FromMilliseconds(Math.Max(0, options.batchDelayMs)));
                     Log.Information($"Posted {typed.Count} typed IoT event(s) ({string.Join(", ", typed.GroupBy(x => x.Definition.Split('\\').Last()).Select(g => $"{g.Key}={g.Count()}"))}) to {options.hostAddress}");
                 }
             }
