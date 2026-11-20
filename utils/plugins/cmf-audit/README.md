@@ -36,6 +36,8 @@ Checkpoints contain confidential raw JSON responses and event payloads; keep the
 A previous execution without `--checkpointDirectory` cannot be recovered from these checkpoints; its next collection must run once with checkpointing enabled.
 
 
+Upload progress retains the original batch number, batch total and event range when using checkpoints. Generic and typed uploads each have their own totals. For five events in batches of two, retrying after the first batch was acknowledged reports batch 1/3 as previously acknowledged and skipped, then posts batch 2/3 (events 3-4 of 5) and batch 3/3 (event 5 of 5). Failure messages use the same overall positions. Existing checkpoints remain compatible. An already running process keeps its original log messages until the next invocation.
+
 ## Prerequisites
 
 - **.NET SDK 8.0.x**.
