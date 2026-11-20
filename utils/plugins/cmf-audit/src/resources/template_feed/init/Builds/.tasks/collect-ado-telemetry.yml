@@ -1,0 +1,48 @@
+parameters:
+- name: CollectorArguments
+  type: object
+  default: []
+- name: FieldsConfig
+  type: string
+  default: ''
+
+steps:
+- pwsh: |
+    $ErrorActionPreference = 'Stop'
+    foreach ($name in @('AUDIT_MES_HOST', 'AUDIT_MES_TENANT', 'CMF_AUDIT_SECURITY_TOKEN', 'SYSTEM_ACCESSTOKEN')) {
+      $value = [Environment]::GetEnvironmentVariable($name)
+      if ([string]::IsNullOrWhiteSpace($value) -or $value.StartsWith('$(')) {
+        throw "Required pipeline setting $name is missing."
+      }
+    }
+    $additional = @(ConvertFrom-Json -InputObject $env:AUDIT_COLLECTOR_ARGUMENTS)
+    if ($additional | Where-Object { $_ -match '^--(personalAccessToken|securityAccessToken)(=|$)' }) {
+      throw 'Pass credentials through secret environment variables, not collector arguments.'
+    }
+    # Project-specific fields (milestone, story points, team regex, ...): path of a JSON file in the repository, see the cmf-audit README (--fieldsConfig).
+    if (-not [string]::IsNullOrWhiteSpace($env:AUDIT_FIELDS_CONFIG) -and -not ($additional | Where-Object { $_ -match '^--fieldsConfig(=|$)' })) {
+      if (-not (Test-Path -LiteralPath $env:AUDIT_FIELDS_CONFIG)) { throw "FieldsConfig file not found: $($env:AUDIT_FIELDS_CONFIG)" }
+      $additional += @('--fieldsConfig', $env:AUDIT_FIELDS_CONFIG)
+    }
+    # Agent-job telemetry is opt-in: it needs --pools (and the Agent Pools: Read permission), so it is only collected when --pools is passed.
+    $include = @()
+    if (-not ($additional | Where-Object { $_ -match '^--include(=|$)' })) {
+      $parts = 'runs,steps,tests,changes,prs,approvals,tags'
+      if ($additional | Where-Object { $_ -match '^--pools(=|$)' }) { $parts += ',jobs' }
+      $include = @('--include', $parts)
+    }
+    $arguments = @(
+      'pipeline-runs', '--hostAddress', $env:AUDIT_MES_HOST, '--tenantName', $env:AUDIT_MES_TENANT,
+      '--postEvent', '--typedEvents', '--telemetryEvents', 'false', '--strictCollection',
+      '--refreshOpenPullRequests', '--refreshChangedWorkItems', '--workItemHistory'
+    ) + $include + $additional
+    & cmf-audit @arguments
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+  displayName: Collect and post ADO telemetry
+  env:
+    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+    CMF_AUDIT_SECURITY_TOKEN: $(AuditMesRefreshToken)
+    AUDIT_MES_HOST: $(AuditMesHost)
+    AUDIT_MES_TENANT: $(AuditMesTenant)
+    AUDIT_COLLECTOR_ARGUMENTS: ${{ convertToJson(parameters.CollectorArguments) }}
+    AUDIT_FIELDS_CONFIG: ${{ parameters.FieldsConfig }}
