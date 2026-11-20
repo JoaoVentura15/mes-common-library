@@ -503,6 +503,9 @@ namespace audit.Services
                 var (body, next) = await GetAsync(url, requireFound: true);
                 if (body.ValueKind != JsonValueKind.Object || !body.TryGetProperty("value", out var items) || items.ValueKind != JsonValueKind.Array)
                     throw new InvalidDataException("Agent job page did not contain a value array");
+                // ADO can retain an empty cursor header on the terminal empty page.
+                // Accept only that observed sentinel, not arbitrary stalled pagination.
+                if (items.GetArrayLength() == 0 && next == "||") break;
                 var added = 0;
                 foreach (var item in items.EnumerateArray())
                 {
