@@ -1,0 +1,2400 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Where PR lead time goes, by team: wait for approval, approval to merge, merge to Resolved. Time range filters on merge time. Copy of the PR approvals & sprint flow dashboard, redesigned.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [
+    {
+      "includeVars": true,
+      "keepTime": true,
+      "title": "Package release flow",
+      "type": "link",
+      "url": "/Grafana/d/cmf-ado-release-flow"
+    },
+    {
+      "asDropdown": true,
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "ado"
+      ],
+      "title": "ADO dashboards",
+      "type": "dashboards"
+    }
+  ],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "panels": [],
+      "title": "Summary: merged PRs in the selected time range",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Distinct pull requests merged in the time range (a PR linked to several work items counts once).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#4f8ff7",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 0,
+          "noValue": "No data",
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "count"
+          ],
+          "fields": "/^PullRequestId$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${TargetBranch:singlequote}) or TargetBranch in (${TargetBranch:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((PullRequestId))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "PRs merged",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "PullRequestId"
+              ]
+            }
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Mean time from PR creation to the first approval vote (10, from the PR threads), per PR.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#f2a33a",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 1,
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 1
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "/^TimeToFirstApproval$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${TargetBranch:singlequote}) or TargetBranch in (${TargetBranch:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and TimeToFirstApproval ne null)/groupby((PullRequestId,TimeToFirstApproval))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Wait for first approval",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Mean time from the first approval to the merge, per PR. Long values point at policy/build gates or extra pushes after approval.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#9d7cd8",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 1,
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 1
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "/^ApprovalToMerge$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${TargetBranch:singlequote}) or TargetBranch in (${TargetBranch:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and ApprovalToMerge ne null)/groupby((PullRequestId,ApprovalToMerge))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "First approval → merge",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Mean time from merge to the work item reaching Resolved (manual, by the reviewer). Expected ≈30 min.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#ef6fb0",
+            "mode": "fixed"
+          },
+          "custom": {},
+          "decimals": 1,
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 1
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "/^MergeToResolved$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${TargetBranch:singlequote}) or TargetBranch in (${TargetBranch:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and MergeToResolved ne null)/groupby((PullRequestId,WorkItemId,MergeToResolved))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Merge → Resolved",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Share of PR–work item links whose iteration changed after the PR was created (from work item history).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {},
+          "decimals": 0,
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3fb68b"
+              },
+              {
+                "color": "#f2a33a",
+                "value": 0.2
+              },
+              {
+                "color": "#e5534b",
+                "value": 0.35
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 1
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^CarriedShare$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${TargetBranch:singlequote}) or TargetBranch in (${TargetBranch:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((Organization),aggregate(CarriedOver with average as CarriedShare))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Carried over",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Work items linked to a merged PR that are still not Resolved/Closed more than 24 h after the merge.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {},
+          "decimals": 0,
+          "noValue": "No data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3fb68b"
+              },
+              {
+                "color": "#f2a33a",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 1
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^NotDone$/",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${TargetBranch:singlequote}) or TargetBranch in (${TargetBranch:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((Organization),aggregate(MergedNotDone with sum as NotDone))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Merged, not Resolved",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 8,
+      "panels": [],
+      "title": "Where PR lead time goes, by team",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Each bar is a team; segments are the mean wait for first approval, first approval → merge, and merge → Resolved. Sorted by total. Teams come from the work item iteration path; blank = path did not match the team pattern.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "fillOpacity": 85,
+            "gradientMode": "none",
+            "lineWidth": 0
+          },
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Wait for first approval"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2a33a",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Approval → merge"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#9d7cd8",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Merge → Resolved"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#ef6fb0",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Team"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "match": "null+nan",
+                      "result": {
+                        "text": "(no team)"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 0,
+        "y": 6
+      },
+      "id": 9,
+      "options": {
+        "barWidth": 0.85,
+        "groupWidth": 0.75,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "never",
+        "stacking": "normal",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "Team",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${TargetBranch:singlequote}) or TargetBranch in (${TargetBranch:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((Team,PullRequestId,WorkItemId,TimeToFirstApproval,ApprovalToMerge,MergeToResolved))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Lead time breakdown by team (mean per PR link)",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Team",
+                "TimeToFirstApproval",
+                "ApprovalToMerge",
+                "MergeToResolved"
+              ]
+            }
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "ApprovalToMerge": {
+                "aggregations": [
+                  "mean"
+                ],
+                "operation": "aggregate"
+              },
+              "MergeToResolved": {
+                "aggregations": [
+                  "mean"
+                ],
+                "operation": "aggregate"
+              },
+              "Team": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "TimeToFirstApproval": {
+                "aggregations": [
+                  "mean"
+                ],
+                "operation": "aggregate"
+              }
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Total",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "TimeToFirstApproval (mean)",
+                "ApprovalToMerge (mean)",
+                "MergeToResolved (mean)"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "Total"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Total": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "ApprovalToMerge (mean)": "Approval → merge",
+              "MergeToResolved (mean)": "Merge → Resolved",
+              "TimeToFirstApproval (mean)": "Wait for first approval"
+            }
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "One row per team, ranked by mean lead time (created → merged, per PR–work item link). Inline bars compare teams; orange/red cells flag carry-over above 20%/35%, work items still not Resolved 24 h after merge, and package-version mismatches. (A period-over-period trend column needs previous-period data, which the load generator does not have yet.)",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": true
+          },
+          "decimals": 1,
+          "noValue": "No data"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Lead time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f8ff7",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Wait for approval"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2a33a",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Team"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "match": "null+nan",
+                      "result": {
+                        "text": "(no team)"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRs"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "custom.width",
+                "value": 70
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Carried over"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "text"
+                    },
+                    {
+                      "color": "#f2a33a",
+                      "value": 0.2
+                    },
+                    {
+                      "color": "#e5534b",
+                      "value": 0.35
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Merged, not Resolved"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "text"
+                    },
+                    {
+                      "color": "#f2a33a",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Version mismatch"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "text"
+                    },
+                    {
+                      "color": "#e5534b",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 12,
+        "y": 6
+      },
+      "id": 10,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${TargetBranch:singlequote}) or TargetBranch in (${TargetBranch:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((Team,PullRequestId,WorkItemId,Created,Merged,TimeToFirstApproval,CarriedOver,MergedNotDone,VersionMismatch))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "Team hot spots",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Team",
+                "PullRequestId",
+                "Created",
+                "Merged",
+                "TimeToFirstApproval",
+                "CarriedOver",
+                "MergedNotDone",
+                "VersionMismatch"
+              ]
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Lead",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Merged"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Created"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "CarriedOver": {
+                "aggregations": [
+                  "mean"
+                ],
+                "operation": "aggregate"
+              },
+              "Lead": {
+                "aggregations": [
+                  "mean"
+                ],
+                "operation": "aggregate"
+              },
+              "MergedNotDone": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "PullRequestId": {
+                "aggregations": [
+                  "distinctCount"
+                ],
+                "operation": "aggregate"
+              },
+              "Team": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "TimeToFirstApproval": {
+                "aggregations": [
+                  "mean"
+                ],
+                "operation": "aggregate"
+              },
+              "VersionMismatch": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "Lead (mean)"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "CarriedOver (mean)": 4,
+              "Lead (mean)": 2,
+              "MergedNotDone (sum)": 5,
+              "PullRequestId (distinctCount)": 1,
+              "Team": 0,
+              "TimeToFirstApproval (mean)": 3,
+              "VersionMismatch (sum)": 6
+            },
+            "renameByName": {
+              "CarriedOver (mean)": "Carried over",
+              "Lead (mean)": "Lead time",
+              "MergedNotDone (sum)": "Merged, not Resolved",
+              "PullRequestId (distinctCount)": "PRs",
+              "TimeToFirstApproval (mean)": "Wait for approval",
+              "VersionMismatch (sum)": "Version mismatch"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 17
+      },
+      "id": 11,
+      "panels": [],
+      "title": "When and how PRs land",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Merged PRs per ISO week (Monday start): median created → merged (blue), slowest PR of the week (dashed orange) and number of merged PRs (grey bars, right axis). Use the Team filter to compare a team with the rest. Detail per PR: collapsed table at the bottom.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "lineWidth": 2,
+            "pointSize": 6,
+            "scaleDistribution": {
+              "log": 10,
+              "type": "log"
+            },
+            "showPoints": "always",
+            "spanNulls": true
+          },
+          "noValue": "No data",
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Median lead time"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f8ff7",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 3
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Slowest PR"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2a33a",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    8,
+                    6
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 1
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 4
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Merged PRs"
+            },
+            "properties": [
+              {
+                "id": "custom.drawStyle",
+                "value": "bars"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 35
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 0
+              },
+              {
+                "id": "custom.showPoints",
+                "value": "never"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#8e8e8e",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.scaleDistribution",
+                "value": {
+                  "type": "linear"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 18
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${TargetBranch:singlequote}) or TargetBranch in (${TargetBranch:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((PullRequestId),aggregate(Merged with max as MergedAt,Created with max as CreatedAt))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "PR lead time per week",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "PullRequestId",
+                "MergedAt",
+                "CreatedAt"
+              ]
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Lead",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "MergedAt"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "CreatedAt"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week_0",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "MergedAt"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week_1",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week_0"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week_2",
+            "mode": "unary",
+            "replaceFields": false,
+            "unary": {
+              "fieldName": "Week_1",
+              "operator": "floor"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week_3",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week_2"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "604800"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Week",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Week_3"
+                }
+              },
+              "operator": "+",
+              "right": {
+                "fixed": "345600"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Lead": {
+                "aggregations": [
+                  "median",
+                  "max"
+                ],
+                "operation": "aggregate"
+              },
+              "PullRequestId": {
+                "aggregations": [
+                  "distinctCount"
+                ],
+                "operation": "aggregate"
+              },
+              "Week": {
+                "aggregations": [],
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": false,
+                "field": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "dateFormat": "X",
+                "destinationType": "time",
+                "targetField": "Week"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Lead (max)": "Slowest PR",
+              "Lead (median)": "Median lead time",
+              "PullRequestId (distinctCount)": "Merged PRs"
+            }
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "Distinct merged PRs by days before the end of the team sprint they merged in (0 = last day). A tall right edge means work lands at the deadline. PRs without a matching team calendar are excluded.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "fillOpacity": 85,
+            "gradientMode": "none",
+            "lineWidth": 0
+          },
+          "noValue": "No data",
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Merged PRs"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#4f8ff7",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 18
+      },
+      "id": 13,
+      "options": {
+        "barWidth": 0.85,
+        "groupWidth": 0.75,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        },
+        "xField": "Days before sprint end",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${TargetBranch:singlequote}) or TargetBranch in (${TargetBranch:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and MergedSprintFinish ne null)/groupby((PullRequestId),aggregate(Merged with max as M,MergedSprintFinish with max as Finish))&$top=20000",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "When in the sprint PRs merge",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "PullRequestId",
+                "M",
+                "Finish"
+              ]
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Left",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Finish"
+                }
+              },
+              "operator": "-",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "M"
+                }
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "DaysLeftRaw",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Left"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "86400"
+              }
+            },
+            "mode": "binary",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Days before sprint end",
+            "mode": "unary",
+            "replaceFields": false,
+            "unary": {
+              "fieldName": "DaysLeftRaw",
+              "operator": "floor"
+            }
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Days before sprint end": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "PullRequestId": {
+                "aggregations": [
+                  "distinctCount"
+                ],
+                "operation": "aggregate"
+              }
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": true,
+                "field": "Days before sprint end"
+              }
+            ]
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "string",
+                "targetField": "Days before sprint end"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "PullRequestId (distinctCount)": "Merged PRs"
+            }
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "criticalmanufacturing-odata-datasource",
+        "uid": "PD36424FC765F148A"
+      },
+      "description": "A PR linked to multiple teams counts once for each team. Team totals are memberships, not a global distinct-PR total. Team comes from iteration paths; AreaPath is a separate filter.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "filterable": true
+          },
+          "decimals": 0,
+          "noValue": "No data",
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/(Seconds$|Duration$|QueueWait$|Busy$|^Wait$|Open$|ApprovalWait$|ApprovalToMerge$|TimeToFirstApproval$|ActiveToResolved$|MergeToResolved$)/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/^(BuildId|PullRequestId|WorkItemId|TestRunId|RequestId)$/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/(failed|failure|error|mismatch)/i"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/(succeeded|passed|success|approved and retained)/i"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/(cancel|partial|queue|wait|p90|maximum)/i"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/(^Runs$|executions|p50|average)/i"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Result"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "canceled": {
+                        "color": "yellow",
+                        "text": "Canceled"
+                      },
+                      "failed": {
+                        "color": "red",
+                        "text": "Failed"
+                      },
+                      "partiallySucceeded": {
+                        "color": "yellow",
+                        "text": "Partial success"
+                      },
+                      "succeeded": {
+                        "color": "green",
+                        "text": "Succeeded"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 28
+      },
+      "id": 16,
+      "options": {
+        "barWidth": 0.8,
+        "groupWidth": 0.7,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "orientation": "vertical",
+        "stacking": "normal",
+        "tooltip": {
+          "mode": "multi"
+        },
+        "xField": "MergeSprint"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "entitySet": {
+            "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+            "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+          },
+          "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${TargetBranch:singlequote}) or TargetBranch in (${TargetBranch:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds} and MergedSprintPath ne null and MergedSprintPath ne '' and Team ne null and Team ne '')/groupby((MergedSprintPath,Team,PullRequestId))",
+          "refId": "A",
+          "usePost": true
+        }
+      ],
+      "title": "PRs per merge sprint by team",
+      "transformations": [
+        {
+          "id": "extractFields",
+          "options": {
+            "format": "regexp",
+            "regExp": "/(?<MergeSprint>Sprint\\s+\\d+)$/",
+            "replace": false,
+            "source": "MergedSprintPath"
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "MergeSprint": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "PullRequestId": {
+                "aggregations": [
+                  "distinctCount"
+                ],
+                "operation": "aggregate"
+              },
+              "Team": {
+                "aggregations": [],
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "Team",
+            "rowField": "MergeSprint",
+            "valueField": "PullRequestId (distinctCount)"
+          }
+        },
+        {
+          "id": "extractFields",
+          "options": {
+            "format": "regexp",
+            "regExp": "/(?<MergeSprintNumber>\\d+)$/",
+            "replace": false,
+            "source": "MergeSprint\\Team"
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "number",
+                "targetField": "MergeSprintNumber"
+              }
+            ]
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "desc": false,
+                "field": "MergeSprintNumber"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "MergeSprintNumber": true
+            }
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 38
+      },
+      "id": 15,
+      "panels": [
+        {
+          "datasource": {
+            "type": "criticalmanufacturing-odata-datasource",
+            "uid": "PD36424FC765F148A"
+          },
+          "description": "Top 100 merged PRs by lead time, with the approval split and the linked work item state and version.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "align": "auto",
+                "cellOptions": {
+                  "type": "auto"
+                },
+                "filterable": true,
+                "inspect": true
+              },
+              "decimals": 1,
+              "noValue": "No data"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Lead time"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "s"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "mode": "basic",
+                      "type": "gauge",
+                      "valueDisplayMode": "text"
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "#4f8ff7",
+                      "mode": "fixed"
+                    }
+                  },
+                  {
+                    "id": "min",
+                    "value": 0
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/^(Wait for approval|Approval → merge|Merge → Resolved)$/"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "s"
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 1
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/^(Organization|Project)$/"
+                },
+                "properties": [
+                  {
+                    "id": "custom.hidden",
+                    "value": true
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "PullRequestId"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "PR"
+                  },
+                  {
+                    "id": "links",
+                    "value": [
+                      {
+                        "targetBlank": true,
+                        "title": "Open PR in Azure DevOps",
+                        "url": "https://dev.azure.com/${__data.fields.Organization}/${__data.fields.Project}/_git/${__data.fields.Repository}/pullrequest/${__value.raw}"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Carried over"
+                },
+                "properties": [
+                  {
+                    "id": "mappings",
+                    "value": [
+                      {
+                        "options": {
+                          "0": {
+                            "text": ""
+                          },
+                          "1": {
+                            "color": "#e5534b",
+                            "text": "yes"
+                          }
+                        },
+                        "type": "value"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 14,
+            "w": 24,
+            "x": 0,
+            "y": 39
+          },
+          "id": 14,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "show": false
+            },
+            "showHeader": true
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "criticalmanufacturing-odata-datasource",
+                "uid": "PD36424FC765F148A"
+              },
+              "entitySet": {
+                "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+                "name": "ADOTelemetry.ADOWorkItemFlowTyped"
+              },
+              "entityType": "UserDefined.ADOTelemetry.ADOWorkItemFlowTyped",
+              "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})) and ('__all' in (${Repository:singlequote}) or Repository in (${Repository:singlequote})) and ('__all' in (${Team:singlequote}) or Team in (${Team:singlequote})) and ('__all' in (${TargetBranch:singlequote}) or TargetBranch in (${TargetBranch:singlequote})) and Merged ge ${__from:date:seconds} and Merged lt ${__to:date:seconds})/groupby((Organization,Project,PullRequestId,Repository,Team,TargetBranch,WorkItemId,State,TargetPackageVersion,CarriedOver,Created,Merged,TimeToFirstApproval,ApprovalToMerge,MergeToResolved))&$top=20000",
+              "refId": "A",
+              "usePost": true
+            }
+          ],
+          "title": "Slowest merged PRs",
+          "transformations": [
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "Organization",
+                    "Project",
+                    "PullRequestId",
+                    "Repository",
+                    "Team",
+                    "TargetBranch",
+                    "WorkItemId",
+                    "State",
+                    "TargetPackageVersion",
+                    "CarriedOver",
+                    "Created",
+                    "Merged",
+                    "TimeToFirstApproval",
+                    "ApprovalToMerge",
+                    "MergeToResolved"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Lead time",
+                "binary": {
+                  "left": {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Merged"
+                    }
+                  },
+                  "operator": "-",
+                  "right": {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Created"
+                    }
+                  }
+                },
+                "mode": "binary",
+                "replaceFields": false
+              }
+            },
+            {
+              "id": "convertFieldType",
+              "options": {
+                "conversions": [
+                  {
+                    "dateFormat": "X",
+                    "destinationType": "time",
+                    "targetField": "Created"
+                  },
+                  {
+                    "dateFormat": "X",
+                    "destinationType": "time",
+                    "targetField": "Merged"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "sortBy",
+              "options": {
+                "sort": [
+                  {
+                    "desc": true,
+                    "field": "Lead time"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "limit",
+              "options": {
+                "limitField": 100
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "indexByName": {
+                  "Lead time": 2,
+                  "PullRequestId": 0,
+                  "Team": 1
+                },
+                "renameByName": {
+                  "ApprovalToMerge": "Approval → merge",
+                  "CarriedOver": "Carried over",
+                  "MergeToResolved": "Merge → Resolved",
+                  "TargetPackageVersion": "Package version",
+                  "TimeToFirstApproval": "Wait for approval"
+                }
+              }
+            }
+          ],
+          "type": "table"
+        }
+      ],
+      "title": "Detail: slowest PRs (click a PR id to open it in Azure DevOps)",
+      "type": "row"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [
+    "ado",
+    "cmf-audit"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Organization",
+        "multi": true,
+        "name": "Organization",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=groupby((Organization))&$select=Organization&$orderby=Organization",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Project",
+        "multi": true,
+        "name": "Project",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOPipelineRunsTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})))/groupby((Project))&$select=Project&$orderby=Project",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Repository",
+        "multi": true,
+        "name": "Repository",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})))/groupby((Repository))&$select=Repository&$orderby=Repository",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Team",
+        "multi": true,
+        "name": "Team",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})))/groupby((Team))&$select=Team&$orderby=Team",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": "'__all'",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "criticalmanufacturing-odata-datasource",
+          "uid": "PD36424FC765F148A"
+        },
+        "includeAll": true,
+        "label": "Target branch",
+        "multi": true,
+        "name": "TargetBranch",
+        "options": [],
+        "query": {
+          "oDataQueryString": "ADOTelemetry.ADOWorkItemFlowTyped?$apply=filter(('__all' in (${Organization:singlequote}) or Organization in (${Organization:singlequote})) and ('__all' in (${Project:singlequote}) or Project in (${Project:singlequote})))/groupby((TargetBranch))&$select=TargetBranch&$orderby=TargetBranch",
+          "usePost": true
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-120d",
+    "to": "now"
+  },
+  "timepicker": {
+    "quick_ranges": [
+      {
+        "display": "Last 7 days",
+        "from": "now-7d",
+        "to": "now"
+      },
+      {
+        "display": "Last 14 days",
+        "from": "now-14d",
+        "to": "now"
+      },
+      {
+        "display": "Last 30 days",
+        "from": "now-30d",
+        "to": "now"
+      },
+      {
+        "display": "Last 60 days",
+        "from": "now-60d",
+        "to": "now"
+      },
+      {
+        "display": "Last 90 days",
+        "from": "now-90d",
+        "to": "now"
+      },
+      {
+        "display": "Last 120 days",
+        "from": "now-120d",
+        "to": "now"
+      },
+      {
+        "display": "Last 180 days",
+        "from": "now-180d",
+        "to": "now"
+      }
+    ]
+  },
+  "timezone": "browser",
+  "title": "ADO - PR flow hot spots",
+  "uid": "cmf-ado-pr-flow",
+  "version": 9
+}
