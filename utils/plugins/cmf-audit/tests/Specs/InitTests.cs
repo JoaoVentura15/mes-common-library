@@ -115,7 +115,7 @@ namespace specs
         public void MergeIntoCdContainers_AddsStageAfterInstallationAndChainsRestorePoint()
         {
             var merged = PipelineYamlMerger.MergeIntoCdContainers(CdContainers, "${{ parameters.Environment }}");
-            var lines = merged.Split('\n').ToList();
+            var lines = merged.Replace("\r\n", "\n").Split('\n').ToList();
 
             // stage between Installation and RestorePoint
             var audit = lines.IndexOf("- stage: AuditReview");
@@ -143,7 +143,7 @@ namespace specs
         {
             var merged = PipelineYamlMerger.MergeIntoCdContainers(CdContainers, "$(CustomerEnvironmentName)", "Cmf.Audit@1.0.0");
 
-            Assert.Contains("- name: CmfAuditPackageToInstall\n  value: 'Cmf.Audit@1.0.0'", merged);
+            Assert.Contains("- name: CmfAuditPackageToInstall\n  value: 'Cmf.Audit@1.0.0'", merged.Replace("\r\n", "\n"));
         }
 
         [Fact]
@@ -285,7 +285,7 @@ namespace specs
                 Assert.Equal("# project version\n", File.ReadAllText(Path.Combine(builds, ".tasks", "use-node-version.yml")));
 
                 // values resolved from the project's own pipelines, no template tokens left behind
-                var auditReview = File.ReadAllText(Path.Combine(builds, "CD-AuditReview.yml"));
+                var auditReview = File.ReadAllText(Path.Combine(builds, "CD-AuditReview.yml")).Replace("\r\n", "\n");
                 Assert.DoesNotContain("<%=", auditReview);
                 Assert.Contains("  name: MyPool", auditReview);
                 Assert.Contains("    endpoint: my-connection", auditReview);
