@@ -36,7 +36,8 @@ public sealed class PipelineCheckpoint : IDisposable
                 if (!File.Exists(path)) throw new InvalidDataException("Checkpoint manifest is missing");
                 using var stream = File.OpenRead(path);
                 var manifest = JsonSerializer.Deserialize<Manifest>(stream) ?? throw new InvalidDataException("Invalid checkpoint manifest");
-                if (manifest.Version != Version || (manifest.Fingerprint != fingerprint && manifest.Fingerprint != compatibleFingerprint))
+                if (manifest.Version != Version || (manifest.Fingerprint != fingerprint &&
+                    (compatibleFingerprint == null || manifest.Fingerprint != compatibleFingerprint)))
                     throw new InvalidOperationException("Checkpoint options or format do not match. Use the original command and destination, or a new directory");
                 CreatedUtc = manifest.CreatedUtc;
             }
