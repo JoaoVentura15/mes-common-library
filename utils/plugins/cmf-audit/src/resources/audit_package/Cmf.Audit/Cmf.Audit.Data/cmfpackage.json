@@ -1,0 +1,25 @@
+{
+  "packageId": "Cmf.Audit.Data",
+  "version": "2.0.0",
+  "description": "Cmf Audit Data Package",
+  "packageType": "Data",
+  "isInstallable": true,
+  "isUniqueInstall": true,
+  "contentToPack": [
+    {
+      "source": "DEEs/*",
+      "target": "DeeRules",
+      "contentType": "DEE"
+    },
+    {
+      "source": "DEEs/ProcessRules/$(version)/Before/*",
+      "target": "DeeRules/ProcessRules/$(version)/Before/",
+      "contentType": "ProcessRulesPre"
+    },
+    {
+      "source": "MasterData/$(version)/*",
+      "target": "MasterData/$(version)/",
+      "contentType": "MasterData"
+    }
+  ]
+}
