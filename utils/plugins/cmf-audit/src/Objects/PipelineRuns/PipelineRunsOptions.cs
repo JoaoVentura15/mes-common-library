@@ -35,6 +35,9 @@ namespace audit.Objects.PipelineRuns
         public int batchSize { get; set; } = 200;
         public int batchDelayMs { get; set; } = 1000;
         public int parallelism { get; set; } = 8;
+        public int uploadParallelism { get; set; } = 1;
+        public bool concurrentCollection { get; set; } = true;
+        public bool streamEvents { get; set; }
         public bool strictCollection { get; set; }
         public bool refreshOpenPullRequests { get; set; }
         public bool refreshChangedWorkItems { get; set; }
