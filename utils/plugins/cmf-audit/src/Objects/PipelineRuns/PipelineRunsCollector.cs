@@ -14,6 +14,9 @@ namespace audit.Objects.PipelineRuns
         private readonly IAzureDevOpsRestClient ado;
         private readonly PipelineRunsSettings s;
         private readonly int parallelism;
+        private readonly bool concurrentCollection;
+        private readonly Func<IReadOnlyList<PostTelemetry>, Task>? eventSink;
+        private readonly CancellationToken cancellationToken;
         private readonly List<PostTelemetry> events = new();
         private readonly object gate = new();
         private bool testsAvailable = true;
@@ -24,16 +27,27 @@ namespace audit.Objects.PipelineRuns
         private Task<Dictionary<string, HashSet<int>>>? changedWorkItemPullRequests;
         private readonly Dictionary<string, Task<((string Id, string Version)? Package, bool Failed)>> installedByCommit = new();
 
-        public PipelineRunsCollector(IAzureDevOpsRestClient ado, PipelineRunsSettings settings, int parallelism = 4)
+        public PipelineRunsCollector(IAzureDevOpsRestClient ado, PipelineRunsSettings settings, int parallelism = 4,
+            Func<IReadOnlyList<PostTelemetry>, Task>? eventSink = null, bool concurrentCollection = true,
+            CancellationToken cancellationToken = default)
         {
             this.ado = ado;
             this.s = settings;
             policyObservedAt = settings.CollectedAt;
             this.parallelism = Math.Max(1, parallelism);
+            this.eventSink = eventSink;
+            this.concurrentCollection = concurrentCollection;
+            this.cancellationToken = cancellationToken;
         }
 
-        private void Add(PostTelemetry? e) { if (e != null) lock (gate) events.Add(e); }
-        private void AddRange(IEnumerable<PostTelemetry> e) { lock (gate) events.AddRange(e); }
+        private Task AddAsync(PostTelemetry? e) => e == null ? Task.CompletedTask : AddRangeAsync(new[] { e });
+        private Task AddRangeAsync(IEnumerable<PostTelemetry> source)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (eventSink != null) return eventSink(source as IReadOnlyList<PostTelemetry> ?? source.ToList());
+            lock (gate) events.AddRange(source);
+            return Task.CompletedTask;
+        }
         private void WarnOrThrow(string message, Exception? exception = null)
         {
             if (s.StrictCollection) throw new InvalidOperationException(message, exception);
@@ -42,16 +56,36 @@ namespace audit.Objects.PipelineRuns
 
         public async Task<List<PostTelemetry>> CollectAsync()
         {
-            if (s.AllWorkItemHistory) await CollectAllWorkItemHistoryAsync();
-            if ((s.Parts & ~PipelineRunsSettings.MetadataParts) == PipelineRunsParts.None)
+            var stages = new List<(string Name, Func<Task> Run)>();
+            if (s.AllWorkItemHistory) stages.Add(("work-item history", CollectAllWorkItemHistoryAsync));
+            if ((s.Parts & ~PipelineRunsSettings.MetadataParts) != PipelineRunsParts.None)
+                stages.Add(("runs and pull requests", CollectRunsAndPullRequestsAsync));
+            if (s.Parts.HasFlag(PipelineRunsParts.AgentJobs))
             {
-                if (s.Parts.HasFlag(PipelineRunsParts.ReleaseSchedule)) await CollectReleaseScheduleAsync();
-                if (s.Parts.HasFlag(PipelineRunsParts.ReleaseTags)) await CollectReleaseTagsAsync(await ResolveRepositoriesAsync());
-                if (s.Parts.HasFlag(PipelineRunsParts.PullRequestFiles)) await CollectPullRequestFilesAsync(await ResolveRepositoriesAsync());
-                if (s.Parts.HasFlag(PipelineRunsParts.WorkItemScope)) await CollectWorkItemScopeAsync();
-                return events;
+                if (s.Pools.Count == 0) WarnOrThrow("Agent jobs requested without pools; pass --pools or exclude jobs from --include.");
+                else stages.Add(("agent jobs", CollectAgentJobsAsync));
             }
+            if (s.Parts.HasFlag(PipelineRunsParts.ReleaseSchedule)) stages.Add(("release schedule", CollectReleaseScheduleAsync));
+            if (s.Parts.HasFlag(PipelineRunsParts.ReleaseTags)) stages.Add(("release tags", async () => await CollectReleaseTagsAsync(await ResolveRepositoriesAsync())));
+            if (s.Parts.HasFlag(PipelineRunsParts.PullRequestFiles)) stages.Add(("PR files", async () => await CollectPullRequestFilesAsync(await ResolveRepositoriesAsync())));
+            if (s.Parts.HasFlag(PipelineRunsParts.WorkItemScope)) stages.Add(("work-item scope", CollectWorkItemScopeAsync));
+            async Task RunAsync((string Name, Func<Task> Run) stage)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var elapsed = System.Diagnostics.Stopwatch.StartNew();
+                Log.Information($"Collection started: {stage.Name}");
+                await stage.Run();
+                Log.Information($"Collection completed: {stage.Name} in {elapsed.Elapsed.TotalSeconds:F1}s");
+            }
+            // Build inventory and explicit parent links must precede policy-linked build lookups.
+            // Independent history/metadata phases can overlap; the REST client bounds all HTTP requests.
+            if (concurrentCollection) await Task.WhenAll(stages.Select(RunAsync));
+            else foreach (var stage in stages) await RunAsync(stage);
+            return events;
+        }
 
+        private async Task CollectRunsAndPullRequestsAsync()
+        {
             var repositories = await ResolveRepositoriesAsync();
 
             var builds = new List<JsonElement>();
@@ -97,7 +131,7 @@ namespace audit.Objects.PipelineRuns
             if (s.Parts.HasFlag(PipelineRunsParts.PullRequests))
             {
                 var iterations = await ado.GetIterationsAsync(s.Project);
-                if (iterations != null) AddRange(MapSprints(iterations.Value, s));
+                if (iterations != null) await AddRangeAsync(MapSprints(iterations.Value, s));
                 var repos = repositories.Count > 0
                     ? repositories
                     : (s.RefreshOpenPullRequests || s.Parts.HasFlag(PipelineRunsParts.Policies))
@@ -110,35 +144,6 @@ namespace audit.Objects.PipelineRuns
                 }
             }
 
-            if (s.Parts.HasFlag(PipelineRunsParts.AgentJobs))
-            {
-                if (s.Pools.Count == 0)
-                    WarnOrThrow("Agent jobs requested without pools; pass --pools or exclude jobs from --include.");
-                else
-                    await CollectAgentJobsAsync();
-            }
-
-            if (s.Parts.HasFlag(PipelineRunsParts.ReleaseSchedule))
-            {
-                await CollectReleaseScheduleAsync();
-            }
-
-            if (s.Parts.HasFlag(PipelineRunsParts.ReleaseTags))
-            {
-                await CollectReleaseTagsAsync(repositories);
-            }
-
-            if (s.Parts.HasFlag(PipelineRunsParts.PullRequestFiles))
-            {
-                await CollectPullRequestFilesAsync(repositories);
-            }
-
-            if (s.Parts.HasFlag(PipelineRunsParts.WorkItemScope))
-            {
-                await CollectWorkItemScopeAsync();
-            }
-
-            return events;
         }
 
         /// <summary>
@@ -161,7 +166,7 @@ namespace audit.Objects.PipelineRuns
                 var revisions = await ado.GetWorkItemRevisionsAsync(s.Project, id);
                 var mapped = MapReleaseSchedule(id, revisions, s);
                 if (mapped.Count == 0) return;
-                AddRange(mapped);
+                await AddRangeAsync(mapped);
                 Interlocked.Increment(ref releases);
                 Interlocked.Add(ref changes, mapped.Count);
             });
@@ -236,7 +241,7 @@ namespace audit.Objects.PipelineRuns
                 var epic = Ancestor(item, s.EpicType, topmost: true);
                 var mapped = MapWorkItemScope(item, Ancestor(item, s.FeatureType, topmost: false), epic, s);
                 if (mapped == null) continue;
-                Add(mapped);
+                await AddAsync(mapped);
                 emitted++;
                 if (epic != null) withEpic++;
                 if (mapped.Parameters.Any(p => p.Name == "Done" && p.NumericValues.FirstOrDefault() == 1)) done++;
@@ -274,7 +279,7 @@ namespace audit.Objects.PipelineRuns
                     var pushedAt = pushes.Select(p => Date(p, "date")).Where(x => x != null).OrderByDescending(x => x).FirstOrDefault();
                     var mapped = MapReleaseTag(name, tag, annotated, commit, s, pushedAt);
                     if (mapped == null) return;
-                    Add(mapped);
+                    await AddAsync(mapped);
                     Interlocked.Increment(ref emitted);
                 });
                 Log.Information($"Release tags: {emitted} tag event(s) from {name}");
@@ -303,7 +308,7 @@ namespace audit.Objects.PipelineRuns
                     var mapped = MapPullRequestFiles(pr, changes, s);
                     if (mapped != null)
                     {
-                        Add(mapped);
+                        await AddAsync(mapped);
                         Interlocked.Increment(ref emitted);
                     }
                     var count = Interlocked.Increment(ref done);
@@ -411,6 +416,7 @@ namespace audit.Objects.PipelineRuns
             var logErrors = s.StepErrors && (s.Parts.HasFlag(PipelineRunsParts.Failures) || (s.LogErrors && s.Parts.HasFlag(PipelineRunsParts.Steps)))
                 ? await ReadFailureLogsAsync(id, timeline) : new Dictionary<string, FailureEvidence>();
 
+            var testEvents = new List<PostTelemetry>();
             int? failed = null; // stays null when the build has no test run (or tests are skipped), so FailedTests is NULL rather than 0
             if (s.Parts.HasFlag(PipelineRunsParts.Tests) && testsAvailable)
             {
@@ -423,8 +429,8 @@ namespace audit.Objects.PipelineRuns
                         var run = testRuns[i];
                         var results = resultsByRun[i];
                         failed = (failed ?? 0) + results.Count;
-                        Add(MapTestRun(b, run, results.Count, s));
-                        AddRange(results.Select(r => MapTestFailure(b, run, r, s)));
+                        testEvents.Add(MapTestRun(b, run, results.Count, s));
+                        testEvents.AddRange(results.Select(r => MapTestFailure(b, run, r, s)));
                     }
                 }
                 catch (UnauthorizedAccessException ex)
@@ -440,15 +446,16 @@ namespace audit.Objects.PipelineRuns
                 installed = await GetInstalledPackageAsync(b);
             }
 
-            Add(MapRun(b, timeline, s, parent, failed, installed));
+            await AddAsync(MapRun(b, timeline, s, parent, failed, installed));
+            await AddRangeAsync(testEvents);
 
             if (s.Parts.HasFlag(PipelineRunsParts.Steps))
             {
-                AddRange(MapTimeline(b, timeline, s, logErrors));
+                await AddRangeAsync(MapTimeline(b, timeline, s, logErrors));
             }
             if (s.Parts.HasFlag(PipelineRunsParts.Failures) && s.StepErrors)
             {
-                AddRange(MapFailureEvidence(b, timeline, logErrors, s, parent));
+                await AddRangeAsync(MapFailureEvidence(b, timeline, logErrors, s, parent));
             }
 
             if (s.Parts.HasFlag(PipelineRunsParts.Approvals) && approvalsAvailable)
@@ -460,7 +467,7 @@ namespace audit.Objects.PipelineRuns
                     {
                         foreach (var approval in await ado.GetApprovalsAsync(s.Project, stages.Keys))
                         {
-                            Add(MapApproval(b, approval, stages.GetValueOrDefault(Str(approval, "id"), ""), s));
+                            await AddAsync(MapApproval(b, approval, stages.GetValueOrDefault(Str(approval, "id"), ""), s));
                         }
                     }
                     catch (UnauthorizedAccessException ex)
@@ -473,7 +480,7 @@ namespace audit.Objects.PipelineRuns
 
             if (s.Parts.HasFlag(PipelineRunsParts.Changes))
             {
-                Add(MapRunChanges(b, await ado.GetBuildChangesAsync(s.Project, id), s));
+                await AddAsync(MapRunChanges(b, await ado.GetBuildChangesAsync(s.Project, id), s));
             }
         }
 
@@ -512,7 +519,7 @@ namespace audit.Objects.PipelineRuns
                 var iterationsTask = ado.GetPullRequestIterationsAsync(s.Project, repositoryId, (int)Long(pr, "pullRequestId"));
                 var threads = await threadsTask;
                 var iterations = await iterationsTask;
-                Add(MapPullRequest(pr, linked, s, threads, iterations));
+                await AddAsync(MapPullRequest(pr, linked, s, threads, iterations));
                 if (s.Parts.HasFlag(PipelineRunsParts.Policies)) await CollectPolicySnapshotAsync(pr);
                 foreach (var item in linked)
                 {
@@ -522,9 +529,9 @@ namespace audit.Objects.PipelineRuns
                     {
                         history = await workItemHistory.GetOrAdd(id, k => new Lazy<Task<List<JsonElement>>>(() => ado.GetWorkItemRevisionsAsync(s.Project, k))).Value;
                     }
-                    Add(MapPullRequestWorkItem(pr, item, s));
-                    Add(MapWorkItemFlow(pr, item, history, s));
-                    if (history != null && historyEmitted.TryAdd(id, true)) AddRange(MapWorkItemHistory(item, history, s));
+                    await AddAsync(MapPullRequestWorkItem(pr, item, s));
+                    await AddAsync(MapWorkItemFlow(pr, item, history, s));
+                    if (history != null && historyEmitted.TryAdd(id, true)) await AddRangeAsync(MapWorkItemHistory(item, history, s));
                 }
                 var n = Interlocked.Increment(ref mappedPrs);
                 if (n % 25 == 0 || n == prs.Count)
@@ -585,16 +592,12 @@ namespace audit.Objects.PipelineRuns
             return result;
         }
 
-        private async Task ForEachParallelAsync<T>(IEnumerable<T> items, Func<T, Task> body)
-        {
-            using var throttle = new SemaphoreSlim(parallelism);
-            await Task.WhenAll(items.Select(async item =>
+        private Task ForEachParallelAsync<T>(IEnumerable<T> items, Func<T, Task> body) =>
+            Parallel.ForEachAsync(items, new ParallelOptions
             {
-                await throttle.WaitAsync();
-                try { await body(item); }
-                finally { throttle.Release(); }
-            }));
-        }
+                MaxDegreeOfParallelism = parallelism,
+                CancellationToken = cancellationToken
+            }, async (item, _) => await body(item));
 
         private async Task CollectAgentJobsAsync()
         {
@@ -623,7 +626,7 @@ namespace audit.Objects.PipelineRuns
                 var requests = await ado.ListJobRequestsAsync((int)Long(pool, "id"));
                 var jobs = requests
                     .Where(j => Date(j, "finishTime") is DateTime f && f >= s.Since).ToList();
-                AddRange(jobs.Select(j => MapAgentJob(j, Str(pool, "name"), s)));
+                await AddRangeAsync(jobs.Select(j => MapAgentJob(j, Str(pool, "name"), s)));
                 Log.Information($"Agent jobs: {jobs.Count} finished in pool {Str(pool, "name")} since {s.Since:yyyy-MM-dd}");
             }
         }
