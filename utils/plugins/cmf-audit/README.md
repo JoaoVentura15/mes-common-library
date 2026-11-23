@@ -40,6 +40,33 @@ Upload progress retains the original batch number, batch total and event range w
 
 A dual-stream checkpoint can be resumed with `--typedEvents --telemetryEvents false --resume` to stop further generic PostTelemetry uploads while reusing the saved extraction and typed batch acknowledgements. Every other collection and destination option must match. The manifest is preserved, and already queued generic events remain in Kafka. This requires the existing checkpoint files; a deleted checkpoint cannot be resumed. If both uploads already finished, allow ingestion to drain instead of uploading again.
 
+### Concurrent collection and uploads
+
+Independent history, agent-job, scope, tag, schedule and PR-file phases overlap by default. Build processing still precedes PR policy-linked build lookups so explicit parent links are not lost. `--parallelism` bounds all actual ADO requests in the built-in REST client, including nested PR/test reads, log pages and WIQL. Set `--concurrentCollection false` to run phases sequentially. Each phase logs its elapsed time.
+
+`--uploadParallelism 4` permits four upload batches in flight; the default remains one. This works with or without checkpoints. Each acknowledged checkpoint batch keeps its own receipt, so a later batch completing before an earlier failure is skipped correctly on resume. Completion totals count acknowledged or previously acknowledged events, not a contiguous prefix. These performance settings may change on resume; collection filters, destination and batch size remain guarded. `--batchDelayMs 0` removes intentional pacing. Higher concurrency does not bypass source or destination throttling.
+
+### Streaming typed events during extraction
+
+For a **new** extraction, add these options to the existing project-specific command:
+
+```powershell
+--typedEvents --telemetryEvents false --postEvent `
+--streamEvents --strictCollection `
+--checkpointDirectory "C:\Work\AuditCheckpoints\stream-backfill" `
+--parallelism 12 --uploadParallelism 4 --batchSize 200 --batchDelayMs 0
+```
+
+Streaming requires typed-only posting, strict collection and a checkpoint directory; it cannot generate a report. It uses the existing `PostMultipleIoTEvents` endpoint, rather than direct Kafka credentials or a new broker client. The service accepts events into the ingestion pipeline; acknowledgement does not establish ClickHouse completion.
+
+The collector hands events to a bounded spool as they become available instead of retaining the full mapped event and typed lists. Exact source and typed payloads are atomically saved before publication. The queue holds at most twice the upload-worker count; source-payload hashes and the small run-time conversion context remain in memory. ADO response/revision caches and confidential on-disk spool files still need space. Run metadata precedes dependent records, and partition-selecting event times remain stable across chunks and restarts.
+
+After a failure, repeat the **same streaming command and directory** with `--resume`. Saved chunks retain their exact ordering and payloads; only batches without durable acknowledgements are sent. For interrupted extraction, successful ADO reads are reused and exact source payloads already in the spool are suppressed even if concurrent producers finish in a different order. A persisted extraction seal allows upload-only resume without ADO reads. Corrupt chunks, missing chunks, inconsistent seals and mismatched receipts fail before new publication.
+
+Streaming deliberately publishes before the full extraction is known to be complete. If a later strict read fails, already published chunks remain queued; no successful extraction seal is written. Resume completes the missing work. This is **at-least-once delivery**: an event accepted remotely just before a lost response or failed receipt write may be replayed. Typed table keys support replacement, but this is not exactly-once Kafka delivery or an ordered transaction across event types. Parallel completion order is not event-time order.
+
+Legacy and streaming checkpoints cannot be mixed. A directory created by an earlier version resumes through the existing collect-then-upload path; do not add `--streamEvents` to it. You can still add `--uploadParallelism 4` and change collection parallelism or batch delay. A fresh directory is required to switch to streaming. Do not delete a checkpoint while unacknowledged chunks remain.
+
 ## Prerequisites
 
 - **.NET SDK 8.0.x**.
