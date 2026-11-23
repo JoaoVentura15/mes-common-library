@@ -51,6 +51,7 @@ namespace specs
                 "--workItemFields", "Package=Custom.Package", "--doneStates", "Closed", "--include", "runs,steps",
                 "--days", "7", "--identity", "name", "--typedEvents", "--strictCollection", "--refreshOpenPullRequests", "--refreshChangedWorkItems", "--stepErrors", "false",
                 "--checkpointDirectory", "checkpoint-example", "--resume",
+                "--uploadParallelism", "4", "--streamEvents", "--concurrentCollection", "false",
             };
             Assert.Equal(0, await cmd.InvokeAsync(args));
             Assert.NotNull(bound);
@@ -67,6 +68,9 @@ namespace specs
             Assert.Equal(7, bound!.days);
             Assert.Equal("checkpoint-example", bound.checkpointDirectory);
             Assert.True(bound.resume);
+            Assert.True(bound.streamEvents);
+            Assert.Equal(4, bound.uploadParallelism);
+            Assert.False(bound.concurrentCollection);
             Assert.True(bound.typedEvents);
             Assert.True(s.StrictCollection);
             Assert.True(s.RefreshOpenPullRequests);

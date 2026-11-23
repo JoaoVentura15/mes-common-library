@@ -51,10 +51,14 @@ namespace audit.Services
         private readonly HttpClient http;
         private readonly string orgUrl;
         private readonly PipelineCheckpoint? checkpoint;
+        private readonly SemaphoreSlim requests;
+        private readonly CancellationToken cancellationToken;
 
-        public AzureDevOpsRestClient(string organizationUrl, string token, HttpMessageHandler? handler = null, bool useBearer = false, PipelineCheckpoint? checkpoint = null)
+        public AzureDevOpsRestClient(string organizationUrl, string token, HttpMessageHandler? handler = null, bool useBearer = false, PipelineCheckpoint? checkpoint = null, int parallelism = 8, CancellationToken cancellationToken = default)
         {
             this.checkpoint = checkpoint;
+            requests = new SemaphoreSlim(Math.Max(1, parallelism));
+            this.cancellationToken = cancellationToken;
             orgUrl = organizationUrl.TrimEnd('/') + "/";
             http = handler == null ? new HttpClient() : new HttpClient(handler);
             http.Timeout = TimeSpan.FromSeconds(100);
@@ -63,7 +67,18 @@ namespace audit.Services
             http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public void Dispose() => http.Dispose();
+        public void Dispose() { http.Dispose(); requests.Dispose(); }
+
+        private sealed class RequestLease(SemaphoreSlim semaphore) : IDisposable
+        {
+            private SemaphoreSlim? owner = semaphore;
+            public void Dispose() => Interlocked.Exchange(ref owner, null)?.Release();
+        }
+        private async Task<IDisposable> EnterRequestAsync()
+        {
+            await requests.WaitAsync(cancellationToken);
+            return new RequestLease(requests);
+        }
 
         private static string Q(string value) => Uri.EscapeDataString(value);
         private static string Iso(DateTime value) => value.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
@@ -86,11 +101,13 @@ namespace audit.Services
         {
             for (var attempt = 1; ; attempt++)
             {
-                using var response = await http.GetAsync(url);
+                using var requestLease = await EnterRequestAsync();
+                using var response = await http.GetAsync(url, cancellationToken);
                 if ((response.StatusCode == (HttpStatusCode)429 || (int)response.StatusCode >= 500) && attempt < 4)
                 {
                     var wait = response.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(5 * attempt);
-                    await Task.Delay(wait);
+                    requestLease.Dispose();
+                    await Task.Delay(wait, cancellationToken);
                     continue;
                 }
                 if (response.StatusCode == HttpStatusCode.NotFound)
@@ -164,10 +181,12 @@ namespace audit.Services
             {
                 using var request = new HttpRequestMessage(HttpMethod.Get, url);
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
-                using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+                using var requestLease = await EnterRequestAsync();
+                using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                 if ((response.StatusCode == (HttpStatusCode)429 || (int)response.StatusCode >= 500) && attempt < 4)
                 {
-                    await Task.Delay(response.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(5 * attempt));
+                    requestLease.Dispose();
+                    await Task.Delay(response.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(5 * attempt), cancellationToken);
                     continue;
                 }
                 if (response.StatusCode == HttpStatusCode.NotFound) return null;
@@ -176,7 +195,8 @@ namespace audit.Services
                 response.EnsureSuccessStatusCode();
                 if (response.Content.Headers.ContentType?.MediaType is "text/html" or "application/zip")
                     throw new InvalidDataException("Unexpected build log response format.");
-                using var timeout = new CancellationTokenSource(http.Timeout);
+                using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                timeout.CancelAfter(http.Timeout);
                 using var reader = new StreamReader(await response.Content.ReadAsStreamAsync(timeout.Token));
                 var buffer = new char[8192];
                 var text = new StringBuilder();
@@ -422,10 +442,12 @@ namespace audit.Services
             for (var attempt = 1; ; attempt++)
             {
                 using var content = new StringContent(JsonSerializer.Serialize(new { query = wiql }), Encoding.UTF8, "application/json");
-                using var response = await http.PostAsync(url, content);
+                using var requestLease = await EnterRequestAsync();
+                using var response = await http.PostAsync(url, content, cancellationToken);
                 if ((response.StatusCode == (HttpStatusCode)429 || (int)response.StatusCode >= 500) && attempt < 4)
                 {
-                    await Task.Delay(response.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(5 * attempt));
+                    requestLease.Dispose();
+                    await Task.Delay(response.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(5 * attempt), cancellationToken);
                     continue;
                 }
                 if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden || response.StatusCode == HttpStatusCode.NonAuthoritativeInformation)
