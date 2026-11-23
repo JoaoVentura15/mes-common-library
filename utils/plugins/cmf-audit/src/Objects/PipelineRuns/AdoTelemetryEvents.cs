@@ -542,14 +542,16 @@ namespace audit.Objects.PipelineRuns
         };
 
         /// <summary>Converts the collector events of the supported areas; other areas are left to PostTelemetry.</summary>
-        public static List<TypedEvent> Convert(IEnumerable<PostTelemetry> events)
+        public static List<TypedEvent> Convert(IEnumerable<PostTelemetry> events, DateTime? fallbackTime = null,
+            IDictionary<string, DateTime>? runTimes = null)
         {
             var list = events.ToList();
             // Entity time of each run, for records that have no time of their own (pending steps)
-            var runTime = new Dictionary<string, DateTime>();
+            var runTime = runTimes ?? new Dictionary<string, DateTime>();
+            static string RunKey(PostTelemetry e, string id) => $"{e.Enterprise?.Name}|{e.Site?.Name}|{id}";
             foreach (var e in list.Where(e => e.Area?.Name == PipelineRunsMapper.AreaRun))
             {
-                if (PipelineRun.EntityTime(e) is { } t && TagOf(e, "BuildId") is { } id) runTime[id] = t;
+                if (PipelineRun.EntityTime(e) is { } t && TagOf(e, "BuildId") is { } id) runTime[RunKey(e, id)] = t;
             }
 
             var schemas = Schemas;
@@ -559,7 +561,7 @@ namespace audit.Objects.PipelineRuns
                 var schema = schemas.FirstOrDefault(s => s.Areas.Contains(e.Area?.Name ?? ""));
                 if (schema == null) continue;
                 var time = schema.EntityTime(e)
-                    ?? (TagOf(e, "BuildId") is { } id && runTime.TryGetValue(id, out var rt) ? rt : DateTime.UtcNow.Date);
+                    ?? (TagOf(e, "BuildId") is { } id && runTime.TryGetValue(RunKey(e, id), out var rt) ? rt : fallbackTime ?? DateTime.UtcNow.Date);
                 var data = new Dictionary<string, object?>();
                 foreach (var column in schema.Columns)
                 {
