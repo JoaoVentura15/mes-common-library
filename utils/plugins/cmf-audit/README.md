@@ -6,7 +6,7 @@ Add `--allWorkItemHistory` to `pipeline-runs` to backfill every accessible work 
 
 Every revision is emitted using the existing `WorkItemHistory` schema. Revisions that leave state and iteration unchanged use `ChangeKind=Updated` and do not duplicate state-duration measurements. This retains the schema's state, iteration, area, reason, actor and timestamp fields; it does not archive arbitrary field snapshots, attachments, comments or deleted work items. No new event definition columns or data sets are required.
 
-Work-item queries use ascending ID pages of at most 10,000 and continue to an empty page, including beyond 20,000 items. Repeated pages and malformed responses are rejected. Revision requests use 200-row pages; full-history collection rejects missing, duplicate or mismatched revisions and empty histories before posting. Use `--strictCollection` for the remaining collections. Without checkpoint resume, full history is rebuilt whenever this flag is supplied; revisions and generated events are held in memory, so large projects need adequate memory.
+Work-item queries use ascending ID pages of at most 10,000 and continue to an empty page, including beyond 20,000 items. Repeated pages and malformed responses are rejected. Revision requests use 200-row pages; full-history collection rejects missing, duplicate or mismatched revisions and empty histories before posting in the default collect-then-upload mode. Streaming can publish completed chunks before a later completeness check fails. Use `--strictCollection` for the remaining collections. Without checkpoint resume, full history is rebuilt whenever this flag is supplied; revisions and generated events are held in memory, so large projects need adequate memory.
 
 For example, append `--allWorkItemHistory --strictCollection` to an existing `pipeline-runs` command with `--typedEvents --postEvent`. Keep the organization's existing tenant, field mappings, repository and pool configuration. For incremental pipeline collection, retain a recent `--since`; the full work-item history remains independent of that lookback.
 
@@ -334,3 +334,5 @@ npm run publish:live  # publishes with the "latest" tag
 ```
 
 Both `cd` into `npm/` and run `npm publish` there, so the same `files` filtering applies as in step 3.
+
+Parallel uploads coordinate access-token refresh after HTTP 401 and retain rotated refresh tokens in memory. Authentication retries HTTP 429 and 5xx responses up to three attempts with bounded delays; persistent failures leave the checkpoint intact.
