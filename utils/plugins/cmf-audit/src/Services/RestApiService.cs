@@ -16,6 +16,8 @@ namespace audit.Services
     public class RestApiService : IRestApiService, IDisposable
     {
         private string? _accessToken;
+        private string _refreshToken;
+        private readonly SemaphoreSlim _tokenGate = new(1, 1);
         private HttpClient? _httpClient;
         private ClientConfiguration _clientConfiguration;
 
@@ -44,7 +46,9 @@ namespace audit.Services
         public RestApiService(ClientConfiguration clientConfiguration, HttpClient? httpClient = null)
         {
             this._clientConfiguration = clientConfiguration;
-            this._httpClient = httpClient;
+            this._refreshToken = clientConfiguration.SecurityAccessToken;
+            this._httpClient = httpClient ?? new HttpClient();
+            this._httpClient.BaseAddress = new Uri($"http{(clientConfiguration.useSSL ? "s" : "")}://{clientConfiguration.HostAddress}");
             if (!clientConfiguration.useSSL)
             {
                 Log.Warning("SSL is disabled: the security token and audit data will be sent unencrypted.");
@@ -54,29 +58,69 @@ namespace audit.Services
 
         public async Task<string> AccessTokenAsync()
         {
-            this._httpClient ??= new HttpClient();
-            this._httpClient.BaseAddress = new Uri($"http{(_clientConfiguration.useSSL ? "s" : "")}://{_clientConfiguration.HostAddress}");
+            await _tokenGate.WaitAsync(UploadCancellation);
+            try { return await RefreshTokenCoreAsync(); }
+            finally { _tokenGate.Release(); }
+        }
+
+        private async Task<string> RefreshTokenCoreAsync()
+        {
             var url = $"/SecurityPortal/api/tenant/{Uri.EscapeDataString(_clientConfiguration.ClientTenantName ?? string.Empty)}/oauth2/token";
-
-            var form = new FormUrlEncodedContent(new Dictionary<string, string>
+            for (var attempt = 1; ; attempt++)
             {
-                { "client_id", _clientConfiguration.ClientId },
-                { "grant_type", "refresh_token" },
-                { "refresh_token", _clientConfiguration.SecurityAccessToken }
-            });
+                using var request = new HttpRequestMessage(HttpMethod.Post, url)
+                {
+                    Content = new FormUrlEncodedContent(new Dictionary<string, string>
+                    {
+                        { "client_id", _clientConfiguration.ClientId },
+                        { "grant_type", "refresh_token" },
+                        { "refresh_token", _refreshToken }
+                    })
+                };
+                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                using var response = await _httpClient!.SendAsync(request, UploadCancellation);
+                if (attempt < 3 && ((int)response.StatusCode >= 500 || (int)response.StatusCode == 429))
+                {
+                    var delay = response.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(attempt);
+                    delay = TimeSpan.FromSeconds(Math.Clamp(delay.TotalSeconds, 0, 30));
+                    Log.Warning($"Authentication returned HTTP {(int)response.StatusCode}; retrying ({attempt}/3).");
+                    await Task.Delay(delay, UploadCancellation);
+                    continue;
+                }
+                response.EnsureSuccessStatusCode();
+                var token = JsonSerializer.Deserialize<JsonElement>(await response.Content.ReadAsStringAsync());
+                var access = token.GetProperty("access_token").GetString();
+                if (string.IsNullOrWhiteSpace(access)) throw new InvalidDataException("Authentication returned no access token.");
+                if (token.TryGetProperty("refresh_token", out var refresh) && refresh.ValueKind == JsonValueKind.String
+                    && !string.IsNullOrWhiteSpace(refresh.GetString())) _refreshToken = refresh.GetString()!;
+                _accessToken = access;
+                return access;
+            }
+        }
 
-            var request = new HttpRequestMessage(HttpMethod.Post, url) { Content = form };
-            request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-
-            var response = await this._httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-
-            var body = await response.Content.ReadAsStringAsync();
-            var tokenResponse = JsonSerializer.Deserialize<JsonElement>(body);
-            var accessToken = tokenResponse.GetProperty("access_token").GetString();
-
-            _accessToken = accessToken;
-            return accessToken;
+        private async Task<HttpResponseMessage> SendAuthenticatedAsync(HttpRequestMessage request)
+        {
+            // Freeze the body before sending: an authentication retry must preserve the exact events.
+            var body = request.Content == null ? null : await request.Content.ReadAsByteArrayAsync();
+            var rejectedToken = request.Headers.Authorization?.Parameter;
+            var response = await _httpClient!.SendAsync(request, UploadCancellation);
+            if (response.StatusCode != System.Net.HttpStatusCode.Unauthorized) return response;
+            response.Dispose();
+            await _tokenGate.WaitAsync(UploadCancellation);
+            try
+            {
+                if (_accessToken == rejectedToken) await RefreshTokenCoreAsync();
+            }
+            finally { _tokenGate.Release(); }
+            using var retry = new HttpRequestMessage(request.Method, request.RequestUri);
+            foreach (var header in request.Headers) retry.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            retry.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+            if (body != null)
+            {
+                retry.Content = new ByteArrayContent(body);
+                foreach (var header in request.Content!.Headers) retry.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            }
+            return await _httpClient.SendAsync(retry, UploadCancellation);
         }
 
         public Task PostEventsAsync(List<PostTelemetry> eventsData, int batchSize = 0) =>
@@ -141,7 +185,7 @@ namespace audit.Services
 
                 try
                 {
-                    using var response = await _httpClient.SendAsync(request, UploadCancellation);
+                    using var response = await SendAuthenticatedAsync(request);
                     var responseBody = await response.Content.ReadAsStringAsync();
                     if (!response.IsSuccessStatusCode)
                     {
@@ -242,7 +286,8 @@ namespace audit.Services
                     {
                         try
                         {
-                            response = await _httpClient!.SendAsync(NewRequest(), UploadCancellation);
+                            using var attemptRequest = NewRequest();
+                            response = await SendAuthenticatedAsync(attemptRequest);
                             if ((int)response.StatusCode < 500 || attempt >= MaxAttempts) break;
                             response.Dispose();
                         }
@@ -323,13 +368,14 @@ namespace audit.Services
             var json = JsonSerializer.Serialize(input);
             request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.SendAsync(request, UploadCancellation);
+            var response = await SendAuthenticatedAsync(request);
             response.EnsureSuccessStatusCode();
         }
 
         public void Dispose()
         {
             _httpClient?.Dispose();
+            _tokenGate.Dispose();
         }
     }
 
