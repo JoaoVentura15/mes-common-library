@@ -20,7 +20,7 @@ public partial class PipelineRunsCollector
             if (ordered.Where((r, index) => Long(r, "rev") != index + 1 || Long(r, "id") != id).Any())
                 throw new InvalidDataException($"Incomplete or mismatched revisions for work item {id}; refusing a partial full-history collection");
             // Revisions contain the item's fields and ID; no PR or current-state lookup is required.
-            if (historyEmitted.TryAdd(id, true)) AddRange(MapWorkItemHistory(ordered[^1], ordered, s));
+            if (historyEmitted.TryAdd(id, true)) await AddRangeAsync(MapWorkItemHistory(ordered[^1], ordered, s));
             var done = Interlocked.Increment(ref completed);
             if (done % 100 == 0 || done == ids.Count) Log.Information($"Full work item history: {done}/{ids.Count} item(s) read");
         });

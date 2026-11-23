@@ -21,6 +21,25 @@ namespace audit.Services
 
         /// <summary>Pause between batches. One second by default (a courtesy to the Data Platform); zero posts back to back.</summary>
         public TimeSpan BatchDelay { get; set; } = TimeSpan.FromSeconds(1);
+        public int UploadParallelism { get; set; } = 1;
+        public CancellationToken UploadCancellation { get; set; }
+
+        private static string Total(int value) => value < 0 ? "collecting" : value.ToString();
+        private async Task PostConcurrentAsync<T>(List<T> events, int batchSize, Func<List<T>, int, UploadBatchProgress, Task> send)
+        {
+            batchSize = batchSize > 0 ? batchSize : Math.Max(1, events.Count);
+            var count = events.Count == 0 ? 0 : (events.Count - 1) / batchSize + 1;
+            await Parallel.ForEachAsync(Enumerable.Range(0, count), new ParallelOptions
+            {
+                MaxDegreeOfParallelism = Math.Max(1, UploadParallelism), CancellationToken = UploadCancellation
+            }, async (index, _) =>
+            {
+                var offset = index * batchSize;
+                var batch = events.GetRange(offset, Math.Min(batchSize, events.Count - offset));
+                await send(batch, batch.Count, new UploadBatchProgress(index + 1, count, offset, events.Count, Concurrent: true));
+                if (BatchDelay > TimeSpan.Zero) await Task.Delay(BatchDelay, UploadCancellation);
+            });
+        }
 
         public RestApiService(ClientConfiguration clientConfiguration, HttpClient? httpClient = null)
         {
@@ -65,6 +84,11 @@ namespace audit.Services
 
         public async Task PostEventsAsync(List<PostTelemetry> eventsData, int batchSize, UploadBatchProgress? progress)
         {
+            if (progress == null && UploadParallelism > 1)
+            {
+                await PostConcurrentAsync(eventsData, batchSize, (batch, size, position) => PostEventsAsync(batch, size, position));
+                return;
+            }
             // 0 = everything in one call (previous behaviour)
             batchSize = batchSize > 0 ? batchSize : Math.Max(1, eventsData.Count);
 
@@ -113,11 +137,11 @@ namespace audit.Services
                 var json = JsonSerializer.Serialize(call);
                 request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                Log.Information($"Posting batch {batchNumber}/{totalBatches}: events {eventOffset + 1}-{eventOffset + batch.Count} of {totalEvents} ({eventTypes}) to {_clientConfiguration.HostAddress}");
+                Log.Information($"Posting batch {batchNumber}/{Total(totalBatches)}: events {eventOffset + 1}-{eventOffset + batch.Count} of {Total(totalEvents)} ({eventTypes}) to {_clientConfiguration.HostAddress}");
 
                 try
                 {
-                    using var response = await _httpClient.SendAsync(request);
+                    using var response = await _httpClient.SendAsync(request, UploadCancellation);
                     var responseBody = await response.Content.ReadAsStringAsync();
                     if (!response.IsSuccessStatusCode)
                     {
@@ -139,16 +163,18 @@ namespace audit.Services
                 catch (Exception ex)
                 {
                     throw new Exception(
-                        $"Failed posting batch {batchNumber}/{totalBatches} (events {eventOffset + 1}-{eventOffset + batch.Count} of {totalEvents}; {eventTypes}). " +
-                        $"{eventOffset} event(s) were acknowledged before this batch. The failed batch may already have been accepted; it was not retried.", ex);
+                        $"Failed posting batch {batchNumber}/{Total(totalBatches)} (events {eventOffset + 1}-{eventOffset + batch.Count} of {Total(totalEvents)}; {eventTypes}). " +
+                        (progress?.Concurrent == true ? "Concurrent batches may have completed out of order. " : $"{eventOffset} event(s) were acknowledged before this batch. ") + $" The failed batch may already have been accepted; it was not retried.", ex);
                 }
 
-                Log.Information($"Posted batch {batchNumber}/{totalBatches}: {eventOffset + batch.Count}/{totalEvents} event(s) acknowledged");
+                Log.Information(progress?.Concurrent == true
+                    ? $"Posted batch {batchNumber}/{Total(totalBatches)}: events {eventOffset + 1}-{eventOffset + batch.Count} acknowledged (completion can be out of order)"
+                    : $"Posted batch {batchNumber}/{Total(totalBatches)}: {eventOffset + batch.Count}/{totalEvents} event(s) acknowledged");
 
                 // Wait 1 second before next batch (except for the last batch)
                 if (i + batchSize < eventsData.Count)
                 {
-                    await Task.Delay(BatchDelay);
+                    await Task.Delay(BatchDelay, UploadCancellation);
                 }
             }
         }
@@ -161,6 +187,11 @@ namespace audit.Services
 
         public async Task PostTypedEventsAsync(List<audit.Objects.PipelineRuns.TypedEvent> eventsData, int batchSize, UploadBatchProgress? progress)
         {
+            if (progress == null && UploadParallelism > 1)
+            {
+                await PostConcurrentAsync(eventsData, batchSize, (batch, size, position) => PostTypedEventsAsync(batch, size, position));
+                return;
+            }
             batchSize = batchSize > 0 ? batchSize : Math.Max(1, eventsData.Count);
 
             for (int i = 0; i < eventsData.Count; i += batchSize)
@@ -201,7 +232,7 @@ namespace audit.Services
                     return request;
                 }
 
-                Log.Information($"Posting typed batch {batchNumber}/{totalBatches}: events {eventOffset + 1}-{eventOffset + batch.Count} of {totalEvents} ({eventTypes}) to {_clientConfiguration.HostAddress}");
+                Log.Information($"Posting typed batch {batchNumber}/{Total(totalBatches)}: events {eventOffset + 1}-{eventOffset + batch.Count} of {Total(totalEvents)} ({eventTypes}) to {_clientConfiguration.HostAddress}");
 
                 try
                 {
@@ -211,15 +242,15 @@ namespace audit.Services
                     {
                         try
                         {
-                            response = await _httpClient!.SendAsync(NewRequest());
+                            response = await _httpClient!.SendAsync(NewRequest(), UploadCancellation);
                             if ((int)response.StatusCode < 500 || attempt >= MaxAttempts) break;
                             response.Dispose();
                         }
-                        catch (Exception ex) when (attempt < MaxAttempts && (ex is HttpRequestException || ex is IOException || ex is TaskCanceledException))
+                        catch (Exception ex) when (!UploadCancellation.IsCancellationRequested && attempt < MaxAttempts && (ex is HttpRequestException || ex is IOException || ex is TaskCanceledException))
                         {
                         }
-                        Log.Warning($"Typed batch {batchNumber}/{totalBatches} attempt {attempt}/{MaxAttempts} failed; retrying in {attempt * 5} s");
-                        await Task.Delay(TimeSpan.FromSeconds(attempt * 5));
+                        Log.Warning($"Typed batch {batchNumber}/{Total(totalBatches)} attempt {attempt}/{MaxAttempts} failed; retrying in {attempt * 5} s");
+                        await Task.Delay(TimeSpan.FromSeconds(attempt * 5), UploadCancellation);
                     }
                     using var _ = response;
                     var responseBody = await response.Content.ReadAsStringAsync();
@@ -243,15 +274,17 @@ namespace audit.Services
                 catch (Exception ex)
                 {
                     throw new Exception(
-                        $"Failed posting typed batch {batchNumber}/{totalBatches} (events {eventOffset + 1}-{eventOffset + batch.Count} of {totalEvents}; {eventTypes}). " +
-                        $"{eventOffset} event(s) were acknowledged before this batch. Re-posting is safe: rows with the same key are replaced.", ex);
+                        $"Failed posting typed batch {batchNumber}/{Total(totalBatches)} (events {eventOffset + 1}-{eventOffset + batch.Count} of {Total(totalEvents)}; {eventTypes}). " +
+                        (progress?.Concurrent == true ? "Concurrent batches may have completed out of order. " : $"{eventOffset} event(s) were acknowledged before this batch. ") + $" Re-posting is safe: rows with the same key are replaced.", ex);
                 }
 
-                Log.Information($"Posted typed batch {batchNumber}/{totalBatches}: {eventOffset + batch.Count}/{totalEvents} event(s) acknowledged");
+                Log.Information(progress?.Concurrent == true
+                    ? $"Posted typed batch {batchNumber}/{Total(totalBatches)}: events {eventOffset + 1}-{eventOffset + batch.Count} acknowledged (completion can be out of order)"
+                    : $"Posted typed batch {batchNumber}/{Total(totalBatches)}: {eventOffset + batch.Count}/{totalEvents} event(s) acknowledged");
 
                 if (i + batchSize < eventsData.Count)
                 {
-                    await Task.Delay(BatchDelay);
+                    await Task.Delay(BatchDelay, UploadCancellation);
                 }
             }
         }
@@ -290,7 +323,7 @@ namespace audit.Services
             var json = JsonSerializer.Serialize(input);
             request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.SendAsync(request);
+            var response = await _httpClient.SendAsync(request, UploadCancellation);
             response.EnsureSuccessStatusCode();
         }
 
