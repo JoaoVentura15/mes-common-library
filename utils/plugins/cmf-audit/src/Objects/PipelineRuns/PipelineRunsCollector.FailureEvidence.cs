@@ -64,11 +64,11 @@ public partial class PipelineRunsCollector
         catch (NotSupportedException) { status = "Unsupported"; }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException or InvalidDataException)
         { status = "Unavailable"; }
-        Add(MapPolicySnapshot(pr, null, s, policyObservedAt, status));
+        await AddAsync(MapPolicySnapshot(pr, null, s, policyObservedAt, status));
         if (status != "Complete") { WarnOrThrow($"PR {Long(pr, "pullRequestId")}: policy evidence {status}."); return; }
         foreach (var policy in policies)
         {
-            Add(MapPolicySnapshot(pr, policy, s, policyObservedAt, status));
+            await AddAsync(MapPolicySnapshot(pr, policy, s, policyObservedAt, status));
             var buildId = LinkedPolicyBuildId(policy);
             if (buildId <= 0 || collectedBuilds.ContainsKey(buildId)) continue;
             try

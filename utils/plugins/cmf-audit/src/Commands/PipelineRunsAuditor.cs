@@ -104,6 +104,9 @@ namespace Cmf.Cli.Plugin.Audit.Commands
                 getDefaultValue: () => 200));
 
             cmd.AddOption(new Option<int>("--parallelism", () => 8, "Azure DevOps requests in flight at once while reading runs and pull requests (lower it if Azure DevOps answers 429)"));
+            cmd.AddOption(new Option<int>("--uploadParallelism", () => 1, "Concurrent upload batches (1..32); acknowledged batches keep independent durable receipts"));
+            cmd.AddOption(new Option<bool>("--concurrentCollection", () => true, "Overlap independent collection phases under the shared ADO request limit"));
+            cmd.AddOption(new Option<bool>("--streamEvents", "Spool and upload typed IoT events while collection runs; requires a new strict checkpoint, --postEvent --typedEvents --telemetryEvents false, and no generated report"));
             cmd.AddOption(new Option<bool>("--strictCollection", "Fail if requested collection is incomplete instead of posting partial results"));
             cmd.AddOption(new Option<string>("--checkpointDirectory", "Persist successful ADO reads and upload receipts locally; use a new directory for each extraction snapshot"));
             cmd.AddOption(new Option<bool>("--resume", "Resume the same command and destination from --checkpointDirectory; reuse completed extraction and acknowledged batches"));
@@ -143,6 +146,11 @@ namespace Cmf.Cli.Plugin.Audit.Commands
 
         public async Task ExecuteAsync(PipelineRunsOptions options)
         {
+            if (options.uploadParallelism is < 1 or > 32) throw new CliException("--uploadParallelism must be between 1 and 32");
+            if (options.parallelism < 1) throw new CliException("--parallelism must be positive");
+            if (options.streamEvents && (!options.postEvent || !options.typedEvents || options.telemetryEvents ||
+                options.generateReport || string.IsNullOrWhiteSpace(options.checkpointDirectory) || !options.strictCollection))
+                throw new CliException("--streamEvents requires --postEvent --typedEvents --telemetryEvents false --strictCollection --checkpointDirectory, and cannot generate a report");
             if (!string.IsNullOrWhiteSpace(options.writeEventDefinitions))
             {
                 this.fileSystem.Directory.CreateDirectory(options.writeEventDefinitions);
@@ -167,6 +175,7 @@ namespace Cmf.Cli.Plugin.Audit.Commands
                 ? PipelineCheckpoint.Fingerprint(options, telemetryEvents: true) : null;
             using var checkpoint = string.IsNullOrWhiteSpace(options.checkpointDirectory) ? null
                 : new PipelineCheckpoint(options.checkpointDirectory, PipelineCheckpoint.Fingerprint(options), options.resume, compatibleFingerprint);
+            if (checkpoint != null) await checkpoint.BindUploadModeAsync(options.streamEvents);
             if (checkpoint != null) Log.Information($"Checkpoint snapshot: {checkpoint.CreatedUtc:O}. Reuse this directory with --resume after failure; use a new directory to collect newer data.");
             var settings = PipelineRunsSettings.From(options, checkpoint?.CreatedUtc ?? DateTime.UtcNow);
             var (token, useBearer) = ResolveAdoToken(options.personalAccessToken,
@@ -177,11 +186,35 @@ namespace Cmf.Cli.Plugin.Audit.Commands
                 throw new CliException($"No Azure DevOps token: set SYSTEM_ACCESSTOKEN or {ENV_ADO_PAT}, or pass --personalAccessToken");
             }
 
-            var ado = clientFactory?.Invoke(settings.OrganizationUrl, token) ?? new AzureDevOpsRestClient(settings.OrganizationUrl, token, useBearer: useBearer, checkpoint: checkpoint);
+            if (options.streamEvents)
+            {
+                var config = new ClientConfiguration(options.hostAddress ?? "localhost", options.tenantName ?? throw new CliException("No MES tenant found"),
+                    options.clientId ?? "MES", options.securityAccessToken ?? "", options.useSSL);
+                var poster = postFactory?.Invoke(config) ?? new RestApiService(config);
+                try
+                {
+                    if (poster is RestApiService service) service.BatchDelay = TimeSpan.Zero;
+                    var stream = new PipelineStreamingUpload(checkpoint!, options.batchSize, options.uploadParallelism,
+                        (batch, progress) => poster is RestApiService rest ? rest.PostTypedEventsAsync(batch, batch.Count, progress)
+                            : poster.PostTypedEventsAsync(batch, batch.Count), TimeSpan.FromMilliseconds(Math.Max(0, options.batchDelayMs)));
+                    if (poster is RestApiService streamingRest) streamingRest.UploadCancellation = stream.CancellationToken;
+                    await stream.RunAsync(async (emit, cancellation) =>
+                    {
+                        using var client = new AzureDevOpsRestClient(settings.OrganizationUrl, token, useBearer: useBearer,
+                            checkpoint: checkpoint, parallelism: options.parallelism, cancellationToken: cancellation);
+                        await new PipelineRunsCollector(client, settings, options.parallelism, emit, options.concurrentCollection, cancellation).CollectAsync();
+                    });
+                }
+                finally { (poster as IDisposable)?.Dispose(); }
+                return;
+            }
+
+            var ado = clientFactory?.Invoke(settings.OrganizationUrl, token) ?? new AzureDevOpsRestClient(settings.OrganizationUrl, token,
+                useBearer: useBearer, checkpoint: checkpoint, parallelism: options.parallelism);
             List<PostTelemetry> events;
             try
             {
-                var collector = new PipelineRunsCollector(ado, settings, options.parallelism);
+                var collector = new PipelineRunsCollector(ado, settings, options.parallelism, concurrentCollection: options.concurrentCollection);
                 events = checkpoint == null ? await collector.CollectAsync()
                     : await checkpoint.GetOrCreateAsync("collected-events", collector.CollectAsync);
             }
@@ -210,14 +243,19 @@ namespace Cmf.Cli.Plugin.Audit.Commands
                 }
                 var config = new ClientConfiguration(options.hostAddress ?? "localhost", tenant, options.clientId ?? "MES", options.securityAccessToken ?? "", options.useSSL);
                 var poster = postFactory?.Invoke(config) ?? new RestApiService(config);
-                if (poster is RestApiService rest) rest.BatchDelay = TimeSpan.FromMilliseconds(Math.Max(0, options.batchDelayMs));
+                if (poster is RestApiService rest)
+                {
+                    rest.BatchDelay = TimeSpan.FromMilliseconds(Math.Max(0, options.batchDelayMs));
+                    rest.UploadParallelism = options.uploadParallelism;
+                }
+                using var posterLifetime = poster as IDisposable;
                 if (options.telemetryEvents)
                 {
                     if (checkpoint == null) await poster.PostEventsAsync(events, Math.Max(1, options.batchSize));
                     else await checkpoint.PostBatchesAsync("generic", events, options.batchSize,
                         (batch, progress) => poster is RestApiService service
                             ? service.PostEventsAsync(batch, batch.Count, progress)
-                            : poster.PostEventsAsync(batch, batch.Count), TimeSpan.FromMilliseconds(Math.Max(0, options.batchDelayMs)));
+                        : poster.PostEventsAsync(batch, batch.Count), TimeSpan.FromMilliseconds(Math.Max(0, options.batchDelayMs)), options.uploadParallelism);
                     Log.Information($"Posted {events.Count} PostTelemetry event(s) to {options.hostAddress}");
                 }
                 if (options.typedEvents)
@@ -228,7 +266,7 @@ namespace Cmf.Cli.Plugin.Audit.Commands
                     else await checkpoint.PostBatchesAsync("typed", typed, options.batchSize,
                         (batch, progress) => poster is RestApiService service
                             ? service.PostTypedEventsAsync(batch, batch.Count, progress)
-                            : poster.PostTypedEventsAsync(batch, batch.Count), TimeSpan.FromMilliseconds(Math.Max(0, options.batchDelayMs)));
+                            : poster.PostTypedEventsAsync(batch, batch.Count), TimeSpan.FromMilliseconds(Math.Max(0, options.batchDelayMs)), options.uploadParallelism);
                     Log.Information($"Posted {typed.Count} typed IoT event(s) ({string.Join(", ", typed.GroupBy(x => x.Definition.Split('\\').Last()).Select(g => $"{g.Key}={g.Count()}"))}) to {options.hostAddress}");
                 }
             }
