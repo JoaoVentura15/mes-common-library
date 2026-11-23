@@ -9,18 +9,46 @@ namespace audit.Services
     public interface IRestApiService
     {
         Task PostEventAsync(PostTelemetry eventData);
-        Task PostEventsAsync(List<PostTelemetry> eventsData);
+        Task PostEventsAsync(List<PostTelemetry> eventsData, int batchSize = 0);
+        Task PostTypedEventsAsync(List<audit.Objects.PipelineRuns.TypedEvent> eventsData, int batchSize = 0);
     }
 
     public class RestApiService : IRestApiService, IDisposable
     {
         private string? _accessToken;
+        private string _refreshToken;
+        private readonly SemaphoreSlim _tokenGate = new(1, 1);
         private HttpClient? _httpClient;
         private ClientConfiguration _clientConfiguration;
 
-        public RestApiService(ClientConfiguration clientConfiguration)
+        /// <summary>Pause between batches. One second by default (a courtesy to the Data Platform); zero posts back to back.</summary>
+        public TimeSpan BatchDelay { get; set; } = TimeSpan.FromSeconds(1);
+        public int UploadParallelism { get; set; } = 1;
+        public CancellationToken UploadCancellation { get; set; }
+
+        private static string Total(int value) => value < 0 ? "collecting" : value.ToString();
+        private async Task PostConcurrentAsync<T>(List<T> events, int batchSize, Func<List<T>, int, UploadBatchProgress, Task> send)
+        {
+            batchSize = batchSize > 0 ? batchSize : Math.Max(1, events.Count);
+            var count = events.Count == 0 ? 0 : (events.Count - 1) / batchSize + 1;
+            await Parallel.ForEachAsync(Enumerable.Range(0, count), new ParallelOptions
+            {
+                MaxDegreeOfParallelism = Math.Max(1, UploadParallelism), CancellationToken = UploadCancellation
+            }, async (index, _) =>
+            {
+                var offset = index * batchSize;
+                var batch = events.GetRange(offset, Math.Min(batchSize, events.Count - offset));
+                await send(batch, batch.Count, new UploadBatchProgress(index + 1, count, offset, events.Count, Concurrent: true));
+                if (BatchDelay > TimeSpan.Zero) await Task.Delay(BatchDelay, UploadCancellation);
+            });
+        }
+
+        public RestApiService(ClientConfiguration clientConfiguration, HttpClient? httpClient = null)
         {
             this._clientConfiguration = clientConfiguration;
+            this._refreshToken = clientConfiguration.SecurityAccessToken;
+            this._httpClient = httpClient ?? new HttpClient();
+            this._httpClient.BaseAddress = new Uri($"http{(clientConfiguration.useSSL ? "s" : "")}://{clientConfiguration.HostAddress}");
             if (!clientConfiguration.useSSL)
             {
                 Log.Warning("SSL is disabled: the security token and audit data will be sent unencrypted.");
@@ -30,40 +58,95 @@ namespace audit.Services
 
         public async Task<string> AccessTokenAsync()
         {
-            this._httpClient = new HttpClient();
-            this._httpClient.BaseAddress = new Uri($"http{(_clientConfiguration.useSSL ? "s" : "")}://{_clientConfiguration.HostAddress}");
-            var url = $"/SecurityPortal/api/tenant/{Uri.EscapeDataString(_clientConfiguration.ClientTenantName ?? string.Empty)}/oauth2/token";
-
-            var form = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                { "client_id", _clientConfiguration.ClientId },
-                { "grant_type", "refresh_token" },
-                { "refresh_token", _clientConfiguration.SecurityAccessToken }
-            });
-
-            var request = new HttpRequestMessage(HttpMethod.Post, url) { Content = form };
-            request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-
-            var response = await this._httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-
-            var body = await response.Content.ReadAsStringAsync();
-            var tokenResponse = JsonSerializer.Deserialize<JsonElement>(body);
-            var accessToken = tokenResponse.GetProperty("access_token").GetString();
-
-            _accessToken = accessToken;
-            return accessToken;
+            await _tokenGate.WaitAsync(UploadCancellation);
+            try { return await RefreshTokenCoreAsync(); }
+            finally { _tokenGate.Release(); }
         }
 
-        public async Task PostEventsAsync(List<PostTelemetry> eventsData)
+        private async Task<string> RefreshTokenCoreAsync()
         {
-            int batchSize = eventsData.Count;
+            var url = $"/SecurityPortal/api/tenant/{Uri.EscapeDataString(_clientConfiguration.ClientTenantName ?? string.Empty)}/oauth2/token";
+            for (var attempt = 1; ; attempt++)
+            {
+                using var request = new HttpRequestMessage(HttpMethod.Post, url)
+                {
+                    Content = new FormUrlEncodedContent(new Dictionary<string, string>
+                    {
+                        { "client_id", _clientConfiguration.ClientId },
+                        { "grant_type", "refresh_token" },
+                        { "refresh_token", _refreshToken }
+                    })
+                };
+                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                using var response = await _httpClient!.SendAsync(request, UploadCancellation);
+                if (attempt < 3 && ((int)response.StatusCode >= 500 || (int)response.StatusCode == 429))
+                {
+                    var delay = response.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(attempt);
+                    delay = TimeSpan.FromSeconds(Math.Clamp(delay.TotalSeconds, 0, 30));
+                    Log.Warning($"Authentication returned HTTP {(int)response.StatusCode}; retrying ({attempt}/3).");
+                    await Task.Delay(delay, UploadCancellation);
+                    continue;
+                }
+                response.EnsureSuccessStatusCode();
+                var token = JsonSerializer.Deserialize<JsonElement>(await response.Content.ReadAsStringAsync());
+                var access = token.GetProperty("access_token").GetString();
+                if (string.IsNullOrWhiteSpace(access)) throw new InvalidDataException("Authentication returned no access token.");
+                if (token.TryGetProperty("refresh_token", out var refresh) && refresh.ValueKind == JsonValueKind.String
+                    && !string.IsNullOrWhiteSpace(refresh.GetString())) _refreshToken = refresh.GetString()!;
+                _accessToken = access;
+                return access;
+            }
+        }
+
+        private async Task<HttpResponseMessage> SendAuthenticatedAsync(HttpRequestMessage request)
+        {
+            // Freeze the body before sending: an authentication retry must preserve the exact events.
+            var body = request.Content == null ? null : await request.Content.ReadAsByteArrayAsync();
+            var rejectedToken = request.Headers.Authorization?.Parameter;
+            var response = await _httpClient!.SendAsync(request, UploadCancellation);
+            if (response.StatusCode != System.Net.HttpStatusCode.Unauthorized) return response;
+            response.Dispose();
+            await _tokenGate.WaitAsync(UploadCancellation);
+            try
+            {
+                if (_accessToken == rejectedToken) await RefreshTokenCoreAsync();
+            }
+            finally { _tokenGate.Release(); }
+            using var retry = new HttpRequestMessage(request.Method, request.RequestUri);
+            foreach (var header in request.Headers) retry.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            retry.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+            if (body != null)
+            {
+                retry.Content = new ByteArrayContent(body);
+                foreach (var header in request.Content!.Headers) retry.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            }
+            return await _httpClient.SendAsync(retry, UploadCancellation);
+        }
+
+        public Task PostEventsAsync(List<PostTelemetry> eventsData, int batchSize = 0) =>
+            PostEventsAsync(eventsData, batchSize, null);
+
+        public async Task PostEventsAsync(List<PostTelemetry> eventsData, int batchSize, UploadBatchProgress? progress)
+        {
+            if (progress == null && UploadParallelism > 1)
+            {
+                await PostConcurrentAsync(eventsData, batchSize, (batch, size, position) => PostEventsAsync(batch, size, position));
+                return;
+            }
+            // 0 = everything in one call (previous behaviour)
+            batchSize = batchSize > 0 ? batchSize : Math.Max(1, eventsData.Count);
 
             for (int i = 0; i < eventsData.Count; i += batchSize)
             {
                 var batch = eventsData.Skip(i).Take(batchSize).ToList();
+                var batchNumber = (progress?.BatchNumber ?? 1) + i / batchSize;
+                var totalBatches = progress?.TotalBatches ?? (eventsData.Count - 1) / batchSize + 1;
+                var eventOffset = (progress?.EventOffset ?? 0) + i;
+                var totalEvents = progress?.TotalEvents ?? eventsData.Count;
+                var eventTypes = string.Join(", ", batch.GroupBy(item => item.Area?.Name ?? "Unknown")
+                    .Select(group => $"{group.Key}={group.Count()}"));
 
-                var request = new HttpRequestMessage(
+                using var request = new HttpRequestMessage(
                     HttpMethod.Post,
                     "/api/DataPlatform/PostMultipleIoTEvents");
 
@@ -98,22 +181,155 @@ namespace audit.Services
                 var json = JsonSerializer.Serialize(call);
                 request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                Log.Debug($"Posting {batch.Count} event(s) to {_clientConfiguration.HostAddress}");
+                Log.Information($"Posting batch {batchNumber}/{Total(totalBatches)}: events {eventOffset + 1}-{eventOffset + batch.Count} of {Total(totalEvents)} ({eventTypes}) to {_clientConfiguration.HostAddress}");
 
                 try
                 {
-                    var response = await _httpClient.SendAsync(request);
-                    response.EnsureSuccessStatusCode();
+                    using var response = await SendAuthenticatedAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var preview = responseBody[..Math.Min(responseBody.Length, 2048)];
+                        throw new HttpRequestException(
+                            $"HTTP {(int)response.StatusCode} ({response.ReasonPhrase}) from PostMultipleIoTEvents. Response: {preview}",
+                            null, response.StatusCode);
+                    }
+                    if (!string.IsNullOrWhiteSpace(responseBody))
+                    {
+                        using var output = JsonDocument.Parse(responseBody);
+                        if (output.RootElement.TryGetProperty("HasErrors", out var hasErrors) && hasErrors.ValueKind == JsonValueKind.True)
+                        {
+                            var preview = responseBody[..Math.Min(responseBody.Length, 2048)];
+                            throw new InvalidOperationException($"Data Platform returned HasErrors=true from PostMultipleIoTEvents. Response: {preview}");
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception("Failed to Post at least some events to Data Platform", ex);
+                    throw new Exception(
+                        $"Failed posting batch {batchNumber}/{Total(totalBatches)} (events {eventOffset + 1}-{eventOffset + batch.Count} of {Total(totalEvents)}; {eventTypes}). " +
+                        (progress?.Concurrent == true ? "Concurrent batches may have completed out of order. " : $"{eventOffset} event(s) were acknowledged before this batch. ") + $" The failed batch may already have been accepted; it was not retried.", ex);
                 }
+
+                Log.Information(progress?.Concurrent == true
+                    ? $"Posted batch {batchNumber}/{Total(totalBatches)}: events {eventOffset + 1}-{eventOffset + batch.Count} acknowledged (completion can be out of order)"
+                    : $"Posted batch {batchNumber}/{Total(totalBatches)}: {eventOffset + batch.Count}/{totalEvents} event(s) acknowledged");
 
                 // Wait 1 second before next batch (except for the last batch)
                 if (i + batchSize < eventsData.Count)
                 {
-                    await Task.Delay(1000);
+                    await Task.Delay(BatchDelay, UploadCancellation);
+                }
+            }
+        }
+
+        private const int MaxAttempts = 5;
+
+        /// <summary>Posts typed IoT events (one event definition per table, flat column data) with PostMultipleIoTEvents.</summary>
+        public Task PostTypedEventsAsync(List<audit.Objects.PipelineRuns.TypedEvent> eventsData, int batchSize = 0) =>
+            PostTypedEventsAsync(eventsData, batchSize, null);
+
+        public async Task PostTypedEventsAsync(List<audit.Objects.PipelineRuns.TypedEvent> eventsData, int batchSize, UploadBatchProgress? progress)
+        {
+            if (progress == null && UploadParallelism > 1)
+            {
+                await PostConcurrentAsync(eventsData, batchSize, (batch, size, position) => PostTypedEventsAsync(batch, size, position));
+                return;
+            }
+            batchSize = batchSize > 0 ? batchSize : Math.Max(1, eventsData.Count);
+
+            for (int i = 0; i < eventsData.Count; i += batchSize)
+            {
+                var batch = eventsData.Skip(i).Take(batchSize).ToList();
+                var batchNumber = (progress?.BatchNumber ?? 1) + i / batchSize;
+                var totalBatches = progress?.TotalBatches ?? (eventsData.Count - 1) / batchSize + 1;
+                var eventOffset = (progress?.EventOffset ?? 0) + i;
+                var totalEvents = progress?.TotalEvents ?? eventsData.Count;
+                var eventTypes = string.Join(", ", batch.GroupBy(item => item.Definition.Split('\\').Last())
+                    .Select(group => $"{group.Key}={group.Count()}"));
+
+                var input = batch.Select(e => new PostTypedEventInput
+                {
+                    AppProperties = new AppProperties
+                    {
+                        ApplicationName = "CMF-Review",
+                        EventDefinition = e.Definition,
+                        // Stable per entity: it selects the monthly partition, and ReplacingMergeTree only dedupes inside a partition
+                        EventTime = e.EventTime
+                    },
+                    IgnoreLastServiceId = false,
+                    NumberOfRetries = 0,
+                    Data = e.Data,
+                    Priority = 0,
+                    AcceptInvalidSchema = false
+                }).ToList();
+
+                var payload = JsonSerializer.Serialize(new Dictionary<string, List<PostTypedEventInput>> { { "IoTEvents", input } });
+                // A request message can be sent only once, so each attempt builds its own
+                HttpRequestMessage NewRequest()
+                {
+                    var request = new HttpRequestMessage(HttpMethod.Post, "/api/DataPlatform/PostMultipleIoTEvents");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+                    request.Headers.Add("Cmf_ClientTenantName", _clientConfiguration.ClientTenantName);
+                    request.Headers.Add("Cmf_HostName", _clientConfiguration.HostAddress);
+                    request.Content = new StringContent(payload, Encoding.UTF8, "application/json");
+                    return request;
+                }
+
+                Log.Information($"Posting typed batch {batchNumber}/{Total(totalBatches)}: events {eventOffset + 1}-{eventOffset + batch.Count} of {Total(totalEvents)} ({eventTypes}) to {_clientConfiguration.HostAddress}");
+
+                try
+                {
+                    // Typed events are idempotent (same key replaces the row), so transient network failures and 5xx are retried
+                    HttpResponseMessage response;
+                    for (var attempt = 1; ; attempt++)
+                    {
+                        try
+                        {
+                            using var attemptRequest = NewRequest();
+                            response = await SendAuthenticatedAsync(attemptRequest);
+                            if ((int)response.StatusCode < 500 || attempt >= MaxAttempts) break;
+                            response.Dispose();
+                        }
+                        catch (Exception ex) when (!UploadCancellation.IsCancellationRequested && attempt < MaxAttempts && (ex is HttpRequestException || ex is IOException || ex is TaskCanceledException))
+                        {
+                        }
+                        Log.Warning($"Typed batch {batchNumber}/{Total(totalBatches)} attempt {attempt}/{MaxAttempts} failed; retrying in {attempt * 5} s");
+                        await Task.Delay(TimeSpan.FromSeconds(attempt * 5), UploadCancellation);
+                    }
+                    using var _ = response;
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var preview = responseBody[..Math.Min(responseBody.Length, 2048)];
+                        throw new HttpRequestException(
+                            $"HTTP {(int)response.StatusCode} ({response.ReasonPhrase}) from PostMultipleIoTEvents. Response: {preview}",
+                            null, response.StatusCode);
+                    }
+                    if (!string.IsNullOrWhiteSpace(responseBody))
+                    {
+                        using var output = JsonDocument.Parse(responseBody);
+                        if (output.RootElement.TryGetProperty("HasErrors", out var hasErrors) && hasErrors.ValueKind == JsonValueKind.True)
+                        {
+                            var preview = responseBody[..Math.Min(responseBody.Length, 2048)];
+                            throw new InvalidOperationException($"Data Platform returned HasErrors=true from PostMultipleIoTEvents. Response: {preview}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(
+                        $"Failed posting typed batch {batchNumber}/{Total(totalBatches)} (events {eventOffset + 1}-{eventOffset + batch.Count} of {Total(totalEvents)}; {eventTypes}). " +
+                        (progress?.Concurrent == true ? "Concurrent batches may have completed out of order. " : $"{eventOffset} event(s) were acknowledged before this batch. ") + $" Re-posting is safe: rows with the same key are replaced.", ex);
+                }
+
+                Log.Information(progress?.Concurrent == true
+                    ? $"Posted typed batch {batchNumber}/{Total(totalBatches)}: events {eventOffset + 1}-{eventOffset + batch.Count} acknowledged (completion can be out of order)"
+                    : $"Posted typed batch {batchNumber}/{Total(totalBatches)}: {eventOffset + batch.Count}/{totalEvents} event(s) acknowledged");
+
+                if (i + batchSize < eventsData.Count)
+                {
+                    await Task.Delay(BatchDelay, UploadCancellation);
                 }
             }
         }
@@ -152,13 +368,14 @@ namespace audit.Services
             var json = JsonSerializer.Serialize(input);
             request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.SendAsync(request);
+            var response = await SendAuthenticatedAsync(request);
             response.EnsureSuccessStatusCode();
         }
 
         public void Dispose()
         {
             _httpClient?.Dispose();
+            _tokenGate.Dispose();
         }
     }
 
@@ -196,6 +413,14 @@ namespace audit.Services
         public int Priority { get; set; }
     }
 
+    public class PostTypedEventInput : BaseInput
+    {
+        public bool AcceptInvalidSchema { get; set; }
+        public AppProperties AppProperties { get; set; }
+        public Dictionary<string, object?> Data { get; set; }
+        public int Priority { get; set; }
+    }
+
     public class AppProperties
     {
         public string ApplicationName { get; set; }
@@ -217,6 +442,17 @@ namespace audit.Services
         public Entity Site { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public Entity Enterprise { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Entity? Flow { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Entity? Step { get; set; }
+
+        /// <summary>Empty event, for callers that set the ISA95 levels themselves (e.g. pipeline-runs).</summary>
+        public PostTelemetry()
+        {
+            this.Parameters = new List<Data>();
+            this.Tags = new List<Tag>();
+        }
 
         public PostTelemetry(string projectName, string packageId, string packageVersion, string type, string name, Dictionary<string, string> metadata, List<Tag> tags = null)
         {
