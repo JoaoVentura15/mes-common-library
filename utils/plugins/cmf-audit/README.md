@@ -1,9 +1,71 @@
 # cmf-audit
 
+## Complete project work-item history
+
+Add `--allWorkItemHistory` to `pipeline-runs` to backfill every accessible work item's revision history in the selected team project, including user stories without pull requests and closed or removed items. This implies `--workItemHistory` and ignores `--since`, repository filters and scope types for history collection. Pipeline and PR collection still use their configured date range.
+
+Every revision is emitted using the existing `WorkItemHistory` schema. Revisions that leave state and iteration unchanged use `ChangeKind=Updated` and do not duplicate state-duration measurements. This retains the schema's state, iteration, area, reason, actor and timestamp fields; it does not archive arbitrary field snapshots, attachments, comments or deleted work items. No new event definition columns or data sets are required.
+
+Work-item queries use ascending ID pages of at most 10,000 and continue to an empty page, including beyond 20,000 items. Repeated pages and malformed responses are rejected. Revision requests use 200-row pages; full-history collection rejects missing, duplicate or mismatched revisions and empty histories before posting in the default collect-then-upload mode. Streaming can publish completed chunks before a later completeness check fails. Use `--strictCollection` for the remaining collections. Without checkpoint resume, full history is rebuilt whenever this flag is supplied; revisions and generated events are held in memory, so large projects need adequate memory.
+
+For example, append `--allWorkItemHistory --strictCollection` to an existing `pipeline-runs` command with `--typedEvents --postEvent`. Keep the organization's existing tenant, field mappings, repository and pool configuration. For incremental pipeline collection, retain a recent `--since`; the full work-item history remains independent of that lookback.
+
 Plugin used to audit CM CLI based projects. This repo is split in two parts:
 
 - **Root** (`package.json`) — the build/release orchestrator. Not published; it drives `dotnet publish` for every platform and wraps the `npm/` package's version bump/publish scripts.
 - **`npm/`** (`npm/package.json`) — the actual package published as `@criticalmanufacturing/audit`. `postinstall.js` copies the right platform binary from `dist/<rid>` into `node_modules/.bin/...` when a consumer installs it. Its `files` field (`dist`, `postinstall.js`, `run.js`, `utils.js`) is exactly what ends up in the published tarball.
+
+## Resuming a long pipeline collection
+
+Add these flags to the first execution of your existing `pipeline-runs` command:
+
+```powershell
+--strictCollection --checkpointDirectory "C:\Work\AuditCheckpoints\full-backfill-20261120"
+```
+
+If collection or posting fails, rerun the same command with the same directory and add `--resume`. Successful JSON reads (including WIQL queries and individual revision pages) are reused. Agent job collection follows continuation tokens beyond 2,000 requests and rejects repeated tokens, pages that make no progress and malformed responses. An empty final page carrying ADO's `||` cursor is accepted as completion, including when replayed from an existing checkpoint. Only jobs finished since the configured lookback are emitted; Azure DevOps retention still limits what is available.
+
+After extraction completes, the generated events and typed payloads are saved, so an upload retry does not collect again. Acknowledged upload batches are recorded separately for generic and typed events and skipped on resume. A batch whose acknowledgement was lost can be resent: delivery is at least once, with the existing typed event keys supporting deduplication. Generic events do not gain an exactly-once guarantee.
+
+Keep the original collection filters, lookback arguments, destination, typed/generic choices and batch size. Tokens may be renewed, and parallelism and batch delay may change. A changed fields configuration, mismatched options, missing/corrupt checkpoint or concurrent use of the directory is rejected. Atomic file replacement protects completed entries from an interrupted write.
+
+The original collection start time is retained for relative lookbacks and policy observation timestamps. Completed responses are reused; reads not yet completed occur when resumed, so this is not a transactionally consistent Azure DevOps snapshot. A completed checkpoint does not refresh newer data. Use a new empty directory for a new collection.
+
+Checkpoints contain confidential raw JSON responses and event payloads; keep them in an authorized local directory with enough disk space. Authentication headers and token options are not saved. Full task logs are not cached or written; failed-log reads may repeat when an incomplete extraction is resumed. Once final events are saved, they are reused without reading logs again. Existing large in-memory history processing still needs adequate memory.
+
+A previous execution without `--checkpointDirectory` cannot be recovered from these checkpoints; its next collection must run once with checkpointing enabled.
+
+
+Upload progress retains the original batch number, batch total and event range when using checkpoints. Generic and typed uploads each have their own totals. For five events in batches of two, retrying after the first batch was acknowledged reports batch 1/3 as previously acknowledged and skipped, then posts batch 2/3 (events 3-4 of 5) and batch 3/3 (event 5 of 5). Failure messages use the same overall positions. Existing checkpoints remain compatible. An already running process keeps its original log messages until the next invocation.
+
+A dual-stream checkpoint can be resumed with `--typedEvents --telemetryEvents false --resume` to stop further generic PostTelemetry uploads while reusing the saved extraction and typed batch acknowledgements. Every other collection and destination option must match. The manifest is preserved, and already queued generic events remain in Kafka. This requires the existing checkpoint files; a deleted checkpoint cannot be resumed. If both uploads already finished, allow ingestion to drain instead of uploading again.
+
+### Concurrent collection and uploads
+
+Independent history, agent-job, scope, tag, schedule and PR-file phases overlap by default. Build processing still precedes PR policy-linked build lookups so explicit parent links are not lost. `--parallelism` bounds all actual ADO requests in the built-in REST client, including nested PR/test reads, log pages and WIQL. Set `--concurrentCollection false` to run phases sequentially. Each phase logs its elapsed time.
+
+`--uploadParallelism 4` permits four upload batches in flight; the default remains one. This works with or without checkpoints. Each acknowledged checkpoint batch keeps its own receipt, so a later batch completing before an earlier failure is skipped correctly on resume. Completion totals count acknowledged or previously acknowledged events, not a contiguous prefix. These performance settings may change on resume; collection filters, destination and batch size remain guarded. `--batchDelayMs 0` removes intentional pacing. Higher concurrency does not bypass source or destination throttling.
+
+### Streaming typed events during extraction
+
+For a **new** extraction, add these options to the existing project-specific command:
+
+```powershell
+--typedEvents --telemetryEvents false --postEvent `
+--streamEvents --strictCollection `
+--checkpointDirectory "C:\Work\AuditCheckpoints\stream-backfill" `
+--parallelism 12 --uploadParallelism 4 --batchSize 200 --batchDelayMs 0
+```
+
+Streaming requires typed-only posting, strict collection and a checkpoint directory; it cannot generate a report. It uses the existing `PostMultipleIoTEvents` endpoint, rather than direct Kafka credentials or a new broker client. The service accepts events into the ingestion pipeline; acknowledgement does not establish ClickHouse completion.
+
+The collector hands events to a bounded spool as they become available instead of retaining the full mapped event and typed lists. Exact source and typed payloads are atomically saved before publication. The queue holds at most twice the upload-worker count; source-payload hashes and the small run-time conversion context remain in memory. ADO response/revision caches and confidential on-disk spool files still need space. Run metadata precedes dependent records, and partition-selecting event times remain stable across chunks and restarts.
+
+After a failure, repeat the **same streaming command and directory** with `--resume`. Saved chunks retain their exact ordering and payloads; only batches without durable acknowledgements are sent. For interrupted extraction, successful ADO reads are reused and exact source payloads already in the spool are suppressed even if concurrent producers finish in a different order. A persisted extraction seal allows upload-only resume without ADO reads. Corrupt chunks, missing chunks, inconsistent seals and mismatched receipts fail before new publication.
+
+Streaming deliberately publishes before the full extraction is known to be complete. If a later strict read fails, already published chunks remain queued; no successful extraction seal is written. Resume completes the missing work. This is **at-least-once delivery**: an event accepted remotely just before a lost response or failed receipt write may be replayed. Typed table keys support replacement, but this is not exactly-once Kafka delivery or an ordered transaction across event types. Parallel completion order is not event-time order.
+
+Legacy and streaming checkpoints cannot be mixed. A directory created by an earlier version resumes through the existing collect-then-upload path; do not add `--streamEvents` to it. You can still add `--uploadParallelism 4` and change collection parallelism or batch delay. A fresh directory is required to switch to streaming. Do not delete a checkpoint while unacknowledged chunks remain.
 
 ## Prerequisites
 
@@ -15,7 +77,7 @@ Plugin used to audit CM CLI based projects. This repo is split in two parts:
 
 - **Telemetry is off by default.** Set `cmf_audit_enable_telemetry=1` (and optionally `cmf_audit_enable_extended_telemetry=1`) to opt in.
 - **`--postEvent`** sends audit results to the MES system given by `--hostAddress`. For Data packages this includes the full content of master data records. Only use it against systems you are allowed to send that data to, and keep `--useSSL` enabled.
-- **Tokens:** prefer environment variables over command-line arguments, which show up in process lists and shell history. Use `SYSTEM_ACCESSTOKEN` for the Azure DevOps PAT and `CMF_AUDIT_SECURITY_TOKEN` for the MES security token.
+- **Tokens:** prefer environment variables over command-line arguments, which show up in process lists and shell history. Use `SYSTEM_ACCESSTOKEN` for the Azure DevOps pipeline OAuth token or `CMF_AUDIT_ADO_PAT` for a PAT. Set `CMF_AUDIT_SECURITY_TOKEN` to the MES refresh token.
 - **Local debugging:** copy `src/Properties/launchSettings.example.json` to `launchSettings.json`, which is git-ignored, and never commit real tokens.
 
 ## Auditing a project hosted on GitHub
@@ -34,6 +96,174 @@ cmf-audit review-remote-github data --project <project> --packageId Cmf.Custom.D
 ```
 
 Subcommands (one per auditor, each runnable on its own): `root`, `data`, `iot`, `pipeline`. `pipeline` also takes `--azureDevOpsUrl` and `--azureDevOpsRepository`, because the generated pipelines embed an Azure DevOps repository URL that has to match the committed ones. Options: `--repository` (owner/name), `--gitRef`, `--project`, `--path` (wins over `--project`), `--githubToken` (prefer the `GITHUB_TOKEN` environment variable), plus the common reporting options.
+
+## Collecting Azure DevOps pipeline runs (`pipeline-runs`)
+
+`pipeline-runs` reads a project's Azure DevOps pipeline history and posts it as `PostTelemetry` events, next to the
+audit data: every pipeline run with its stages and steps, approvals, the commits and merged pull requests it included,
+test runs and failed tests, pull requests with their linked work items, and agent pool jobs.
+
+ISA95 mapping: Enterprise = organization, Site = project, Facility = repository, Area = record type
+(`PipelineRun`, `PipelineStage`, `PipelineStep`, `Approval`, `RunChange`, `TestRun`, `TestFailure`, `PullRequest`,
+`AgentJob`), Resource = record id (build id, test name, pull request id, agent name), Flow = pipeline, Step = stage,
+step or test run.
+
+```powershell
+# token with Build, Code, Test Management, Work Items and Agent Pools: Read (or run inside a pipeline with SYSTEM_ACCESSTOKEN)
+$env:CMF_AUDIT_ADO_PAT = "<pat>"
+
+# dry run: last 14 days, CSV and Excel report only
+cmf-audit pipeline-runs --azureDevOpsUrl https://dev.azure.com/<organization>/ --teamProject <project> `
+  --repositories <repository> --pools <agent pool> --generateReport --reportOutputFolder C:\Temp\pipeline-runs
+
+# post to an MES Data Platform
+$env:CMF_AUDIT_SECURITY_TOKEN = "<MES refresh token>"
+cmf-audit pipeline-runs --azureDevOpsUrl https://dev.azure.com/<organization>/ --teamProject <project> `
+  --repositories <repository> --pools <agent pool> --postEvent --hostAddress <mes host> --tenantName <tenant>
+```
+
+Options: `--days` (default 14) or `--since`; `--repositories` (names or ids, empty = all runs of the project);
+`--include` (runs, steps, tests, changes, prs, approvals, jobs, all; `scope` and `schedule` are named explicitly and are not part of `all`); `--pools` (names, ids or `all`);
+`--pipelineRoles` (exact pipeline name = role, wins over the prefixes); `--pipelineRolePrefixes` (prefix=Role pairs; default is the CM CLI
+convention PR-=PR,CI-Publish=Publish,CI-=CI,CD-=CD, `none` turns it off, anything not matched is Other); `--approvalStages` (default none, so no stage counts as an approval until you name them; a run is released when every one that ran
+succeeded, "with failures" when tests failed); `--identity` (`id` default, `name` or `none`); `--batchSize` (events
+per post, default 200).
+
+For unattended collection, `--strictCollection` fails when requested data cannot be collected, and
+`--refreshOpenPullRequests` refreshes all open PRs even when they predate the lookback window. The
+lookback still applies to completed runs and recently created or closed PRs. Changes to work items linked
+only to older closed PRs are not independently refreshed; use a wider `--since` for a backfill.
+
+### Daily pipeline
+
+`cmf-audit init` generates `Builds/CD-AdoTelemetry.yml` and its collector task. Commit them and register
+the YAML as an Azure DevOps pipeline. The default schedule runs at 02:00 UTC on `main` every day; edit
+the branch and schedule in the generated file for the project. Install `Cmf.Audit` in the target MES
+environment before enabling the schedule.
+
+Set pipeline variables `AuditMesHost` (hostname without scheme) and `AuditMesTenant`, and set the
+secret `AuditMesRefreshToken`. Map the pipeline's job token with the required Build, Code, Test
+Management and Work Items read permissions (plus Agent Pools: Read when agent jobs are collected). The agent must reach both ADO and MES.
+The install task may also need the registry credentials configured for the chosen npm registry.
+
+Set the root pipeline's `CollectorArguments` array to additional command-line arguments, for example
+`['--teamFromIterationPath', '<regex>', '--sprintFromIterationPath', '<regex>']`.
+Use the same mappings on every run. Do not put credentials in the array. The pipeline posts typed
+events only, enables strict collection, open-PR refresh and changed-work-item refresh, and uses the default 14-day overlap.
+`--refreshChangedWorkItems` finds the work items changed since the window starts and re-reads the pull requests (of any age) linked to them, so a work item that
+moves sprint or closes long after its PR merged does not keep stale values in the flow rows.
+By default the pipeline collects `runs,steps,tests,changes,prs,approvals,tags` and leaves agent jobs out. Agent-job telemetry is opt-in:
+add `'--pools', 'Pool A'` (names, ids or `all`) to `CollectorArguments` and the pipeline adds `jobs` to the collected parts; this needs the
+Agent Pools: Read permission. Passing your own `--include` replaces the default list completely.
+An ADO acknowledgement precedes asynchronous Data Platform ingestion; it does not prove that the
+datasets already show the posted rows.
+
+Release options (for `--include schedule`): `--releaseTitleContains` is required and names the text that identifies a release Feature; `--releaseTitle` is a regex with one capture group for the version (default: a leading version number); `--releaseKinds` maps a kind to a text found in the title, for example `Hotfix=hotfix,Planned=planned` (default none, so `ReleaseKind` stays empty). The branch (`Line`) of a release version comes from `--branchVersions` (`main=1.6,release/1.3=1.3` puts 1.6.x on `main` and 1.3.x on `release/1.3`); versions without an entry fall back to `development` for x.y.0 and `release/x.y` otherwise.
+
+### Work item scope
+
+`--include scope --typedEvents` posts one `WorkItemScope` row per User Story/Bug (`--scopeTypes`, default `User Story,Bug`):
+state, team and sprint (from the iteration path), story points, when it became done, and the Feature and the topmost
+Epic above it. Open items and items changed since `--since` are read; re-running updates the rows. A Removed item is
+never done. Deploy the `WorkItemScope` event definition first using the `Cmf.Audit.Data` package.
+
+**Team and sprint from the iteration path.** `--teamFromIterationPath` and `--sprintFromIterationPath` (regexes with exactly one capture group) fill the `Team` and `Sprint` columns of every work item event (`WorkItemScope`, `WorkItemFlow`, `PullRequestWorkItem`, `WorkItemHistory`, `Sprint`). A team pattern that requires a sprint node after the team, such as `^[^\\]+\\[^\\]+\\([^\\]+)\\`, leaves `Team` empty for items that sit in the team backlog node without a sprint (for example `Contoso\Product Backlog\Team A`). Use a pattern that also accepts the team node itself, for example `^[^\\]+\\Product Backlog\\([^\\]+)` for `Contoso\Product Backlog\<Team>[\Sprint N]`, and pass the same patterns on every run that posts these events (a run without them overwrites the columns with empty values). After changing a pattern, re-post the events (rows are replaced by key).
+
+
+## ADO Grafana dashboards
+
+The event definitions ship as MasterData in the `Cmf.Audit.Data` package, which creates the IoT event definitions folder before import.
+The typed datasets (`Dataset-ADO*Typed.xml`) ship in the `Cmf.Audit.ExportedObjects` package, `ExportedObjects/2.0.0`, next to the objects of version 1.0.0. Eight dashboards ship in the
+`Cmf.Audit.Grafana` package, `2.0.0/dashboards/ADO Data`: Pipeline hot spots, PR flow hot spots, Team progress, Sprint handoff,
+Agents and tests, Pipeline investigation, Package release flow and Epic forecast. Most panels use the typed datasets
+(`UserDefined.ADOTelemetry.*Typed`) over the CM Data Platform OData datasource, with multi-select filters and Grafana's time
+range. Replace the datasource UIDs if they differ in your deployment.
+
+The Pipeline investigation dashboard also reads the raw `PullRequest`, `PipelineRun` and `PipelineStep` events
+for the validation-efficiency section. Configure the IoT Events OData datasource and install Grafana Business
+Charts (`volkovlabs-echarts-panel`) for the charts. Use **Build link organization** and **Build link project**
+to scope the unlinked-child table to one Azure DevOps project. Both build ID columns open the results page
+in that project. PRs with missing child links stay outside the full-chain rerun ratios.
+
+### Failure evidence and PR policies
+
+Install `PipelineFailure` and `PullRequestPolicy` from `Cmf.Audit.Data` before collecting those events.
+The corresponding exported datasets are `ADOPipelineFailuresTyped` and `ADOBlockedPullRequestsTyped`.
+Add `failures` and `policies` to `--include` and post with `--typedEvents`. In the generated pipeline,
+`CollectorArguments` replaces the default include list when you supply `--include`. To keep default
+collection and add both parts, pass `--include runs,steps,tests,changes,prs,approvals,tags,failures,policies`.
+
+Failure collection uses failed timeline tasks and requires step errors to be enabled. Pass `--logErrors true`
+to scan the failed tasks' logs as well. The collector posts bounded, redacted excerpts and records incomplete
+reads. With `--strictCollection`, an incomplete requested log scan fails collection. The ADO identity
+needs read access to the builds and, when you enable policies, to pull request policy evaluations.
+
+The Epic forecast dashboard (Monte Carlo forecast of an epic or a set of milestones, per team) works for any number of projects. It reads `ADOEpicForecastTyped`, `ADORemainingWorkTyped`, `ADOReleasesTyped` and, for its filters, `ADOScopeDimensionsTyped`. Pick the Organization and Project (several allowed; each project keeps its own rows, so ids and milestone names of different projects never mix), then the scope: milestones (several allowed), features (several allowed) or an epic id, a target date and the history to learn from. A story that has no Feature is grouped under its Epic (listed as `Epic: ... (no feature)`), or under `(standalone)` when it has no parent either, so it can still be forecast; the table "Open items in scope without a Feature" lists them so their links can be fixed in Azure DevOps.
+
+To collect the data for a project, run the collector with that project's own settings (the generated pipeline does this for the project it lives in; pass the arguments through its `CollectorArguments`):
+
+- `--include scope --typedEvents` with `--since` early enough to cover the history window (default 20 weeks). `--teamFromIterationPath` and `--sprintFromIterationPath` give the team and sprint; the datasets read `Team` as posted, so a project with another backlog layout only needs another regex.
+- Fields that differ between projects are options: `--milestoneField` (default `Custom.Milestone`, empty for none), `--storyPointsField` (default `Microsoft.VSTS.Scheduling.StoryPoints`, for example `Microsoft.VSTS.Scheduling.Effort`), `--scopeTypes`, `--doneStates`, `--removedStates` (default `Removed`), `--featureType` and `--epicType` (default `Feature` and `Epic`, the levels above the stories).
+- `--include schedule` (with `--releaseTitleContains`, and `--releaseTitle`/`--releaseKinds`/`--branchVersions` to match the project's release Features) for the release panel.
+
+#### Project-specific fields (one place to keep them)
+
+The collector reads a few fields whose names differ from one Azure DevOps project to another. Keep them together in the pipeline's `CollectorArguments` for that project, and record here what each one is for, so the next person knows why it is set. Fill in the right-hand column for your own project; the defaults apply when an option is left out.
+
+| Option | Default | What it is used for | Forecast dashboard behaviour |
+|---|---|---|---|
+| `--milestoneField` | `Custom.Milestone` | Field that tags an item with a milestone or release target | Filter `Scope = Milestone`; empty means no milestone scope |
+| `--storyPointsField` | `Microsoft.VSTS.Scheduling.StoryPoints` | Size of an item (for example `Microsoft.VSTS.Scheduling.Effort`) | `Unit = Story points`; unsized items count as the team average |
+| `--featureType` / `--epicType` | `Feature` / `Epic` | Work item types of the levels above the stories | `Scope = Feature` groups by Feature, falls back to the Epic, then to "(standalone)" |
+| `--teamFromIterationPath` | none | Regex with one capture group that extracts the team from the iteration path | Per-team throughput and remaining work; items without a team are spread automatically |
+| `--sprintFromIterationPath` | none | Regex with one capture group for the sprint | Sprint column in the item tables |
+| `--scopeTypes`, `--doneStates`, `--removedStates` | see above | Which types are counted, which states mean done, which mean out of scope | Throughput history and remaining work |
+| `--workItemFields` | none | Extra fields copied into the events | Available to custom panels |
+
+Instead of repeating these in every pipeline, declare them once in a JSON file and pass `--fieldsConfig <path>`. Each entry is either the plain value or an object with the value and a note on what it is for (the note is documentation only). A command-line value that differs from the built-in default wins over the file.
+
+```json
+{
+  "fields": {
+    "milestoneField": { "value": "Custom.Milestone", "purpose": "release target an item is planned for (Scope = Milestone)" },
+    "storyPointsField": { "value": "Microsoft.VSTS.Scheduling.Effort", "purpose": "size of an item (Unit = Story points)" },
+    "teamFromIterationPath": { "value": "^[^\\\\]+\\\\Backlog\\\\([^\\\\]+)", "purpose": "team that owns the item" },
+    "featureType": "Feature",
+    "epicType": "Epic"
+  }
+}
+```
+
+Settings the file can hold: `milestoneField`, `storyPointsField`, `featureType`, `epicType`, `removedStates`, `doneStates`, `scopeTypes`, `teamFromIterationPath`, `sprintFromIterationPath`, `workItemFields`. An unknown name is rejected. Keep the file next to the pipeline definition.
+
+The capacity assumptions (CapacityPct, HistoryWeeks, SkipLatestWeeks, TrimNewTeams, Trials) are dashboard variables. To give a project its own defaults, open the dashboard with that project and values in the URL (`var-Project=...&var-CapacityPct=80`) and save the link, or save a copy of the dashboard with those defaults.
+
+The shared package contains exports from both MES 11.2 and 11.3. Initialization preserves these exports;
+importing the older audit objects into MES 11.2 and importing the full package into MES 11.3 remain unverified.
+
+### Notes and limits
+
+- Qualified follow-up PRs require the same linked WI to match the ending sprint in its current or recorded initial
+  iteration and have a usable target package matching the package filter. Target versions are latest WI snapshots;
+  historical package assignments and test-fix causation are not established. Unverified links remain inspectable.
+- General handoff activity uses unqualified created/merged populations in the same handoff window, not whole-sprint
+  totals. The package selector applies only to dedicated qualified follow-up panels, not the activity curve or table.
+  PR cohort reconciliation deduplicates by organization, project, repository, sprint, and PR, then separates events
+  seen on both sides from creation-only and merge-only records. A merge without a creation event in the window is
+  not automatically prior-sprint carryover. This is not a complete open-backlog balance. Team calendar dates are
+  available in the evidence section because the same sprint number can have different dates across teams.
+- Linked-work completion is not full sprint commitment: WIs without merged PRs are absent. Full planned scope requires
+  all planned WIs and their historical sprint-start assignments.
+- The team drilldown deduplicates WIs within each initial sprint before calculating completion and move share.
+  Initial iteration means assignment around PR creation, not original commitment. Current team ownership can include
+  transferred WIs. Only observed merged-PR links with history are included, with a 20,000-link query cap.
+  Overview sprint labels omit the full iteration prefix; non-sprint paths display as unassigned.
+- Branch/version mapping disagreements are not package-delivery mistakes. The delivery KPI remains unmeasured until
+  original commitment history is available; no branch-based mismatch total is presented as a delivery failure count.
+- CD approval/retention is not a proven production deployment. Approval-stage non-release is not production change
+  failure rate. Production deployment and incident/recovery linkage is required for production DORA metrics.
+- Task elapsed seconds do not establish active developer time or flow efficiency. Platform trends mix workloads
+  unless pipeline, branch, and scope are controlled; they are not causal platform-effect estimates.
 
 ## 1. Install dependencies
 
@@ -104,3 +334,5 @@ npm run publish:live  # publishes with the "latest" tag
 ```
 
 Both `cd` into `npm/` and run `npm publish` there, so the same `files` filtering applies as in step 3.
+
+Parallel uploads coordinate access-token refresh after HTTP 401 and retain rotated refresh tokens in memory. Authentication retries HTTP 429 and 5xx responses up to three attempts with bounded delays; persistent failures leave the checkpoint intact.
