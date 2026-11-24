@@ -1,0 +1,41 @@
+pool:
+  name: <%= $CLI_PARAM_AgentPool %>
+
+trigger: none
+pr: none
+
+variables:
+- group: Authentication Variables
+- template: .vars/global.yml
+
+schedules:
+- cron: '0 2 * * *'
+  displayName: Daily ADO telemetry
+  branches:
+    include:
+    - main
+  always: true
+
+parameters:
+- name: CollectorArguments
+  type: object
+  default: []
+- name: FieldsConfig
+  type: string
+  default: ''
+
+jobs:
+- job: CollectAdoTelemetry
+  displayName: Collect ADO telemetry
+  timeoutInMinutes: 120
+  steps:
+  - checkout: self
+  - template: .tasks/use-node-version.yml
+  - template: .tasks/cmf-login.yml
+    parameters:
+      CustomerPortalPAT: $(CustomerPortalPAT)
+  - template: .tasks/install-cmf-audit.yml
+  - template: .tasks/collect-ado-telemetry.yml
+    parameters:
+      CollectorArguments: ${{ parameters.CollectorArguments }}
+      FieldsConfig: ${{ parameters.FieldsConfig }}

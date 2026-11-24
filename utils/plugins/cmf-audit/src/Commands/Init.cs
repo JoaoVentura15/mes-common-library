@@ -31,6 +31,8 @@ namespace Cmf.Cli.Plugin.Audit.Commands.install
             "CD-AuditReview.yml",
             ".tasks/assembling-audit-package.yml",
             ".tasks/audit-review.yml",
+            "CD-AdoTelemetry.yml",
+            ".tasks/collect-ado-telemetry.yml",
             ".tasks/install-cmf-audit.yml",
             ".tasks/run-audit-review.yml",
         ];
