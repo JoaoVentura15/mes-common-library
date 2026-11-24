@@ -2578,7 +2578,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "ADO - Pipeline hot spots",
+  "title": "Pipeline hot spots",
   "uid": "cmf-ado-pipelines",
   "version": 15
 }
